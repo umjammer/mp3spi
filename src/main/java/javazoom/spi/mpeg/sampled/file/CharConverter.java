@@ -12,9 +12,9 @@ import java.util.logging.Logger;
 
 
 /**
- * CharConverter. 
+ * CharConverter.
  *
- * @author <a href="vavivavi@yahoo.co.jp">Naohide Sano</a> (nsano)
+ * @author <a href="umjammer@gmail.com">Naohide Sano</a> (nsano)
  * @version 0.00 051208 nsano initial version <br>
  */
 public final class CharConverter {

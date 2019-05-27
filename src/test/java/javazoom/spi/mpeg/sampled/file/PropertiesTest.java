@@ -15,10 +15,13 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
-import junit.framework.TestCase;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.tritonus.share.sampled.TAudioFormat;
 import org.tritonus.share.sampled.file.TAudioFileFormat;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 /**
@@ -27,35 +30,18 @@ import org.tritonus.share.sampled.file.TAudioFileFormat;
  * generate your own test.mp3.properties Uncomment out = System.out; in setUp()
  * method to generated it on stdout from your own MP3 file.
  */
-public class PropertiesTest extends TestCase {
+public class PropertiesTest {
+
     private String basefile = null;
-
     private String baseurl = null;
-
     private String filename = null;
-
     private String fileurl = null;
-
     private String name = null;
-
     private Properties props = null;
-
     private PrintStream out = null;
 
-    /**
-     * Constructor for PropertiesTest.
-     * 
-     * @param arg0
-     */
-    public PropertiesTest(String arg0) {
-        super(arg0);
-    }
-
-    /*
-     * @see TestCase#setUp()
-     */
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
         props = new Properties();
         InputStream pin = getClass().getClassLoader().getResourceAsStream("test.mp3.properties");
         props.load(pin);
@@ -67,16 +53,13 @@ public class PropertiesTest extends TestCase {
         out = System.out;
     }
 
-    /*
-     * @see TestCase#tearDown()
-     */
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
-
+    @Test
     public void testPropertiesFile() {
         String[] testPropsAFF = {
-            "duration", "title", "author", "album", "date", "comment", "copyright", "mp3.framerate.fps", "mp3.copyright", "mp3.padding", "mp3.original", "mp3.length.bytes", "mp3.frequency.hz", "mp3.length.frames", "mp3.mode", "mp3.channels", "mp3.version.mpeg", "mp3.framesize.bytes", "mp3.vbr.scale", "mp3.version.encoding", "mp3.header.pos", "mp3.version.layer", "mp3.crc"
+            "duration", "title", "author", "album", "date", "comment", "copyright", "mp3.framerate.fps", "mp3.copyright",
+            "mp3.padding", "mp3.original", "mp3.length.bytes", "mp3.frequency.hz", "mp3.length.frames", "mp3.mode",
+            "mp3.channels", "mp3.version.mpeg", "mp3.framesize.bytes", "mp3.vbr.scale", "mp3.version.encoding",
+            "mp3.header.pos", "mp3.version.layer", "mp3.crc"
         };
         String[] testPropsAF = {
             "vbr", "bitrate"
@@ -107,7 +90,7 @@ public class PropertiesTest extends TestCase {
                     assertEquals(key, valexpected, val);
                 }
             } else {
-                assertTrue("testPropertiesFile : TAudioFileFormat expected", false);
+                assertTrue(false, "testPropertiesFile : TAudioFileFormat expected");
             }
 
             if (baseFormat instanceof TAudioFormat) {
@@ -123,19 +106,22 @@ public class PropertiesTest extends TestCase {
                     assertEquals(key, valexpected, val);
                 }
             } else {
-                assertTrue("testPropertiesFile : TAudioFormat expected", false);
+                assertTrue(false, "testPropertiesFile : TAudioFormat expected");
             }
         } catch (UnsupportedAudioFileException e) {
-            assertTrue("testPropertiesFile : " + e.getMessage(), false);
+            assertTrue(false, "testPropertiesFile : " + e.getMessage());
         } catch (IOException e) {
-            assertTrue("testPropertiesFile : " + e.getMessage(), false);
+            assertTrue(false, "testPropertiesFile : " + e.getMessage());
         }
     }
 
+    @Test
     public void testPropertiesURL() {
-        String[] testPropsAFF = {/* "duration", */
-            "title", "author", "album", "date", "comment", "copyright", "mp3.framerate.fps", "mp3.copyright", "mp3.padding", "mp3.original",/* "mp3.length.bytes", */"mp3.frequency.hz",
-            /* "mp3.length.frames", */"mp3.mode", "mp3.channels", "mp3.version.mpeg", "mp3.framesize.bytes", "mp3.vbr.scale", "mp3.version.encoding", "mp3.header.pos", "mp3.version.layer", "mp3.crc"
+        String[] testPropsAFF = { /* "duration", */
+            "title", "author", "album", "date", "comment", "copyright", "mp3.framerate.fps", "mp3.copyright", "mp3.padding",
+            "mp3.original", /* "mp3.length.bytes", */"mp3.frequency.hz", /* "mp3.length.frames", */"mp3.mode", "mp3.channels",
+            "mp3.version.mpeg", "mp3.framesize.bytes", "mp3.vbr.scale", "mp3.version.encoding", "mp3.header.pos",
+            "mp3.version.layer", "mp3.crc"
         };
         String[] testPropsAF = {
             "vbr", "bitrate"
@@ -163,7 +149,7 @@ public class PropertiesTest extends TestCase {
                     assertEquals(key, valexpected, val);
                 }
             } else {
-                assertTrue("testPropertiesURL : TAudioFileFormat expected", false);
+                assertTrue(false, "testPropertiesURL : TAudioFileFormat expected");
             }
             if (baseFormat instanceof TAudioFormat) {
                 Map<?, ?> properties = ((TAudioFormat) baseFormat).properties();
@@ -178,15 +164,16 @@ public class PropertiesTest extends TestCase {
                     assertEquals(key, valexpected, val);
                 }
             } else {
-                assertTrue("testPropertiesURL : TAudioFormat expected", false);
+                assertTrue(false, "testPropertiesURL : TAudioFormat expected");
             }
         } catch (UnsupportedAudioFileException e) {
-            assertTrue("testPropertiesURL : " + e.getMessage(), false);
+            assertTrue(false, "testPropertiesURL : " + e.getMessage());
         } catch (IOException e) {
-            assertTrue("testPropertiesURL : " + e.getMessage(), false);
+            assertTrue(false, "testPropertiesURL : " + e.getMessage());
         }
     }
 
+    @Test
     public void testPropertiesShoutcast() {
         AudioFileFormat baseFileFormat = null;
         AudioFormat baseFormat = null;
@@ -211,7 +198,7 @@ public class PropertiesTest extends TestCase {
                         out.println(key + "='" + val + "'");
                 }
             } else {
-                assertTrue("testPropertiesShoutcast : TAudioFileFormat expected", false);
+                assertTrue(false, "testPropertiesShoutcast : TAudioFileFormat expected");
             }
             if (baseFormat instanceof TAudioFormat) {
                 Map<?, ?> properties = ((TAudioFormat) baseFormat).properties();
@@ -225,12 +212,12 @@ public class PropertiesTest extends TestCase {
                         out.println(key + "='" + val + "'");
                 }
             } else {
-                assertTrue("testPropertiesShoutcast : TAudioFormat expected", false);
+                assertTrue(false, "testPropertiesShoutcast : TAudioFormat expected");
             }
         } catch (UnsupportedAudioFileException e) {
-            assertTrue("testPropertiesShoutcast : " + e.getMessage(), false);
+            assertTrue(false, "testPropertiesShoutcast : " + e.getMessage());
         } catch (IOException e) {
-            assertTrue("testPropertiesShoutcast : " + e.getMessage(), false);
+            assertTrue(false, "testPropertiesShoutcast : " + e.getMessage());
         }
     }
 
@@ -253,7 +240,7 @@ public class PropertiesTest extends TestCase {
                         out.println(key + "='" + val + "'");
                 }
             } else {
-                assertTrue("testDumpPropertiesFile : TAudioFileFormat expected", false);
+                assertTrue(false, "testDumpPropertiesFile : TAudioFileFormat expected");
             }
 
             if (baseFormat instanceof TAudioFormat) {
@@ -266,12 +253,12 @@ public class PropertiesTest extends TestCase {
                         out.println(key + "='" + val + "'");
                 }
             } else {
-                assertTrue("testDumpPropertiesFile : TAudioFormat expected", false);
+                assertTrue(false, "testDumpPropertiesFile : TAudioFormat expected");
             }
         } catch (UnsupportedAudioFileException e) {
-            assertTrue("testDumpPropertiesFile : " + e.getMessage(), false);
+            assertTrue(false, "testDumpPropertiesFile : " + e.getMessage());
         } catch (IOException e) {
-            assertTrue("testDumpPropertiesFile : " + e.getMessage(), false);
+            assertTrue(false, "testDumpPropertiesFile : " + e.getMessage());
         }
     }
 }

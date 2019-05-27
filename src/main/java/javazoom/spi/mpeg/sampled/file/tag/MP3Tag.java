@@ -1,11 +1,11 @@
 /*
  * MP3Tag.
- * 
+ *
  * jicyshout : http://sourceforge.net/projects/jicyshout/
- *  
+ *
  * JavaZOOM : mp3spi@javazoom.net
- * 			  http://www.javazoom.net
- * 
+ *               http://www.javazoom.net
+ *
  *-----------------------------------------------------------------------
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU Library General Public License as published
@@ -30,23 +30,23 @@ package javazoom.spi.mpeg.sampled.file.tag;
     tagging scheme (Icy, ID3, etc.).
  */
 public abstract class MP3Tag extends Object {
-	protected String name;
-	protected Object value;
-	public MP3Tag(String name, Object value) {
-		this.name = name;
-		this.value = value;
-	}
-	public String getName() {
-		return name;
-	}
-	public Object getValue() {
-		return value;
-	}
-	public String toString() {
-		return getClass().getName()
-			+ " -- "
-			+ getName()
-			+ ":"
-			+ getValue().toString();
-	}
+    protected String name;
+    protected Object value;
+    public MP3Tag(String name, Object value) {
+        this.name = name;
+        this.value = value;
+    }
+    public String getName() {
+        return name;
+    }
+    public Object getValue() {
+        return value;
+    }
+    public String toString() {
+        return getClass().getName()
+            + " -- "
+            + getName()
+            + ":"
+            + getValue().toString();
+    }
 }

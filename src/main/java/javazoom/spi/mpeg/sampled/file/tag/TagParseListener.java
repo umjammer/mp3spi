@@ -1,11 +1,11 @@
 /*
  * TagParseListener.
- * 
+ *
  * jicyshout : http://sourceforge.net/projects/jicyshout/
- *  
+ *
  * JavaZOOM : mp3spi@javazoom.net
- * 			  http://www.javazoom.net
- * 
+ *               http://www.javazoom.net
+ *
  *-----------------------------------------------------------------------
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU Library General Public License as published
@@ -30,8 +30,8 @@ import java.util.EventListener;
     get callbacks when MP3 tags are received.
  */
 public interface TagParseListener extends EventListener {
-	/** Called when a tag is found (parsed from the stream,
-	    received via UDP, etc.)
-	 */
-	public void tagParsed(TagParseEvent tpe);
+    /** Called when a tag is found (parsed from the stream,
+        received via UDP, etc.)
+     */
+    public void tagParsed(TagParseEvent tpe);
 }

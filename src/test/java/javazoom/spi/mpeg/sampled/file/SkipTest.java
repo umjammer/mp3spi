@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.Properties;
+
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -30,57 +31,43 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
-import junit.framework.TestCase;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Skip bytes before playing.
  */
-public class SkipTest extends TestCase
+public class SkipTest
 {
-	private String basefile=null;
-	private String baseurl=null;
-	private String filename=null;
-	private String fileurl=null;
-	private String name=null;
-	private Properties props = null;
-	private PrintStream out = null;
+    private String basefile=null;
+    private String baseurl=null;
+    private String filename=null;
+    private String fileurl=null;
+    private String name=null;
+    private Properties props = null;
+    private PrintStream out = null;
 
-	/**
-	 * Constructor for PropertiesTest.
-	 * @param arg0
-	 */
-	public SkipTest(String arg0)
-	{
-		super(arg0);
-	}
-	/*
-	 * @see TestCase#setUp()
-	 */
-	protected void setUp() throws Exception
-	{
-		super.setUp();
-		props = new Properties();
-		InputStream pin = getClass().getClassLoader().getResourceAsStream("test.mp3.properties");
-		props.load(pin);
-		basefile = (String) props.getProperty("basefile");
-		baseurl = (String) props.getProperty("baseurl");
-		name = (String) props.getProperty("filename");
-		filename = basefile + name;
-		fileurl = baseurl + name;
-		out = System.out;
-	}
+    @BeforeEach
+    protected void setUp() throws Exception
+    {
+        props = new Properties();
+        InputStream pin = getClass().getClassLoader().getResourceAsStream("test.mp3.properties");
+        props.load(pin);
+        basefile = props.getProperty("basefile");
+        baseurl = props.getProperty("baseurl");
+        name = props.getProperty("filename");
+        filename = basefile + name;
+        fileurl = baseurl + name;
+        out = System.out;
+    }
 
-	/*
-	 * @see TestCase#tearDown()
-	 */
-	protected void tearDown() throws Exception
-	{
-		super.tearDown();
-	}
-
-	public void testSkipFile()
-	{
-		if (out != null) out.println("-> Filename : "+filename+" <-");
+    @Test
+    public void testSkipFile()
+    {
+        if (out != null) out.println("-> Filename : "+filename+" <-");
         try
         {
             File file = new File(filename);
@@ -98,22 +85,22 @@ public class SkipTest extends TestCase
                   baseFormat.getSampleRate(),
                   false);
             if (out != null) out.println("Target Format : "+decodedFormat.toString());
-            din = AudioSystem.getAudioInputStream(decodedFormat, in);            
-            long toSkip = (long)(file.length()/2);
+            din = AudioSystem.getAudioInputStream(decodedFormat, in);
+            long toSkip = file.length()/2;
             long skipped = skip(din,toSkip);
             if (out != null) out.println("Skip : "+skipped+"/"+toSkip+" (Total="+file.length()+")");
             if (out != null) out.println("Start playing");
             rawplay(decodedFormat, din);
-            in.close();       
+            in.close();
             if (out != null) out.println("Played");
-            assertTrue("testSkip : OK",true);            
+            assertTrue(true, "testSkip : OK");
         }
         catch (Exception e)
         {
-            assertTrue(e.getMessage(),false);        
+            assertTrue(false, e.getMessage());
         }
-	}
-    
+    }
+
     private long skip(AudioInputStream in, long bytes) throws IOException
     {
         long SKIP_INACCURACY_SIZE = 1200;
@@ -125,7 +112,7 @@ public class SkipTest extends TestCase
             if (skipped == 0) break;
             totalSkipped = totalSkipped + skipped;
         }
-        return totalSkipped;        
+        return totalSkipped;
     }
 
     private SourceDataLine getLine(AudioFormat audioFormat) throws LineUnavailableException
@@ -136,11 +123,11 @@ public class SkipTest extends TestCase
       res.open(audioFormat);
       return res;
     }
-    
+
     private void rawplay(AudioFormat targetFormat, AudioInputStream din) throws IOException, LineUnavailableException
     {
         byte[] data = new byte[4096];
-        SourceDataLine line = getLine(targetFormat);        
+        SourceDataLine line = getLine(targetFormat);
         if (line != null)
         {
           // Start
@@ -156,7 +143,7 @@ public class SkipTest extends TestCase
           line.stop();
           line.close();
           din.close();
-        }       
+        }
     }
 
 }

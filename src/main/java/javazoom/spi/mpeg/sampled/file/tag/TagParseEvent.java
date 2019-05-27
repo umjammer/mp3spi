@@ -1,11 +1,11 @@
 /*
  * TagParseEvent.
- * 
+ *
  * jicyshout : http://sourceforge.net/projects/jicyshout/
- *  
+ *
  * JavaZOOM : mp3spi@javazoom.net
- * 			  http://www.javazoom.net
- * 
+ *               http://www.javazoom.net
+ *
  *-----------------------------------------------------------------------
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU Library General Public License as published
@@ -31,14 +31,14 @@ import java.util.EventObject;
     and converted into an MP3Tag object.
  */
 public class TagParseEvent extends EventObject {
-	protected MP3Tag tag;
-	public TagParseEvent(Object source, MP3Tag tag) {
-		super(source);
-		this.tag = tag;
-	}
-	/** Get the tag that was parsed.
-	 */
-	public MP3Tag getTag() {
-		return tag;
-	}
+    protected MP3Tag tag;
+    public TagParseEvent(Object source, MP3Tag tag) {
+        super(source);
+        this.tag = tag;
+    }
+    /** Get the tag that was parsed.
+     */
+    public MP3Tag getTag() {
+        return tag;
+    }
 }

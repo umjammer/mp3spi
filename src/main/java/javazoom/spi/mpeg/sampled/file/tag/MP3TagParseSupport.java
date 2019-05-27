@@ -1,11 +1,11 @@
 /*
  * MP3TagParseSupport.
- * 
+ *
  * jicyshout : http://sourceforge.net/projects/jicyshout/
- *  
+ *
  * JavaZOOM : mp3spi@javazoom.net
- * 			  http://www.javazoom.net
- * 
+ *               http://www.javazoom.net
+ *
  *-----------------------------------------------------------------------
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU Library General Public License as published
@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-/**  
+/**
  */
 public class MP3TagParseSupport {
     List<TagParseListener> tagParseListeners;
@@ -39,7 +39,7 @@ public class MP3TagParseSupport {
      */
     public MP3TagParseSupport() {
         super();
-        tagParseListeners = new ArrayList<TagParseListener>();
+        tagParseListeners = new ArrayList<>();
     }
 
     /**

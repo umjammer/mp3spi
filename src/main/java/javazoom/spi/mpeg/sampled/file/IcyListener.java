@@ -1,9 +1,9 @@
 /*
  * IcyListener.
- * 
+ *
  * JavaZOOM : mp3spi@javazoom.net
- * 			  http://www.javazoom.net
- * 
+ *               http://www.javazoom.net
+ *
  *-----------------------------------------------------------------------
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU Library General Public License as published
@@ -33,99 +33,99 @@ import javazoom.spi.mpeg.sampled.file.tag.TagParseListener;
  */
 public class IcyListener implements TagParseListener
 {
-	private static IcyListener instance = null;
-	private MP3Tag lastTag = null;
-	private String streamTitle = null;
-	private String streamUrl = null;
-	
-		
-	private IcyListener()
-	{
-		super();
-	}
+    private static IcyListener instance = null;
+    private MP3Tag lastTag = null;
+    private String streamTitle = null;
+    private String streamUrl = null;
 
-	public static synchronized IcyListener getInstance()
-	{
-		if (instance == null)
-		{
-			instance = new IcyListener();
-		}
-		return instance;		
-	}
-	
-	/* (non-Javadoc)
-	 * @see javazoom.spi.mpeg.sampled.file.tag.TagParseListener#tagParsed(javazoom.spi.mpeg.sampled.file.tag.TagParseEvent)
-	 */
-	public void tagParsed(TagParseEvent tpe)
-	{		
-		lastTag = tpe.getTag();
-		String name = lastTag.getName();
-		if ((name != null) && (name.equalsIgnoreCase("streamtitle")))
-		{
-			streamTitle = (String) lastTag.getValue();
-		}
-		else if ((name != null) && (name.equalsIgnoreCase("streamurl")))
-		{
-			streamUrl = (String) lastTag.getValue();
-		}	
-	}
 
-	/**
-	 * @return
-	 */
-	public MP3Tag getLastTag()
-	{
-		return lastTag;
-	}
+    private IcyListener()
+    {
+        super();
+    }
 
-	/**
-	 * @param tag
-	 */
-	public void setLastTag(MP3Tag tag)
-	{
-		lastTag = tag;
-	}
+    public static synchronized IcyListener getInstance()
+    {
+        if (instance == null)
+        {
+            instance = new IcyListener();
+        }
+        return instance;
+    }
 
-	/**
-	 * @return
-	 */
-	public String getStreamTitle()
-	{
-		return streamTitle;
-	}
+    /* (non-Javadoc)
+     * @see javazoom.spi.mpeg.sampled.file.tag.TagParseListener#tagParsed(javazoom.spi.mpeg.sampled.file.tag.TagParseEvent)
+     */
+    public void tagParsed(TagParseEvent tpe)
+    {
+        lastTag = tpe.getTag();
+        String name = lastTag.getName();
+        if ((name != null) && (name.equalsIgnoreCase("streamtitle")))
+        {
+            streamTitle = (String) lastTag.getValue();
+        }
+        else if ((name != null) && (name.equalsIgnoreCase("streamurl")))
+        {
+            streamUrl = (String) lastTag.getValue();
+        }
+    }
 
-	/**
-	 * @return
-	 */
-	public String getStreamUrl()
-	{
-		return streamUrl;
-	}
+    /**
+     * @return
+     */
+    public MP3Tag getLastTag()
+    {
+        return lastTag;
+    }
 
-	/**
-	 * @param string
-	 */
-	public void setStreamTitle(String string)
-	{
-		streamTitle = string;
-	}
+    /**
+     * @param tag
+     */
+    public void setLastTag(MP3Tag tag)
+    {
+        lastTag = tag;
+    }
 
-	/**
-	 * @param string
-	 */
-	public void setStreamUrl(String string)
-	{
-		streamUrl = string;
-	}
-	
-	/**
-	 * Reset all properties.
-	 */
-	public void reset()
-	{
-		lastTag = null;
-		streamTitle = null;
-		streamUrl = null;		
-	}
+    /**
+     * @return
+     */
+    public String getStreamTitle()
+    {
+        return streamTitle;
+    }
+
+    /**
+     * @return
+     */
+    public String getStreamUrl()
+    {
+        return streamUrl;
+    }
+
+    /**
+     * @param string
+     */
+    public void setStreamTitle(String string)
+    {
+        streamTitle = string;
+    }
+
+    /**
+     * @param string
+     */
+    public void setStreamUrl(String string)
+    {
+        streamUrl = string;
+    }
+
+    /**
+     * Reset all properties.
+     */
+    public void reset()
+    {
+        lastTag = null;
+        streamTitle = null;
+        streamUrl = null;
+    }
 
 }

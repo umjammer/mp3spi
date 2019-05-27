@@ -1,3 +1,4 @@
+
 /*
  *   PlayerTest - JavaZOOM : http://www.javazoom.net
  *
@@ -30,8 +31,14 @@ import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import javazoom.spi.PropertiesContainer;
-import junit.framework.TestCase;
+
 
 /**
  * Simple player (based on MP3 SPI) unit test.
@@ -39,111 +46,93 @@ import junit.framework.TestCase;
  * It takes around 10-12% of CPU and 10MB RAM under Win2K/PIII/1GHz/JDK1.4.1
  * It takes around 8-10% of CPU and 10MB RAM under Win2K/PIII/1GHz/JDK1.3.1
  */
-public class PlayerTest extends TestCase
-{
-	private String basefile=null;
-	private String filename=null;
-	private String name=null;
-	private Properties props = null;
-	private PrintStream out = null;
-	
-	/**
-	 * Constructor for PlayerTest.
-	 * @param arg0
-	 */
-	public PlayerTest(String arg0)
-	{
-		super(arg0);
-	}
+@Disabled
+public class PlayerTest {
 
-	/*
-	 * @see TestCase#setUp()
-	 */
-	protected void setUp() throws Exception
-	{
-		super.setUp();
-		props = new Properties();
-		InputStream pin = getClass().getClassLoader().getResourceAsStream("test.mp3.properties");
-		props.load(pin);
-		basefile = (String) props.getProperty("basefile");
-		name = (String) props.getProperty("filename");		
-		filename = basefile + name;	
-		out = System.out;
-	}
+    private String basefile = null;
+    private String filename = null;
+    private String name = null;
+    private Properties props = null;
+    private PrintStream out = null;
 
-	public void testPlay()
-	{
-	 try
-	 {
-		if (out != null) out.println("---  Start : "+filename+"  ---");
-		File file = new File(filename);
-		//URL file = new URL(props.getProperty("shoutcast"));
-		AudioFileFormat aff = AudioSystem.getAudioFileFormat(file);
-		if (out != null) out.println("Audio Type : "+aff.getType());
-		AudioInputStream in= AudioSystem.getAudioInputStream(file);
-		AudioInputStream din = null;
-		if (in != null)
-		{
-		  AudioFormat baseFormat = in.getFormat();
-		  if (out != null) out.println("Source Format : "+baseFormat.toString());
-		  AudioFormat  decodedFormat = new AudioFormat(
-			  AudioFormat.Encoding.PCM_SIGNED,
-			  baseFormat.getSampleRate(),
-			  16,
-			  baseFormat.getChannels(),
-			  baseFormat.getChannels() * 2,
-			  baseFormat.getSampleRate(),
-			  false);
-		  if (out != null) out.println("Target Format : "+decodedFormat.toString());
-		  din = AudioSystem.getAudioInputStream(decodedFormat, in);
-		  if (din instanceof PropertiesContainer)
-		  {
-			assertTrue("PropertiesContainer : OK",true);
-		  }
-		  else
-		  {
-			assertTrue("Wrong PropertiesContainer instance",false);
-		  }
-		  rawplay(decodedFormat, din);
-		  in.close();		
-		  if (out != null) out.println("---  Stop : "+filename+"  ---");
-		  assertTrue("testPlay : OK",true);
-		}
-	 }
-	 catch (Exception e)
-	 {
-		assertTrue("testPlay : "+e.getMessage(),false);
-	 }
-	}
+    @BeforeEach
+    protected void setUp() throws Exception {
+        props = new Properties();
+        InputStream pin = getClass().getClassLoader().getResourceAsStream("test.mp3.properties");
+        props.load(pin);
+        basefile = props.getProperty("basefile");
+        name = props.getProperty("filename");
+        filename = basefile + name;
+        out = System.out;
+    }
 
-	private SourceDataLine getLine(AudioFormat audioFormat) throws LineUnavailableException
-	{
-	  SourceDataLine res = null;
-	  DataLine.Info info = new DataLine.Info(SourceDataLine.class, audioFormat);
-	  res = (SourceDataLine) AudioSystem.getLine(info);
-	  res.open(audioFormat);
-	  return res;
-	}
-	
-	private void rawplay(AudioFormat targetFormat, AudioInputStream din) throws IOException, LineUnavailableException
-	{
-		byte[] data = new byte[4096];
-		SourceDataLine line = getLine(targetFormat);		
-		if (line != null)
-		{
-		  // Start
-		  line.start();
-		  int nBytesRead = 0, nBytesWritten = 0;
-		  while (nBytesRead != -1)
-		  {
-			nBytesRead = din.read(data, 0, data.length);
-			if (nBytesRead != -1) nBytesWritten = line.write(data, 0, nBytesRead);
-		  }
-		  // Stop
-		  line.drain();
-		  line.stop();
-		  line.close();
-		  din.close();
-		}		
-	}
+    @Test
+    public void testPlay() {
+        try {
+            if (out != null)
+                out.println("---  Start : " + filename + "  ---");
+            File file = new File(filename);
+            //URL file = new URL(props.getProperty("shoutcast"));
+            AudioFileFormat aff = AudioSystem.getAudioFileFormat(file);
+            if (out != null)
+                out.println("Audio Type : " + aff.getType());
+            AudioInputStream in = AudioSystem.getAudioInputStream(file);
+            AudioInputStream din = null;
+            if (in != null) {
+                AudioFormat baseFormat = in.getFormat();
+                if (out != null)
+                    out.println("Source Format : " + baseFormat.toString());
+                AudioFormat decodedFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED,
+                                                            baseFormat.getSampleRate(),
+                                                            16,
+                                                            baseFormat.getChannels(),
+                                                            baseFormat.getChannels() * 2,
+                                                            baseFormat.getSampleRate(),
+                                                            false);
+                if (out != null)
+                    out.println("Target Format : " + decodedFormat.toString());
+                din = AudioSystem.getAudioInputStream(decodedFormat, in);
+                if (din instanceof PropertiesContainer) {
+                    assertTrue(true, "PropertiesContainer : OK");
+                } else {
+                    assertTrue(false, "Wrong PropertiesContainer instance");
+                }
+                rawplay(decodedFormat, din);
+                in.close();
+                if (out != null)
+                    out.println("---  Stop : " + filename + "  ---");
+                assertTrue(true, "testPlay : OK");
+            }
+        } catch (Exception e) {
+            assertTrue(false, "testPlay : " + e.getMessage());
+        }
+    }
+
+    private SourceDataLine getLine(AudioFormat audioFormat) throws LineUnavailableException {
+        SourceDataLine res = null;
+        DataLine.Info info = new DataLine.Info(SourceDataLine.class, audioFormat);
+        res = (SourceDataLine) AudioSystem.getLine(info);
+        res.open(audioFormat);
+        return res;
+    }
+
+    private void rawplay(AudioFormat targetFormat, AudioInputStream din) throws IOException, LineUnavailableException {
+        byte[] data = new byte[4096];
+        SourceDataLine line = getLine(targetFormat);
+        if (line != null) {
+            // Start
+            line.start();
+            int nBytesRead = 0, nBytesWritten = 0;
+            while (nBytesRead != -1) {
+                nBytesRead = din.read(data, 0, data.length);
+                if (nBytesRead != -1)
+                    nBytesWritten = line.write(data, 0, nBytesRead);
+            }
+            // Stop
+            line.drain();
+            line.stop();
+            line.close();
+            din.close();
+        }
+    }
 }

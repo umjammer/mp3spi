@@ -1,9 +1,9 @@
 /*
  * PropertiesContainer.
- * 
+ *
  * JavaZOOM : mp3spi@javazoom.net
- * 			  http://www.javazoom.net
- * 
+ *               http://www.javazoom.net
+ *
  *-----------------------------------------------------------------------
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU Library General Public License as published
@@ -27,5 +27,5 @@ import java.util.Map;
 
 public interface PropertiesContainer
 {
-	public Map properties();
+    public Map<?, ?> properties();
 }

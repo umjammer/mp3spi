@@ -22,7 +22,7 @@
  * 11/28/04 : String encoding bug fix in chopSubstring method.
  *
  * JavaZOOM : mp3spi@javazoom.net
- * 			  http://www.javazoom.net
+ *               http://www.javazoom.net
  *
  *-----------------------------------------------------------------------
  *   This program is free software; you can redistribute it and/or modify
@@ -292,8 +292,8 @@ public class MpegAudioFileReader extends TAudioFileReader
     public AudioFileFormat getAudioFileFormat(InputStream inputStream, long mediaLength) throws UnsupportedAudioFileException, IOException
     {
         if (TDebug.TraceAudioFileReader) TDebug.out(">MpegAudioFileReader.getAudioFileFormat(InputStream inputStream, long mediaLength): begin");
-        Map<String, Object> aff_properties = new HashMap<String, Object>();
-        Map<String, Object> af_properties = new HashMap<String, Object>();
+        Map<String, Object> aff_properties = new HashMap<>();
+        Map<String, Object> af_properties = new HashMap<>();
         int mLength = (int) mediaLength;
         int size = inputStream.available();
         PushbackInputStream pis = new PushbackInputStream(inputStream, MARK_LIMIT);

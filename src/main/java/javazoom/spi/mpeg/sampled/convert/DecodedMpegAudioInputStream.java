@@ -1,8 +1,8 @@
 /*
  *   DecodedMpegAudioInputStream.
- * 
- *   JavaZOOM : mp3spi@javazoom.net 
- * 				http://www.javazoom.net
+ *
+ *   JavaZOOM : mp3spi@javazoom.net
+ *                 http://www.javazoom.net
  *
  *-----------------------------------------------------------------------------
  *   This program is free software; you can redistribute it and/or modify
@@ -120,12 +120,12 @@ public class DecodedMpegAudioInputStream extends TAsynchronousFilteredAudioInput
             TDebug.out("DecodedMpegAudioInputStream : Cannot read first frame : " + e.getMessage());
             byteslength = -1;
         }
-        properties = new HashMap<String, Object>();
+        properties = new HashMap<>();
     }
 
     /**
      * Return dynamic properties.
-     * 
+     *
      * <ul>
      * <li><b>mp3.frame</b> [Long], current frame position.
      * <li><b>mp3.frame.bitrate</b> [Integer], bitrate of the current frame.
@@ -223,7 +223,7 @@ public class DecodedMpegAudioInputStream extends TAsynchronousFilteredAudioInput
     /**
      * Skip frames. You don't need to call it severals times, it will exactly
      * skip given frames number.
-     * 
+     *
      * @param frames
      * @return bytes length skipped matching to frames skipped.
      */

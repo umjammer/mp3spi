@@ -1,11 +1,11 @@
 /*
  * StringableTag.
- * 
+ *
  * jicyshout : http://sourceforge.net/projects/jicyshout/
- *  
+ *
  * JavaZOOM : mp3spi@javazoom.net
- * 			  http://www.javazoom.net
- * 
+ *               http://www.javazoom.net
+ *
  *-----------------------------------------------------------------------
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU Library General Public License as published
@@ -30,7 +30,7 @@ package javazoom.spi.mpeg.sampled.file.tag;
     Appropriate for tags like artist, title, etc.
  */
 public interface StringableTag {
-	/** Return the value of this tag as a string.
-	 */
-	public String getValueAsString();
+    /** Return the value of this tag as a string.
+     */
+    public String getValueAsString();
 }
