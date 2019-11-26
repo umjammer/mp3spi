@@ -147,7 +147,7 @@ public class IcyInputStream
     /**
      * IcyInputStream constructor for know meta-interval (Icecast 2)
      * @param in
-     * @param metaint
+     * @param metaIntString
      * @throws IOException
      */
     public IcyInputStream(InputStream in, String metaIntString) throws IOException {

@@ -37,6 +37,8 @@ import org.tritonus.share.TDebug;
 import org.tritonus.share.sampled.Encodings;
 import org.tritonus.share.sampled.convert.TEncodingFormatConversionProvider;
 
+import static javax.sound.sampled.AudioSystem.NOT_SPECIFIED;
+
 /**
  * ConversionProvider for MPEG files.
   */
@@ -48,22 +50,22 @@ public class MpegFormatConversionProvider extends TEncodingFormatConversionProvi
     private static final AudioFormat[]    INPUT_FORMATS =
     {
         // mono
-        new AudioFormat(MP3, -1.0F, -1, 1, -1, -1.0F, false),
-        new AudioFormat(MP3, -1.0F, -1, 1, -1, -1.0F, true),
+        new AudioFormat(MP3, NOT_SPECIFIED, NOT_SPECIFIED, 1, NOT_SPECIFIED, NOT_SPECIFIED, false),
+        new AudioFormat(MP3, NOT_SPECIFIED, NOT_SPECIFIED, 1, NOT_SPECIFIED, NOT_SPECIFIED, true),
         // stereo
-        new AudioFormat(MP3, -1.0F, -1, 2, -1, -1.0F, false),
-        new AudioFormat(MP3, -1.0F, -1, 2, -1, -1.0F, true),
+        new AudioFormat(MP3, NOT_SPECIFIED, NOT_SPECIFIED, 2, NOT_SPECIFIED, NOT_SPECIFIED, false),
+        new AudioFormat(MP3, NOT_SPECIFIED, NOT_SPECIFIED, 2, NOT_SPECIFIED, NOT_SPECIFIED, true),
     };
 
 
     private static final AudioFormat[]    OUTPUT_FORMATS =
     {
         // mono, 16 bit signed
-        new AudioFormat(PCM_SIGNED, -1.0F, 16, 1, 2, -1.0F, false),
-        new AudioFormat(PCM_SIGNED, -1.0F, 16, 1, 2, -1.0F, true),
+        new AudioFormat(PCM_SIGNED, NOT_SPECIFIED, 16, 1, 2, NOT_SPECIFIED, false),
+        new AudioFormat(PCM_SIGNED, NOT_SPECIFIED, 16, 1, 2, NOT_SPECIFIED, true),
         // stereo, 16 bit signed
-        new AudioFormat(PCM_SIGNED, -1.0F, 16, 2, 4, -1.0F, false),
-        new AudioFormat(PCM_SIGNED, -1.0F, 16, 2, 4, -1.0F, true),
+        new AudioFormat(PCM_SIGNED, NOT_SPECIFIED, 16, 2, 4, NOT_SPECIFIED, false),
+        new AudioFormat(PCM_SIGNED, NOT_SPECIFIED, 16, 2, 4, NOT_SPECIFIED, true),
     };
 
     /**
