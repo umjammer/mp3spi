@@ -81,7 +81,7 @@ public class MpegAudioFileReader extends TAudioFileReader
             { MpegEncoding.MPEG2L1, MpegEncoding.MPEG2L2, MpegEncoding.MPEG2L3 },
             { MpegEncoding.MPEG1L1, MpegEncoding.MPEG1L2, MpegEncoding.MPEG1L3 },
             { MpegEncoding.MPEG2DOT5L1, MpegEncoding.MPEG2DOT5L2, MpegEncoding.MPEG2DOT5L3 }, };
-    public static final int INITAL_READ_LENGTH = 128000;
+    public static final int INITAL_READ_LENGTH = 128000 * 4; // TODO a tag larger than this length causes an exception
     private static final int MARK_LIMIT = INITAL_READ_LENGTH + 1;
 
     private static final String[] id3v1genres = {
@@ -664,7 +664,7 @@ public class MpegAudioFileReader extends TAudioFileReader
         }
         try
         {
-            if (TDebug.TraceAudioFileReader) TDebug.out("ID3v2 frame dump='" + new String(bframes, 0, bframes.length) + "'");
+            if (TDebug.TraceAudioFileReader) TDebug.out("ID3v2 frame dump(" + bframes.length + ")='" + new String(bframes, 0, bframes.length) + "'");
             /* ID3 tags : http://www.unixgods.org/~tilo/ID3/docs/ID3_comparison.html */
             String value = null;
             for (int i = 10; i < bframes.length && bframes[i] > 0; i += size)
