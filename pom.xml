@@ -3,7 +3,7 @@
 
   <groupId>net.javazoom</groupId>
   <artifactId>mp3spi</artifactId>
-  <version>1.9.5</version>
+  <version>1.9.6</version>
 
   <build>
     <plugins>
@@ -17,7 +17,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.19.1</version>
+        <version>2.22.0</version>
         <dependencies>
           <dependency>
             <groupId>org.junit.platform</groupId>
@@ -38,9 +38,14 @@
 
   <dependencies>
     <dependency>
-      <groupId>com.googlecode.soundlibs</groupId>
+      <groupId>com.github.umjammer.tritonus</groupId>
       <artifactId>tritonus-share</artifactId>
-      <version>0.3.7-2</version>
+      <version>0.3.7-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.umjammer.tritonus</groupId>
+      <artifactId>tritonus-remaining</artifactId>
+      <version>0.3.7-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>com.github.umjammer</groupId>
@@ -60,6 +65,11 @@
       <version>5.3.0</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.junit.platform</groupId>
+      <artifactId>junit-platform-commons</artifactId>
+      <version>1.5.2</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
-
 </project>
