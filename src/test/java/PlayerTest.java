@@ -1,4 +1,3 @@
-
 /*
  *   PlayerTest - JavaZOOM : http://www.javazoom.net
  *
@@ -17,6 +16,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
  */
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,12 +28,12 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
+import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -46,7 +46,6 @@ import javazoom.spi.PropertiesContainer;
  * It takes around 10-12% of CPU and 10MB RAM under Win2K/PIII/1GHz/JDK1.4.1
  * It takes around 8-10% of CPU and 10MB RAM under Win2K/PIII/1GHz/JDK1.3.1
  */
-@Disabled
 public class PlayerTest {
 
     private String basefile = null;
@@ -66,7 +65,22 @@ public class PlayerTest {
         out = System.out;
     }
 
-    @Test
+    @Disabled
+    public void testPlay0() throws Exception {
+        AudioInputStream in = AudioSystem.getAudioInputStream(new File(filename));
+        AudioFormat baseFormat = in.getFormat();
+        AudioFormat decodedFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED,
+                                                    baseFormat.getSampleRate(),
+                                                    16,
+                                                    baseFormat.getChannels(),
+                                                    baseFormat.getChannels() * 2,
+                                                    baseFormat.getSampleRate(),
+                                                    false);
+        AudioInputStream din = AudioSystem.getAudioInputStream(decodedFormat, in);
+        rawplay(decodedFormat, din);
+    }
+
+    @Disabled
     public void testPlay() {
         try {
             if (out != null)
@@ -120,6 +134,10 @@ public class PlayerTest {
         byte[] data = new byte[4096];
         SourceDataLine line = getLine(targetFormat);
         if (line != null) {
+            FloatControl gainControl = (FloatControl) line.getControl(FloatControl.Type.MASTER_GAIN);
+            double gain = .1d; // number between 0 and 1 (loudest)
+            float dB = (float) (Math.log(gain) / Math.log(10.0) * 20.0);
+            gainControl.setValue(dB);
             // Start
             line.start();
             int nBytesRead = 0, nBytesWritten = 0;

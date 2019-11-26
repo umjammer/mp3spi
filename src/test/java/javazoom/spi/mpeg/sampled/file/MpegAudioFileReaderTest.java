@@ -39,6 +39,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 
 /**
@@ -64,11 +65,11 @@ public class MpegAudioFileReaderTest {
         InputStream pin = getClass().getClassLoader().getResourceAsStream("test.mp3.properties");
         props.load(pin);
         basefile = props.getProperty("basefile");
-        baseurl = props.getProperty("baseurl");
+        baseurl = props.getProperty("baseurl").replaceAll("\\$\\{PWD\\}", System.getProperty("user.dir"));
         name = props.getProperty("filename");
         filename = basefile + name;
         fileurl = baseurl + name;
-//        out = System.out;
+        out = System.out;
     }
 
     @Test
@@ -95,10 +96,8 @@ public class MpegAudioFileReaderTest {
             dumpAudioFileFormat(baseFileFormat, out, file.toString());
             assertEquals(Integer.parseInt(props.getProperty("FrameLength")), baseFileFormat.getFrameLength(), "FrameLength");
             assertEquals(Integer.parseInt(props.getProperty("ByteLength")), baseFileFormat.getByteLength(), "ByteLength");
-        } catch (UnsupportedAudioFileException e) {
-            assertTrue(false, "testGetAudioFileFormatFile:" + e.getMessage());
-        } catch (IOException e) {
-            assertTrue(false, "testGetAudioFileFormatFile:" + e.getMessage());
+        } catch (UnsupportedAudioFileException | IOException e) {
+            fail("testGetAudioFileFormatFile: " + e);
         }
     }
 
@@ -112,10 +111,8 @@ public class MpegAudioFileReaderTest {
             dumpAudioFileFormat(baseFileFormat, out, url.toString());
             assertEquals(-1, baseFileFormat.getFrameLength(), "FrameLength");
             assertEquals(-1, baseFileFormat.getByteLength(), "ByteLength");
-        } catch (UnsupportedAudioFileException e) {
-            assertTrue(false, "testGetAudioFileFormatURL:" + e.getMessage());
-        } catch (IOException e) {
-            assertTrue(false, "testGetAudioFileFormatURL:" + e.getMessage());
+        } catch (UnsupportedAudioFileException | IOException e) {
+            fail("testGetAudioFileFormatURL: " + e);
         }
     }
 
@@ -130,10 +127,8 @@ public class MpegAudioFileReaderTest {
             in.close();
             assertEquals(-1, baseFileFormat.getFrameLength(), "FrameLength");
             assertEquals(-1, baseFileFormat.getByteLength(), "ByteLength");
-        } catch (UnsupportedAudioFileException e) {
-            assertTrue(false, "testGetAudioFileFormatInputStream:" + e.getMessage());
-        } catch (IOException e) {
-            assertTrue(false, "testGetAudioFileFormatInputStream:" + e.getMessage());
+        } catch (UnsupportedAudioFileException | IOException e) {
+            fail("testGetAudioFileFormatInputStream: " + e);
         }
     }
 
@@ -149,10 +144,8 @@ public class MpegAudioFileReaderTest {
             assertEquals(Integer.parseInt(props.getProperty("Available")), in.available(), "Available");
             fin.close();
             in.close();
-        } catch (UnsupportedAudioFileException e) {
-            assertTrue(false, "testGetAudioInputStreamInputStream:" + e.getMessage());
-        } catch (IOException e) {
-            assertTrue(false, "testGetAudioInputStreamInputStream:" + e.getMessage());
+        } catch (UnsupportedAudioFileException | IOException e) {
+            fail("testGetAudioInputStreamInputStream: " + e);
         }
     }
 
@@ -167,10 +160,8 @@ public class MpegAudioFileReaderTest {
             assertEquals(-1, in.getFrameLength(), "FrameLength");
             assertEquals(Integer.parseInt(props.getProperty("Available")), in.available(), "Available");
             in.close();
-        } catch (UnsupportedAudioFileException e) {
-            assertTrue(false, "testGetAudioInputStreamFile:" + e.getMessage());
-        } catch (IOException e) {
-            assertTrue(false, "testGetAudioInputStreamFile:" + e.getMessage());
+        } catch (UnsupportedAudioFileException | IOException e) {
+            fail("testGetAudioInputStreamFile:" + e);
         }
     }
 
@@ -185,10 +176,8 @@ public class MpegAudioFileReaderTest {
             assertEquals(-1, in.getFrameLength(), "FrameLength");
             assertEquals(Integer.parseInt(props.getProperty("Available")), in.available(), "Available");
             in.close();
-        } catch (UnsupportedAudioFileException e) {
-            assertTrue(false, "testGetAudioInputStreamURL:" + e.getMessage());
-        } catch (IOException e) {
-            assertTrue(false, "testGetAudioInputStreamURL:" + e.getMessage());
+        } catch (UnsupportedAudioFileException | IOException e) {
+            fail("testGetAudioInputStreamURL: " + e);
         }
     }
 
@@ -247,6 +236,5 @@ public class MpegAudioFileReaderTest {
                      baseFormat.getSampleSizeInBits(),
                      "SampleSizeInBits");
         assertEquals(props.getProperty("Encoding"), baseFormat.getEncoding().toString(), "Encoding");
-
     }
 }
