@@ -1,4 +1,4 @@
-[![Release](https://jitpack.io/v/umjammer/mp3spi.svg)](https://jitpack.io/#umjammer/mp3spi) [![Parent](https://img.shields.io/badge/Parent-vavi--sound--sandbox-pink)](https://github.com/umjammer/vavi-sound-sandbox)
+[![Release](https://jitpack.io/v/umjammer/mp3spi.svg)](https://jitpack.io/#umjammer/mp3spi) [![Java CI with Maven](https://github.com/umjammer/mp3spi/workflows/Java%20CI%20with%20Maven/badge.svg)](https://github.com/umjammer/mp3spi/actions) [![Parent](https://img.shields.io/badge/Parent-vavi--sound--sandbox-pink)](https://github.com/umjammer/vavi-sound-sandbox)
 
 # MP3SPI
 
@@ -16,8 +16,8 @@
 
 MP3SPI is a SPI (Service Provider Interface) that adds MP3 support for JavaSound.
 It allows to play MPEG 1/2/2.5 Layer 1/2/3 files thanks to underlying JLayer
-and Tritonus libraries. This is a non-commercial project and anyone can add his 
-contribution. MP3SPI is licensed under LGPL (see LICENSE.txt).
+and Tritonus libraries. This is a non-commercial project and anyone can add his
+contribution. MP3SPI is licensed under LGPL (see [LICENSE.txt](LICENSE.txt)).
 
 
 ## FAQ
@@ -42,7 +42,7 @@ contribution. MP3SPI is licensed under LGPL (see LICENSE.txt).
 
 ### Does MP3SPI support VBR ?
 
-  Yes, It supports XING and VBRI VBR header too. 
+  Yes, It supports XING and VBRI VBR header too.
 
 ### How to get ID3v2 tags from MP3SPI API ?
 
@@ -64,17 +64,19 @@ contribution. MP3SPI is licensed under LGPL (see LICENSE.txt).
 
   Here are our benchmark notes :
 
-  * Heap use range : 1380KB to 1900KB - 370 classes loaded. 
+  * Heap use range : 1380KB to 1900KB - 370 classes loaded.
   * Footprint :
 
-| ~8MB |under WinNT4/Win2K + J2SE 1.3 (Hotspot) |
+|memory|environment|
 |---|---|
+| ~8MB |under WinNT4/Win2K + J2SE 1.3 (Hotspot) |
 | ~10MB |under WinNT4/Win2K + J2SE 1.4.1 (Hotspot) |
 
   * CPU usage :
 
-| ~12%| under PIII 800Mhz/WinNT4+J2SE 1.3 (Hotspot) |
+|cpu|environment|
 |---|---|
+| ~12%| under PIII 800Mhz/WinNT4+J2SE 1.3 (Hotspot) |
 | ~8% | under PIII 1Ghz/Win2K+J2SE 1.3.1 (Hotspot) |
 | ~12% | under PIII 1Ghz/Win2K+J2SE 1.4.1 (Hotspot) |
 |  ~1% | under PIII 1Ghz/Win2K+J2SE 1.5.0 (Hotspot) |
@@ -91,10 +93,12 @@ contribution. MP3SPI is licensed under LGPL (see LICENSE.txt).
 
 ## KNOWN PROBLEMS
 
-99% of MP3 plays well with JLayer but some (1%) return an `ArrayIndexOutOfBoundsException` 
-while playing. It might come from invalid audio frames. 
+99% of MP3 plays well with JLayer but some (1%) return an `ArrayIndexOutOfBoundsException`
+while playing. It might come from invalid audio frames.
+
+When source is not a file, this cannot deal id3v1 tag which file size is larger than 20M bytes.
 
 ### Workaround
 
-Just `try`/`catch` `ArrayIndexOutOfBoundsException` in your code to skip 
+Just `try`/`catch` `ArrayIndexOutOfBoundsException` in your code to skip
 non-detected invalid frames.

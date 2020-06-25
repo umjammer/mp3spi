@@ -81,7 +81,7 @@ public class MpegAudioFileReader extends TAudioFileReader
             { MpegEncoding.MPEG2L1, MpegEncoding.MPEG2L2, MpegEncoding.MPEG2L3 },
             { MpegEncoding.MPEG1L1, MpegEncoding.MPEG1L2, MpegEncoding.MPEG1L3 },
             { MpegEncoding.MPEG2DOT5L1, MpegEncoding.MPEG2DOT5L2, MpegEncoding.MPEG2DOT5L3 }, };
-    public static final int INITAL_READ_LENGTH = 128000 * 4; // TODO a tag larger than this length causes an exception
+    public static final int INITAL_READ_LENGTH = 1024 * 1024 * 20; // TODO limitation
     private static final int MARK_LIMIT = INITAL_READ_LENGTH + 1;
 
     private static final String[] id3v1genres = {
@@ -357,6 +357,7 @@ public class MpegAudioFileReader extends TAudioFileReader
         // MPEG header info.
         int nVersion = AudioSystem.NOT_SPECIFIED;
         int nLayer = AudioSystem.NOT_SPECIFIED;
+        @SuppressWarnings("unused")
         int nSFIndex = AudioSystem.NOT_SPECIFIED;
         int nMode = AudioSystem.NOT_SPECIFIED;
         int FrameSize = AudioSystem.NOT_SPECIFIED;
@@ -373,7 +374,7 @@ public class MpegAudioFileReader extends TAudioFileReader
         try
         {
             Bitstream m_bitstream = new Bitstream(pis);
-            aff_properties.put("mp3.header.pos", new Integer(m_bitstream.header_pos()));
+            aff_properties.put("mp3.header.pos", m_bitstream.header_pos());
             Header m_header = m_bitstream.readFrame();
             // nVersion = 0 => MPEG2-LSF (Including MPEG2.5), nVersion = 1 => MPEG1
             nVersion = m_header.version();
@@ -384,42 +385,42 @@ public class MpegAudioFileReader extends TAudioFileReader
             aff_properties.put("mp3.version.layer", Integer.toString(nLayer));
             nSFIndex = m_header.sample_frequency();
             nMode = m_header.mode();
-            aff_properties.put("mp3.mode", new Integer(nMode));
+            aff_properties.put("mp3.mode", nMode);
             nChannels = nMode == 3 ? 1 : 2;
-            aff_properties.put("mp3.channels", new Integer(nChannels));
+            aff_properties.put("mp3.channels", nChannels);
             nVBR = m_header.vbr();
-            af_properties.put("vbr", new Boolean(nVBR));
-            aff_properties.put("mp3.vbr", new Boolean(nVBR));
-            aff_properties.put("mp3.vbr.scale", new Integer(m_header.vbr_scale()));
+            af_properties.put("vbr", nVBR);
+            aff_properties.put("mp3.vbr", nVBR);
+            aff_properties.put("mp3.vbr.scale", m_header.vbr_scale());
             FrameSize = m_header.calculate_framesize();
-            aff_properties.put("mp3.framesize.bytes", new Integer(FrameSize));
+            aff_properties.put("mp3.framesize.bytes", FrameSize);
             if (FrameSize < 0) throw new UnsupportedAudioFileException("Invalid FrameSize : " + FrameSize);
             nFrequency = m_header.frequency();
-            aff_properties.put("mp3.frequency.hz", new Integer(nFrequency));
+            aff_properties.put("mp3.frequency.hz", nFrequency);
             FrameRate = (float) ((1.0 / (m_header.ms_per_frame())) * 1000.0);
-            aff_properties.put("mp3.framerate.fps", new Float(FrameRate));
+            aff_properties.put("mp3.framerate.fps", FrameRate);
             if (FrameRate < 0) throw new UnsupportedAudioFileException("Invalid FrameRate : " + FrameRate);
             if (mLength != AudioSystem.NOT_SPECIFIED)
             {
-                aff_properties.put("mp3.length.bytes", new Integer(mLength));
+                aff_properties.put("mp3.length.bytes", mLength);
                 nTotalFrames = m_header.max_number_of_frames(mLength);
-                aff_properties.put("mp3.length.frames", new Integer(nTotalFrames));
+                aff_properties.put("mp3.length.frames", nTotalFrames);
             }
             BitRate = m_header.bitrate();
-            af_properties.put("bitrate", new Integer(BitRate));
-            aff_properties.put("mp3.bitrate.nominal.bps", new Integer(BitRate));
+            af_properties.put("bitrate", BitRate);
+            aff_properties.put("mp3.bitrate.nominal.bps", BitRate);
             nHeader = m_header.getSyncHeader();
             encoding = sm_aEncodings[nVersion][nLayer - 1];
             aff_properties.put("mp3.version.encoding", encoding.toString());
             if (mLength != AudioSystem.NOT_SPECIFIED)
             {
                 nTotalMS = Math.round(m_header.total_ms(mLength));
-                aff_properties.put("duration", new Long(nTotalMS * 1000L));
+                aff_properties.put("duration", nTotalMS * 1000L);
             }
-            aff_properties.put("mp3.copyright", new Boolean(m_header.copyright()));
-            aff_properties.put("mp3.original", new Boolean(m_header.original()));
-            aff_properties.put("mp3.crc", new Boolean(m_header.checksums()));
-            aff_properties.put("mp3.padding", new Boolean(m_header.padding()));
+            aff_properties.put("mp3.copyright", m_header.copyright());
+            aff_properties.put("mp3.original", m_header.original());
+            aff_properties.put("mp3.crc", m_header.checksums());
+            aff_properties.put("mp3.padding", m_header.padding());
             InputStream id3v2 = m_bitstream.getRawID3v2();
             if (id3v2 != null)
             {
@@ -451,11 +452,32 @@ public class MpegAudioFileReader extends TAudioFileReader
         {
             FileInputStream fis = (FileInputStream) inputStream;
             byte[] id3v1 = new byte[128];
+            @SuppressWarnings("unused")
             long bytesSkipped = fis.skip(inputStream.available() - id3v1.length);
+            @SuppressWarnings("unused")
             int read = fis.read(id3v1, 0, id3v1.length);
             if ((id3v1[0] == 'T') && (id3v1[1] == 'A') && (id3v1[2] == 'G'))
             {
                 parseID3v1Frames(id3v1, aff_properties);
+            }
+        } else {
+            if (TDebug.TraceAudioFileReader) TDebug.out("unknown size, maybe not a file: " + inputStream.available());
+            if (inputStream.available() <= INITAL_READ_LENGTH) {
+                InputStream is = new BufferedInputStream(inputStream, inputStream.available());
+                byte[] id3v1 = new byte[128];
+                is.mark(inputStream.available());
+                @SuppressWarnings("unused")
+                long bytesSkipped = is.skip(inputStream.available() - id3v1.length);
+                @SuppressWarnings("unused")
+                int read = is.read(id3v1, 0, id3v1.length);
+    //            is.reset();
+                if (TDebug.TraceAudioFileReader) TDebug.out((char) id3v1[0] + ", " + (char) id3v1[1] + ", " + (char) id3v1[2]);
+                if ((id3v1[0] == 'T') && (id3v1[1] == 'A') && (id3v1[2] == 'G'))
+                {
+                    parseID3v1Frames(id3v1, aff_properties);
+                }
+            } else {
+                if (TDebug.TraceAudioFileReader) TDebug.out("larger than limit 20MB, skip id3v1");
             }
         }
         AudioFormat format = new MpegAudioFormat(encoding, nFrequency, AudioSystem.NOT_SPECIFIED // SampleSizeInBits - The size of a sample
@@ -565,6 +587,8 @@ public class MpegAudioFileReader extends TAudioFileReader
     {
         if (TDebug.TraceAudioFileReader) TDebug.out("MpegAudioFileReader.getAudioInputStream(InputStream inputStream)");
         if (!inputStream.markSupported()) inputStream = new BufferedInputStream(inputStream);
+        if (TDebug.TraceAudioFileReader) TDebug.out("available/limit: " + inputStream.available() + ", " + getMarkLimit());
+        setMarkLimit(Math.min(inputStream.available(), getMarkLimit()));
         return super.getAudioInputStream(inputStream);
     }
 
@@ -610,6 +634,7 @@ public class MpegAudioFileReader extends TAudioFileReader
      * @param end
      * @return
      */
+    @SuppressWarnings("unused")
     private String chopSubstring(String s, int start, int end)
     {
         String str = null;

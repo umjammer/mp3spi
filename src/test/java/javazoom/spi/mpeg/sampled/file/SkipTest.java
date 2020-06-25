@@ -22,10 +22,10 @@ package javazoom.spi.mpeg.sampled.file;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintStream;
+import java.net.URL;
 import java.util.Properties;
+import java.util.logging.Logger;
 
-import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -43,17 +43,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Skip bytes before playing.
  */
-public class SkipTest {
+class SkipTest {
     private String basefile = null;
     private String baseurl = null;
     private String filename = null;
     private String fileurl = null;
     private String name = null;
     private Properties props = null;
-    private PrintStream out = null;
+    private Logger out;
 
     @BeforeEach
-    protected void setUp() throws Exception {
+    void setUp() throws Exception {
         props = new Properties();
         InputStream pin = getClass().getClassLoader().getResourceAsStream("test.mp3.properties");
         props.load(pin);
@@ -62,45 +62,61 @@ public class SkipTest {
         name = props.getProperty("filename");
         filename = basefile + name;
         fileurl = baseurl + name;
-        out = System.out;
+        out = Logger.getLogger(SkipTest.class.getName());
     }
 
     @Test
-    public void testSkipFile() {
-        if (out != null)
-            out.println("-> Filename : " + filename + " <-");
-        try {
-            File file = new File(filename);
-            AudioFileFormat aff = AudioSystem.getAudioFileFormat(file);
-            AudioInputStream in = AudioSystem.getAudioInputStream(file);
-            AudioInputStream din = null;
-            AudioFormat baseFormat = in.getFormat();
-            if (out != null)
-                out.println("Source Format : " + baseFormat.toString());
-            AudioFormat decodedFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED,
-                                                        baseFormat.getSampleRate(),
-                                                        16,
-                                                        baseFormat.getChannels(),
-                                                        baseFormat.getChannels() * 2,
-                                                        baseFormat.getSampleRate(),
-                                                        false);
-            if (out != null)
-                out.println("Target Format : " + decodedFormat.toString());
-            din = AudioSystem.getAudioInputStream(decodedFormat, in);
-            long toSkip = file.length() / 2;
-            long skipped = skip(din, toSkip);
-            if (out != null)
-                out.println("Skip : " + skipped + "/" + toSkip + " (Total=" + file.length() + ")");
-            if (out != null)
-                out.println("Start playing");
-            rawplay(decodedFormat, din);
-            in.close();
-            if (out != null)
-                out.println("Played");
-            assertTrue(true, "testSkip : OK");
-        } catch (Exception e) {
-            assertTrue(false, e.getMessage());
-        }
+    void testSkipFile() throws Exception {
+        out.info("-> Filename : " + filename + " <-");
+        File file = new File(filename);
+        AudioInputStream in = AudioSystem.getAudioInputStream(file);
+        AudioInputStream din = null;
+        AudioFormat baseFormat = in.getFormat();
+        out.info("Source Format : " + baseFormat.toString());
+        AudioFormat decodedFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED,
+                                                    baseFormat.getSampleRate(),
+                                                    16,
+                                                    baseFormat.getChannels(),
+                                                    baseFormat.getChannels() * 2,
+                                                    baseFormat.getSampleRate(),
+                                                    false);
+        out.info("Target Format : " + decodedFormat.toString());
+        din = AudioSystem.getAudioInputStream(decodedFormat, in);
+        long toSkip = file.length() * 19 / 20;
+        long skipped = skip(din, toSkip);
+        out.info("Skip : " + skipped + "/" + toSkip + " (Total=" + file.length() + ")");
+        out.info("Start playing");
+        rawplay(decodedFormat, din);
+        in.close();
+        out.info("Played");
+        assertTrue(true, "testSkip : OK");
+    }
+
+    @Test
+    void testSkipUrl() throws Exception {
+        out.info("-> URL : " + fileurl + " <-");
+        URL url = new URL(fileurl);
+        AudioInputStream in = AudioSystem.getAudioInputStream(url);
+        AudioInputStream din = null;
+        AudioFormat baseFormat = in.getFormat();
+        out.info("Source Format : " + baseFormat.toString());
+        AudioFormat decodedFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED,
+                                                    baseFormat.getSampleRate(),
+                                                    16,
+                                                    baseFormat.getChannels(),
+                                                    baseFormat.getChannels() * 2,
+                                                    baseFormat.getSampleRate(),
+                                                    false);
+        out.info("Target Format : " + decodedFormat.toString());
+        din = AudioSystem.getAudioInputStream(decodedFormat, in);
+        long toSkip = in.available() * 19 / 20;
+        long skipped = skip(din, toSkip);
+        out.info("Skip : " + skipped + "/" + toSkip + " (Total=" + in.available() + ")");
+        out.info("Start playing");
+        rawplay(decodedFormat, din);
+        in.close();
+        out.info("Played");
+        assertTrue(true, "testSkip : OK");
     }
 
     private long skip(AudioInputStream in, long bytes) throws IOException {
@@ -134,11 +150,11 @@ public class SkipTest {
             gainControl.setValue(dB);
             // Start
             line.start();
-            int nBytesRead = 0, nBytesWritten = 0;
+            int nBytesRead = 0;
             while (nBytesRead != -1) {
                 nBytesRead = din.read(data, 0, data.length);
                 if (nBytesRead != -1)
-                    nBytesWritten = line.write(data, 0, nBytesRead);
+                    line.write(data, 0, nBytesRead);
             }
             // Stop
             line.drain();
