@@ -81,7 +81,7 @@ public class MpegAudioFileReader extends TAudioFileReader
             { MpegEncoding.MPEG2L1, MpegEncoding.MPEG2L2, MpegEncoding.MPEG2L3 },
             { MpegEncoding.MPEG1L1, MpegEncoding.MPEG1L2, MpegEncoding.MPEG1L3 },
             { MpegEncoding.MPEG2DOT5L1, MpegEncoding.MPEG2DOT5L2, MpegEncoding.MPEG2DOT5L3 }, };
-    public static final int INITAL_READ_LENGTH = 128000 * 4; // TODO a tag larger than this length causes an exception
+    public static final int INITAL_READ_LENGTH = 1024 * 1024 * 20; // TODO limitation
     private static final int MARK_LIMIT = INITAL_READ_LENGTH + 1;
 
     private static final String[] id3v1genres = {
@@ -457,6 +457,25 @@ public class MpegAudioFileReader extends TAudioFileReader
             {
                 parseID3v1Frames(id3v1, aff_properties);
             }
+        } else {
+            if (TDebug.TraceAudioFileReader) TDebug.out("unknown size, maybe not a file: " + inputStream.available());
+            if (inputStream.available() <= INITAL_READ_LENGTH) {
+                InputStream is = new BufferedInputStream(inputStream, inputStream.available());
+                byte[] id3v1 = new byte[128];
+                is.mark(inputStream.available());
+                @SuppressWarnings("unused")
+                long bytesSkipped = is.skip(inputStream.available() - id3v1.length);
+                @SuppressWarnings("unused")
+                int read = is.read(id3v1, 0, id3v1.length);
+    //            is.reset();
+                if (TDebug.TraceAudioFileReader) TDebug.out((char) id3v1[0] + ", " + (char) id3v1[1] + ", " + (char) id3v1[2]);
+                if ((id3v1[0] == 'T') && (id3v1[1] == 'A') && (id3v1[2] == 'G'))
+                {
+                    parseID3v1Frames(id3v1, aff_properties);
+                }
+            } else {
+                if (TDebug.TraceAudioFileReader) TDebug.out("larger than limit 20MB, skip id3v1");
+            }
         }
         AudioFormat format = new MpegAudioFormat(encoding, nFrequency, AudioSystem.NOT_SPECIFIED // SampleSizeInBits - The size of a sample
                 , nChannels // Channels - The number of channels
@@ -565,6 +584,8 @@ public class MpegAudioFileReader extends TAudioFileReader
     {
         if (TDebug.TraceAudioFileReader) TDebug.out("MpegAudioFileReader.getAudioInputStream(InputStream inputStream)");
         if (!inputStream.markSupported()) inputStream = new BufferedInputStream(inputStream);
+        if (TDebug.TraceAudioFileReader) TDebug.out("available/limit: " + inputStream.available() + ", " + getMarkLimit());
+        setMarkLimit(Math.min(inputStream.available(), getMarkLimit()));
         return super.getAudioInputStream(inputStream);
     }
 
