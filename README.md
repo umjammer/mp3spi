@@ -1,4 +1,4 @@
-[![Release](https://jitpack.io/v/umjammer/mp3spi.svg)](https://jitpack.io/#umjammer/mp3spi) [![Parent](https://img.shields.io/badge/Parent-vavi--sound--sandbox-pink)](https://github.com/umjammer/vavi-sound-sandbox)
+[![Release](https://jitpack.io/v/umjammer/mp3spi.svg)](https://jitpack.io/#umjammer/mp3spi) [![Java CI with Maven](https://github.com/umjammer/mp3spi/workflows/Java%20CI%20with%20Maven/badge.svg)](https://github.com/umjammer/mp3spi/actions) [![Parent](https://img.shields.io/badge/Parent-vavi--sound--sandbox-pink)](https://github.com/umjammer/vavi-sound-sandbox)
 
 # MP3SPI
 
