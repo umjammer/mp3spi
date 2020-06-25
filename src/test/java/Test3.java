@@ -5,6 +5,14 @@
  */
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
@@ -16,6 +24,7 @@ import javax.sound.sampled.LineEvent;
 import javax.sound.sampled.SourceDataLine;
 
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 
 /**
@@ -24,11 +33,9 @@ import org.junit.jupiter.api.Disabled;
  * @author <a href="mailto:umjammer@gmail.com">Naohide Sano</a> (umjammer)
  * @version 0.00 2012/06/11 umjammer initial version <br>
  */
-@Disabled
-public class Test3 {
+class Test3 {
 
-//    static final String inFile = "/Users/nsano/src/sano-n/vavi-util-tag-mp3spi/src/test/resources/test.mp3";
-    static final String inFile = "/Users/nsano/Music/iTunes/iTunes Music/NAMCO/Ace Combat 04 Shattered Skies Original Sound Tracks/1-11 Blockade.mp3";
+    static final String inFile = "src/test/resources/test.mp3";
 
     /**
      * @param args
@@ -77,6 +84,35 @@ gainControl.setValue(dB);
         }
         line.drain();
         line.close();
+    }
+
+    @Test
+    @Disabled
+    void test() throws IOException {
+        Path root = Paths.get(System.getProperty("user.home"), "Music", "iTunes", "iTunes Music");
+System.err.println("ROOT: " + Files.exists(root));
+
+        AtomicInteger count = new AtomicInteger();
+        AtomicInteger error = new AtomicInteger();
+        Files.walkFileTree(root, new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attr) {
+                if (file.getFileName().toString().toLowerCase().endsWith(".mp3")) {
+//System.err.println(file);
+                    count.incrementAndGet();
+                    try {
+                        AudioSystem.getAudioInputStream(file.toFile());
+                    } catch (Exception e) {
+                        try {
+System.err.println("ERROR: " + file + ", " + Files.size(file));
+                        } catch (Exception f) {}
+                        error.incrementAndGet();
+                    }
+                }
+                return FileVisitResult.CONTINUE;
+            }
+        });
+System.err.println("RESULT: " + error + "/" + count);
     }
 }
 
