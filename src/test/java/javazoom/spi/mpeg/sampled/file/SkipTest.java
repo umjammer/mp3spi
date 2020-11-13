@@ -109,7 +109,7 @@ class SkipTest {
                                                     false);
         out.info("Target Format : " + decodedFormat.toString());
         din = AudioSystem.getAudioInputStream(decodedFormat, in);
-        long toSkip = in.available() * 19 / 20;
+        long toSkip = in.available() * 19L / 20;
         long skipped = skip(din, toSkip);
         out.info("Skip : " + skipped + "/" + toSkip + " (Total=" + in.available() + ")");
         out.info("Start playing");
