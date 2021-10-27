@@ -3,11 +3,11 @@
 
   <groupId>net.javazoom</groupId>
   <artifactId>mp3spi</artifactId>
-  <version>1.9.8</version>
+  <version>1.9.9</version>
 
   <properties>
     <tritonus.groupId>org.tritonus</tritonus.groupId>
-    <tritonus.version>0.3.9</tritonus.version>
+    <tritonus.version>0.3.10</tritonus.version>
   </properties>
 
   <build>
@@ -37,12 +37,9 @@
       <url>https://jitpack.io</url>
     </repository>
     <repository>
-      <id>bintray-umjammer-maven</id>
-      <name>bintray</name>
-      <url>https://dl.bintray.com/umjammer/maven</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
+      <id>github</id>
+      <name>GitHub umjammer Apache Maven Packages</name>
+      <url>https://maven.pkg.github.com/umjammer/*</url>
     </repository>
   </repositories>
 
