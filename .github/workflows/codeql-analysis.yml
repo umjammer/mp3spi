@@ -61,7 +61,7 @@ jobs:
     # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
     # If this step fails, then you should remove it and run the build manually (see below)
     - name: Build
-      run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml -Dmaven.test.skip=true
+      run: mvn package -s $GITHUB_WORKSPACE/settings.xml -Dmaven.test.skip=true
       env:
         GITHUB_TOKEN: ${{ github.token }}
 
