@@ -24,8 +24,9 @@ contribution. MP3SPI is licensed under LGPL (see [LICENSE.txt](LICENSE.txt)).
 
 ### How to install MP3SPI ?
 
-  Before running MP3SPI you must set `PATH` and `CLASSPATH` for JAVA
-  and you must add `jl1.0.jar`, `tritonus_share.jar` and `mp3spi1.9.4.jar` to the `CLASSPATH`.
+ * https://github.com/umjammer/mp3spi/packages/1067666
+ * this project uses github packages. add a personal access token to `~/.m2/settings.xml`
+ * see https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-apache-maven-registry
 
 ### Do I need JMF to run MP3SPI player ?
 
