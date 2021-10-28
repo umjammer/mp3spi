@@ -10,6 +10,14 @@
     <tritonus.version>0.3.10</tritonus.version>
   </properties>
 
+  <distributionManagement>
+    <repository>
+      <id>github</id>
+      <name>GitHub umjammer Apache Maven Packages</name>
+      <url>https://maven.pkg.github.com/umjammer/mp3spi</url>
+    </repository>
+  </distributionManagement>
+
   <build>
     <plugins>
       <plugin>
