@@ -21,9 +21,7 @@
  * --------------------------------------------------------------------------
  */
 
-
 package    javazoom.spi.mpeg.sampled.convert;
-
 
 import java.util.Arrays;
 
@@ -38,6 +36,7 @@ import org.tritonus.share.sampled.Encodings;
 import org.tritonus.share.sampled.convert.TEncodingFormatConversionProvider;
 
 import static javax.sound.sampled.AudioSystem.NOT_SPECIFIED;
+
 
 /**
  * ConversionProvider for MPEG files.

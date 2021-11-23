@@ -45,9 +45,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * MpegAudioFileReader unit test.
  * It matches test.mp3 properties to test.mp3.properties expected results.
- * As we don't ship test.mp3, you have to generate your own test.mp3.properties
- * Uncomment out = System.out; in setUp() method to generated it on stdout from
- * your own MP3 file.
  */
 public class MpegAudioFileReaderTest {
 
