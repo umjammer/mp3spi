@@ -21,7 +21,7 @@
  * --------------------------------------------------------------------------
  */
 
-package    javazoom.spi.mpeg.sampled.convert;
+package javazoom.spi.mpeg.sampled.convert;
 
 import java.util.Arrays;
 
@@ -40,7 +40,7 @@ import static javax.sound.sampled.AudioSystem.NOT_SPECIFIED;
 
 /**
  * ConversionProvider for MPEG files.
-  */
+ */
 public class MpegFormatConversionProvider extends TEncodingFormatConversionProvider
 {
     private static final AudioFormat.Encoding    MP3 = Encodings.getEncoding("MP3");
@@ -112,7 +112,9 @@ public class MpegFormatConversionProvider extends TEncodingFormatConversionProvi
             {
                 if ((sourceFormat.getFrameRate() != AudioSystem.NOT_SPECIFIED) || (sourceFormat.getFrameSize() != AudioSystem.NOT_SPECIFIED))
                 {
-                    conversion = true;
+                    if (sourceFormat.getChannels() == targetFormat.getChannels()) {
+                        conversion = true;
+                    }
                 }
             }
         }
