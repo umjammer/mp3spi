@@ -44,13 +44,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Skip bytes before playing.
  */
 class SkipTest {
+    private static Logger logger = Logger.getLogger(SkipTest.class.getName());
+
     private String basefile = null;
     private String baseurl = null;
     private String filename = null;
     private String fileurl = null;
     private String name = null;
     private Properties props = null;
-    private Logger out;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -62,17 +63,16 @@ class SkipTest {
         name = props.getProperty("filename");
         filename = basefile + name;
         fileurl = baseurl + name;
-        out = Logger.getLogger(SkipTest.class.getName());
     }
 
     @Test
     void testSkipFile() throws Exception {
-        out.info("-> Filename : " + filename + " <-");
+        logger.info("-> Filename : " + filename + " <-");
         File file = new File(filename);
         AudioInputStream in = AudioSystem.getAudioInputStream(file);
         AudioInputStream din = null;
         AudioFormat baseFormat = in.getFormat();
-        out.info("Source Format : " + baseFormat.toString());
+        logger.info("Source Format : " + baseFormat.toString());
         AudioFormat decodedFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED,
                                                     baseFormat.getSampleRate(),
                                                     16,
@@ -80,26 +80,26 @@ class SkipTest {
                                                     baseFormat.getChannels() * 2,
                                                     baseFormat.getSampleRate(),
                                                     false);
-        out.info("Target Format : " + decodedFormat.toString());
+        logger.info("Target Format : " + decodedFormat.toString());
         din = AudioSystem.getAudioInputStream(decodedFormat, in);
         long toSkip = file.length() * 19 / 20;
         long skipped = skip(din, toSkip);
-        out.info("Skip : " + skipped + "/" + toSkip + " (Total=" + file.length() + ")");
-        out.info("Start playing");
+        logger.info("Skip : " + skipped + "/" + toSkip + " (Total=" + file.length() + ")");
+        logger.info("Start playing");
         rawplay(decodedFormat, din);
         in.close();
-        out.info("Played");
+        logger.info("Played");
         assertTrue(true, "testSkip : OK");
     }
 
     @Test
     void testSkipUrl() throws Exception {
-        out.info("-> URL : " + fileurl + " <-");
+        logger.info("-> URL : " + fileurl + " <-");
         URL url = new URL(fileurl);
         AudioInputStream in = AudioSystem.getAudioInputStream(url);
         AudioInputStream din = null;
         AudioFormat baseFormat = in.getFormat();
-        out.info("Source Format : " + baseFormat.toString());
+        logger.info("Source Format : " + baseFormat.toString());
         AudioFormat decodedFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED,
                                                     baseFormat.getSampleRate(),
                                                     16,
@@ -107,15 +107,15 @@ class SkipTest {
                                                     baseFormat.getChannels() * 2,
                                                     baseFormat.getSampleRate(),
                                                     false);
-        out.info("Target Format : " + decodedFormat.toString());
+        logger.info("Target Format : " + decodedFormat.toString());
         din = AudioSystem.getAudioInputStream(decodedFormat, in);
         long toSkip = in.available() * 19L / 20;
         long skipped = skip(din, toSkip);
-        out.info("Skip : " + skipped + "/" + toSkip + " (Total=" + in.available() + ")");
-        out.info("Start playing");
+        logger.info("Skip : " + skipped + "/" + toSkip + " (Total=" + in.available() + ")");
+        logger.info("Start playing");
         rawplay(decodedFormat, din);
         in.close();
-        out.info("Played");
+        logger.info("Played");
         assertTrue(true, "testSkip : OK");
     }
 

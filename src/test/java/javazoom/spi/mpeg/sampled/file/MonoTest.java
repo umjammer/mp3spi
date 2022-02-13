@@ -13,6 +13,7 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -33,6 +34,14 @@ public class MonoTest {
 
     static Logger logger = Logger.getLogger(SkipTest.class.getName());
 
+    /** play frames limit */
+    static int frames;
+
+    @BeforeAll
+    static void setup() {
+        frames = Boolean.valueOf(System.getProperty("vavi.test")) ? 2 : 1000;
+    }
+
     @Test
     @DisplayName("mono -> mono")
     void test1() throws Exception {
@@ -51,7 +60,7 @@ logger.info("Out Format: " + outFormat.toString());
         Clip c = AudioSystem.getClip();
         c.open(out);
         c.start();
-//        Thread.sleep((long) (c.getFrameLength() / 44100.) * 1000);
+        Thread.sleep((long) (c.getFrameLength() / 44100.) * frames);
     }
 
     @Test
@@ -81,7 +90,7 @@ logger.info("Out Format 2: " + outFormat2.toString());
         Clip c = AudioSystem.getClip();
         c.open(out2);
         c.start();
-//        Thread.sleep((long) (c.getFrameLength() / 44100.) * 1000);
+        Thread.sleep((long) (c.getFrameLength() / 44100.) * frames);
     }
 
     @Test
@@ -111,7 +120,7 @@ logger.info("Out Format 2: " + outFormat2.toString());
         Clip c = AudioSystem.getClip();
         c.open(out2);
         c.start();
-//        Thread.sleep((long) (c.getFrameLength() / 44100.) * 1000);
+        Thread.sleep((long) (c.getFrameLength() / 44100.) * frames);
     }
 
     @Test

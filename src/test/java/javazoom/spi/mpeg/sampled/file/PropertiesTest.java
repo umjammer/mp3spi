@@ -29,13 +29,14 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 class PropertiesTest {
 
+    private static Logger logger = Logger.getLogger(PropertiesTest.class.getName());
+
     private String basefile = null;
     private String baseurl = null;
     private String filename = null;
     private String fileurl = null;
     private String name = null;
     private Properties props = null;
-    private Logger logger;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -47,7 +48,6 @@ class PropertiesTest {
         name = props.getProperty("filename");
         filename = basefile + name;
         fileurl = baseurl + name;
-        logger = Logger.getLogger(PropertiesTest.class.getName());
     }
 
     @Test
