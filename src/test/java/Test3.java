@@ -20,7 +20,6 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
-import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineEvent;
 import javax.sound.sampled.SourceDataLine;
 
@@ -33,9 +32,9 @@ import vavi.util.Debug;
 import vavi.util.properties.annotation.Property;
 import vavi.util.properties.annotation.PropsEntity;
 
+import static javazoom.spi.mpeg.sampled.file.PlayerTest.volume;
 import static org.junit.jupiter.api.Assertions.fail;
 import static vavix.util.DelayedWorker.later;
-
 
 /**
  * line.
@@ -98,10 +97,7 @@ Debug.println("done");
 
         byte[] buf = new byte[8192];
         line.open(audioFormat, buf.length);
-FloatControl gainControl = (FloatControl) line.getControl(FloatControl.Type.MASTER_GAIN);
-double gain = .2d; // number between 0 and 1 (loudest)
-float dB = (float) (Math.log(gain) / Math.log(10.0) * 20.0);
-gainControl.setValue(dB);
+        volume(line, .2d);
         line.start();
         int r = 0;
         while (!later(time).come()) {
@@ -130,6 +126,7 @@ Debug.println(ais);
 
     @Test
     @Disabled
+    @DisplayName("test all mp3s in your itumes music")
     void test() throws IOException {
         Path root = Paths.get(System.getProperty("user.home"), "Music", "iTunes", "iTunes Music");
 Debug.println("ROOT: " + Files.exists(root));

@@ -67,20 +67,20 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
+import org.tritonus.share.TDebug;
+import org.tritonus.share.sampled.file.TAudioFileReader;
+
 import javazoom.jl.decoder.Bitstream;
 import javazoom.jl.decoder.Header;
 import javazoom.spi.mpeg.sampled.file.tag.IcyInputStream;
 import javazoom.spi.mpeg.sampled.file.tag.MP3Tag;
-
-import org.tritonus.share.TDebug;
-import org.tritonus.share.sampled.file.TAudioFileReader;
 
 /**
  * This class implements AudioFileReader for MP3 SPI.
  */
 public class MpegAudioFileReader extends TAudioFileReader
 {
-    public static final String VERSION = "MP3SPI 1.9.4";
+    public static final String VERSION = "MP3SPI 1.9.10";
 //  private final int SYNC = 0xFFE00000;
     private String weak = null;
     private final AudioFormat.Encoding[][] sm_aEncodings = {
@@ -322,8 +322,9 @@ public class MpegAudioFileReader extends TAudioFileReader
         }
         catch (Exception e)
         {
-            if (TDebug.TraceAudioFileReader) TDebug.out("not a MPEG stream:" + e.getMessage());
-            throw new UnsupportedAudioFileException("not a MPEG stream:" + e.getMessage());
+            if (TDebug.TraceAudioFileReader) e.printStackTrace();
+            if (TDebug.TraceAudioFileReader) TDebug.out("not a MPEG stream: " + e.getMessage());
+            throw new UnsupportedAudioFileException("not a MPEG stream: " + e.getMessage());
         }
         // Deeper checks ?
         int cVersion = (nHeader >> 19) & 0x3;
@@ -341,12 +342,11 @@ public class MpegAudioFileReader extends TAudioFileReader
         // Look up for ID3v1 tag
         if ((size == mediaLength) && (mediaLength != AudioSystem.NOT_SPECIFIED))
         {
-            FileInputStream fis = (FileInputStream) inputStream;
             byte[] id3v1 = new byte[128];
             @SuppressWarnings("unused")
-            long bytesSkipped = fis.skip(inputStream.available() - id3v1.length);
+            long bytesSkipped = inputStream.skip(inputStream.available() - id3v1.length);
             @SuppressWarnings("unused")
-            int read = fis.read(id3v1, 0, id3v1.length);
+            int read = inputStream.read(id3v1, 0, id3v1.length);
             if ((id3v1[0] == 'T') && (id3v1[1] == 'A') && (id3v1[2] == 'G'))
             {
                 parseID3v1Frames(id3v1, aff_properties);
@@ -476,7 +476,8 @@ public class MpegAudioFileReader extends TAudioFileReader
      */
     public AudioInputStream getAudioInputStream(InputStream inputStream) throws UnsupportedAudioFileException, IOException
     {
-        if (TDebug.TraceAudioFileReader) TDebug.out("MpegAudioFileReader.getAudioInputStream(InputStream inputStream)");
+        if (TDebug.TraceAudioFileReader) { TDebug.out("MpegAudioFileReader.getAudioInputStream(InputStream inputStream)");
+                                           TDebug.out("inputStream: " + inputStream.getClass().getName() + ", mark: " + inputStream.markSupported()); }
         if (!inputStream.markSupported()) inputStream = new BufferedInputStream(inputStream);
         if (TDebug.TraceAudioFileReader) TDebug.out("available/limit: " + inputStream.available() + ", " + getMarkLimit());
         setMarkLimit(Math.min(inputStream.available(), getMarkLimit()));

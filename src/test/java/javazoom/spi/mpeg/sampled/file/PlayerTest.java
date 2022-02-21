@@ -17,6 +17,8 @@
  *
  */
 
+package javazoom.spi.mpeg.sampled.file;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,7 +41,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static vavix.util.DelayedWorker.later;
 
 import javazoom.spi.PropertiesContainer;
-
 
 /**
  * Simple player (based on MP3 SPI) unit test.
@@ -130,10 +131,7 @@ public class PlayerTest {
         byte[] data = new byte[4096];
         SourceDataLine line = getLine(targetFormat);
         if (line != null) {
-            FloatControl gainControl = (FloatControl) line.getControl(FloatControl.Type.MASTER_GAIN);
-            double gain = .1d; // number between 0 and 1 (loudest)
-            float dB = (float) (Math.log(gain) / Math.log(10.0) * 20.0);
-            gainControl.setValue(dB);
+            volume(line, .1d);
             // Start
             line.start();
             int nBytesRead = 0;
@@ -150,5 +148,15 @@ public class PlayerTest {
             line.close();
             din.close();
         }
+    }
+
+    /**
+     * @param gain number between 0 and 1 (loudest)
+     * @before {@link DataLine#open()}
+     */
+    public static void volume(DataLine line, double gain) {
+        FloatControl gainControl = (FloatControl) line.getControl(FloatControl.Type.MASTER_GAIN);
+        float dB = (float) (Math.log10(gain) * 20.0);
+        gainControl.setValue(dB);
     }
 }

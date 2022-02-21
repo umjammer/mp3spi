@@ -30,15 +30,14 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
-import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static javazoom.spi.mpeg.sampled.file.PlayerTest.volume;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
 
 /**
  * Skip bytes before playing.
@@ -144,10 +143,7 @@ class SkipTest {
         byte[] data = new byte[4096];
         SourceDataLine line = getLine(targetFormat);
         if (line != null) {
-            FloatControl gainControl = (FloatControl) line.getControl(FloatControl.Type.MASTER_GAIN);
-            double gain = .1d; // number between 0 and 1 (loudest)
-            float dB = (float) (Math.log(gain) / Math.log(10.0) * 20.0);
-            gainControl.setValue(dB);
+            volume(line, .1d);
             // Start
             line.start();
             int nBytesRead = 0;

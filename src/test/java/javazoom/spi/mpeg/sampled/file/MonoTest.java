@@ -17,11 +17,14 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static javazoom.spi.mpeg.sampled.file.PlayerTest.volume;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 /**
  * MonoTest.
+ *
+ * TODO volume for clip doesn't work on mac (oracle 1.8.0_291)
  *
  * @author <a href="mailto:umjammer@gmail.com">Naohide Sano</a> (umjammer)
  * @version 0.00 2021/11/23 umjammer initial version <br>
@@ -59,6 +62,7 @@ logger.info("Out Format: " + outFormat.toString());
         AudioInputStream out = AudioSystem.getAudioInputStream(outFormat, in);
         Clip c = AudioSystem.getClip();
         c.open(out);
+        volume(c, .01d);
         c.start();
         Thread.sleep((long) (c.getFrameLength() / 44100.) * frames);
     }
@@ -89,6 +93,7 @@ logger.info("Out Format 2: " + outFormat2.toString());
         AudioInputStream out2 = AudioSystem.getAudioInputStream(outFormat2, out);
         Clip c = AudioSystem.getClip();
         c.open(out2);
+        volume(c, .01d);
         c.start();
         Thread.sleep((long) (c.getFrameLength() / 44100.) * frames);
     }
@@ -119,6 +124,7 @@ logger.info("Out Format 2: " + outFormat2.toString());
         AudioInputStream out2 = AudioSystem.getAudioInputStream(outFormat2, out);
         Clip c = AudioSystem.getClip();
         c.open(out2);
+        volume(c, .01d);
         c.start();
         Thread.sleep((long) (c.getFrameLength() / 44100.) * frames);
     }
