@@ -49,10 +49,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.AccessControlException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.sound.sampled.AudioFileFormat;
@@ -84,156 +89,17 @@ public class MpegAudioFileReader extends TAudioFileReader
     public static final int INITAL_READ_LENGTH = 1024 * 1024 * 20; // TODO limitation
     private static final int MARK_LIMIT = INITAL_READ_LENGTH + 1;
 
-    private static final String[] id3v1genres = {
-          "Blues"
-          , "Classic Rock"
-          , "Country"
-          , "Dance"
-          , "Disco"
-          , "Funk"
-          , "Grunge"
-          , "Hip-Hop"
-          , "Jazz"
-          , "Metal"
-          , "New Age"
-          , "Oldies"
-          , "Other"
-          , "Pop"
-          , "R&B"
-          , "Rap"
-          , "Reggae"
-          , "Rock"
-          , "Techno"
-          , "Industrial"
-          , "Alternative"
-          , "Ska"
-          , "Death Metal"
-          , "Pranks"
-          , "Soundtrack"
-          , "Euro-Techno"
-          , "Ambient"
-          , "Trip-Hop"
-          , "Vocal"
-          , "Jazz+Funk"
-          , "Fusion"
-          , "Trance"
-          , "Classical"
-          , "Instrumental"
-          , "Acid"
-          , "House"
-          , "Game"
-          , "Sound Clip"
-          , "Gospel"
-          , "Noise"
-          , "AlternRock"
-          , "Bass"
-          , "Soul"
-          , "Punk"
-          , "Space"
-          , "Meditative"
-          , "Instrumental Pop"
-          , "Instrumental Rock"
-          , "Ethnic"
-          , "Gothic"
-          , "Darkwave"
-          , "Techno-Industrial"
-          , "Electronic"
-          , "Pop-Folk"
-          , "Eurodance"
-          , "Dream"
-          , "Southern Rock"
-          , "Comedy"
-          , "Cult"
-          , "Gangsta"
-          , "Top 40"
-          , "Christian Rap"
-          , "Pop/Funk"
-          , "Jungle"
-          , "Native American"
-          , "Cabaret"
-          , "New Wave"
-          , "Psychadelic"
-          , "Rave"
-          , "Showtunes"
-          , "Trailer"
-          , "Lo-Fi"
-          , "Tribal"
-          , "Acid Punk"
-          , "Acid Jazz"
-          , "Polka"
-          , "Retro"
-          , "Musical"
-          , "Rock & Roll"
-          , "Hard Rock"
-          , "Folk"
-          , "Folk-Rock"
-          , "National Folk"
-          , "Swing"
-          , "Fast Fusion"
-          , "Bebob"
-          , "Latin"
-          , "Revival"
-          , "Celtic"
-          , "Bluegrass"
-          , "Avantgarde"
-          , "Gothic Rock"
-          , "Progressive Rock"
-          , "Psychedelic Rock"
-          , "Symphonic Rock"
-          , "Slow Rock"
-          , "Big Band"
-          , "Chorus"
-          , "Easy Listening"
-          , "Acoustic"
-          , "Humour"
-          , "Speech"
-          , "Chanson"
-          , "Opera"
-          , "Chamber Music"
-          , "Sonata"
-          , "Symphony"
-          , "Booty Brass"
-          , "Primus"
-          , "Porn Groove"
-          , "Satire"
-          , "Slow Jam"
-          , "Club"
-          , "Tango"
-          , "Samba"
-          , "Folklore"
-          , "Ballad"
-          , "Power Ballad"
-          , "Rhythmic Soul"
-          , "Freestyle"
-          , "Duet"
-          , "Punk Rock"
-          , "Drum Solo"
-          , "A Capela"
-          , "Euro-House"
-          , "Dance Hall"
-          , "Goa"
-          , "Drum & Bass"
-          , "Club-House"
-          , "Hardcore"
-          , "Terror"
-          , "Indie"
-          , "BritPop"
-          , "Negerpunk"
-          , "Polsk Punk"
-          , "Beat"
-          , "Christian Gangsta Rap"
-          , "Heavy Metal"
-          , "Black Metal"
-          , "Crossover"
-          , "Contemporary Christian"
-          , "Christian Rock"
-          , "Merengue"
-          , "Salsa"
-          , "Thrash Metal"
-          , "Anime"
-          , "JPop"
-          , "SynthPop"
-          };
+    private static final String[] id3v1genres;
+
+    static {
+        try {
+            Path path = Paths.get(MpegAudioFileReader.class.getResource("/genres.properties").toURI());
+            List<String> genres = Files.readAllLines(path);
+            id3v1genres = genres.toArray(new String[genres.size()]);
+        } catch (IOException | URISyntaxException e) {
+            throw new IllegalStateException(e);
+        }
+    }
 
     public MpegAudioFileReader()
     {
