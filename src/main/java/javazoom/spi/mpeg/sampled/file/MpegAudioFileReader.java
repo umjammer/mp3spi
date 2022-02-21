@@ -45,6 +45,7 @@ package javazoom.spi.mpeg.sampled.file;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
@@ -162,6 +163,30 @@ public class MpegAudioFileReader extends TAudioFileReader
         Map<String, Object> af_properties = new HashMap<>();
         int mLength = (int) mediaLength;
         int size = inputStream.available();
+        // https://github.com/umjammer/mp3spi/issues/5
+        inputStream = new FilterInputStream(inputStream) {
+            private void check(int r) throws IOException {
+                if (in.available() < r) {
+                    TDebug.out("stop reading, prevent form eof");
+                    throw new RuntimeException("stop reading, prevent form eof");
+                }
+            }
+            @Override
+            public int read() throws IOException {
+                check(1);
+                return super.read();
+            }
+            @Override
+            public int read(byte[] b) throws IOException {
+                check(b.length);
+                return super.read(b);
+            }
+            @Override
+            public int read(byte[] b, int off, int len) throws IOException {
+                check(len);
+                return super.read(b, off, len);
+            }
+        };
         PushbackInputStream pis = new PushbackInputStream(inputStream, MARK_LIMIT);
         byte head[] = new byte[22];
         pis.read(head);

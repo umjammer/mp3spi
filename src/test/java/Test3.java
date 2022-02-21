@@ -4,7 +4,8 @@
  * Programmed by Naohide Sano
  */
 
-import java.io.File;
+import java.io.BufferedInputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -112,6 +113,19 @@ gainControl.setValue(dB);
         }
         line.drain();
         line.close();
+    }
+
+    @Test
+    @DisplayName("https://github.com/umjammer/mp3spi/issues/5")
+    void test3() throws Exception {
+        try {
+            Path in = Paths.get(Test3.class.getResource("/test.mid").toURI());
+            AudioInputStream ais = AudioSystem.getAudioInputStream(new BufferedInputStream(Files.newInputStream(in)));
+Debug.println(ais);
+        } catch (EOFException e) {
+            e.printStackTrace();
+            fail("spi cosumes all bytes, and eof make stream unresettable");
+        }
     }
 
     @Test
