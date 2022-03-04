@@ -3,7 +3,7 @@
 
   <groupId>net.javazoom</groupId>
   <artifactId>mp3spi</artifactId>
-  <version>1.9.9</version>
+  <version>1.9.10</version>
 
   <properties>
     <tritonus.groupId>org.tritonus</tritonus.groupId>
@@ -85,9 +85,9 @@
     </dependency>
 
     <dependency>
-      <groupId>vavi</groupId> <!-- com.github.umjammer -->
+      <groupId>com.github.umjammer</groupId>
       <artifactId>vavi-commons</artifactId>
-      <version>1.1.6-SNAPSHOT</version>
+      <version>1.1.6</version>
       <scope>test</scope>
     </dependency>
 
