@@ -45,14 +45,20 @@ package javazoom.spi.mpeg.sampled.file;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.AccessControlException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.sound.sampled.AudioFileFormat;
@@ -61,20 +67,20 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
+import org.tritonus.share.TDebug;
+import org.tritonus.share.sampled.file.TAudioFileReader;
+
 import javazoom.jl.decoder.Bitstream;
 import javazoom.jl.decoder.Header;
 import javazoom.spi.mpeg.sampled.file.tag.IcyInputStream;
 import javazoom.spi.mpeg.sampled.file.tag.MP3Tag;
-
-import org.tritonus.share.TDebug;
-import org.tritonus.share.sampled.file.TAudioFileReader;
 
 /**
  * This class implements AudioFileReader for MP3 SPI.
  */
 public class MpegAudioFileReader extends TAudioFileReader
 {
-    public static final String VERSION = "MP3SPI 1.9.4";
+    public static final String VERSION = "MP3SPI 1.9.10";
 //  private final int SYNC = 0xFFE00000;
     private String weak = null;
     private final AudioFormat.Encoding[][] sm_aEncodings = {
@@ -84,156 +90,17 @@ public class MpegAudioFileReader extends TAudioFileReader
     public static final int INITAL_READ_LENGTH = 1024 * 1024 * 20; // TODO limitation
     private static final int MARK_LIMIT = INITAL_READ_LENGTH + 1;
 
-    private static final String[] id3v1genres = {
-          "Blues"
-          , "Classic Rock"
-          , "Country"
-          , "Dance"
-          , "Disco"
-          , "Funk"
-          , "Grunge"
-          , "Hip-Hop"
-          , "Jazz"
-          , "Metal"
-          , "New Age"
-          , "Oldies"
-          , "Other"
-          , "Pop"
-          , "R&B"
-          , "Rap"
-          , "Reggae"
-          , "Rock"
-          , "Techno"
-          , "Industrial"
-          , "Alternative"
-          , "Ska"
-          , "Death Metal"
-          , "Pranks"
-          , "Soundtrack"
-          , "Euro-Techno"
-          , "Ambient"
-          , "Trip-Hop"
-          , "Vocal"
-          , "Jazz+Funk"
-          , "Fusion"
-          , "Trance"
-          , "Classical"
-          , "Instrumental"
-          , "Acid"
-          , "House"
-          , "Game"
-          , "Sound Clip"
-          , "Gospel"
-          , "Noise"
-          , "AlternRock"
-          , "Bass"
-          , "Soul"
-          , "Punk"
-          , "Space"
-          , "Meditative"
-          , "Instrumental Pop"
-          , "Instrumental Rock"
-          , "Ethnic"
-          , "Gothic"
-          , "Darkwave"
-          , "Techno-Industrial"
-          , "Electronic"
-          , "Pop-Folk"
-          , "Eurodance"
-          , "Dream"
-          , "Southern Rock"
-          , "Comedy"
-          , "Cult"
-          , "Gangsta"
-          , "Top 40"
-          , "Christian Rap"
-          , "Pop/Funk"
-          , "Jungle"
-          , "Native American"
-          , "Cabaret"
-          , "New Wave"
-          , "Psychadelic"
-          , "Rave"
-          , "Showtunes"
-          , "Trailer"
-          , "Lo-Fi"
-          , "Tribal"
-          , "Acid Punk"
-          , "Acid Jazz"
-          , "Polka"
-          , "Retro"
-          , "Musical"
-          , "Rock & Roll"
-          , "Hard Rock"
-          , "Folk"
-          , "Folk-Rock"
-          , "National Folk"
-          , "Swing"
-          , "Fast Fusion"
-          , "Bebob"
-          , "Latin"
-          , "Revival"
-          , "Celtic"
-          , "Bluegrass"
-          , "Avantgarde"
-          , "Gothic Rock"
-          , "Progressive Rock"
-          , "Psychedelic Rock"
-          , "Symphonic Rock"
-          , "Slow Rock"
-          , "Big Band"
-          , "Chorus"
-          , "Easy Listening"
-          , "Acoustic"
-          , "Humour"
-          , "Speech"
-          , "Chanson"
-          , "Opera"
-          , "Chamber Music"
-          , "Sonata"
-          , "Symphony"
-          , "Booty Brass"
-          , "Primus"
-          , "Porn Groove"
-          , "Satire"
-          , "Slow Jam"
-          , "Club"
-          , "Tango"
-          , "Samba"
-          , "Folklore"
-          , "Ballad"
-          , "Power Ballad"
-          , "Rhythmic Soul"
-          , "Freestyle"
-          , "Duet"
-          , "Punk Rock"
-          , "Drum Solo"
-          , "A Capela"
-          , "Euro-House"
-          , "Dance Hall"
-          , "Goa"
-          , "Drum & Bass"
-          , "Club-House"
-          , "Hardcore"
-          , "Terror"
-          , "Indie"
-          , "BritPop"
-          , "Negerpunk"
-          , "Polsk Punk"
-          , "Beat"
-          , "Christian Gangsta Rap"
-          , "Heavy Metal"
-          , "Black Metal"
-          , "Crossover"
-          , "Contemporary Christian"
-          , "Christian Rock"
-          , "Merengue"
-          , "Salsa"
-          , "Thrash Metal"
-          , "Anime"
-          , "JPop"
-          , "SynthPop"
-          };
+    private static final String[] id3v1genres;
+
+    static {
+        try {
+            Path path = Paths.get(MpegAudioFileReader.class.getResource("/genres.properties").toURI());
+            List<String> genres = Files.readAllLines(path);
+            id3v1genres = genres.toArray(new String[genres.size()]);
+        } catch (IOException | URISyntaxException e) {
+            throw new IllegalStateException(e);
+        }
+    }
 
     public MpegAudioFileReader()
     {
@@ -296,6 +163,30 @@ public class MpegAudioFileReader extends TAudioFileReader
         Map<String, Object> af_properties = new HashMap<>();
         int mLength = (int) mediaLength;
         int size = inputStream.available();
+        // https://github.com/umjammer/mp3spi/issues/5
+        inputStream = new FilterInputStream(inputStream) {
+            private void check(int r) throws IOException {
+                if (in.available() < r) {
+                    TDebug.out("stop reading, prevent form eof");
+                    throw new RuntimeException("stop reading, prevent form eof");
+                }
+            }
+            @Override
+            public int read() throws IOException {
+                check(1);
+                return super.read();
+            }
+            @Override
+            public int read(byte[] b) throws IOException {
+                check(b.length);
+                return super.read(b);
+            }
+            @Override
+            public int read(byte[] b, int off, int len) throws IOException {
+                check(len);
+                return super.read(b, off, len);
+            }
+        };
         PushbackInputStream pis = new PushbackInputStream(inputStream, MARK_LIMIT);
         byte head[] = new byte[22];
         pis.read(head);
@@ -431,8 +322,9 @@ public class MpegAudioFileReader extends TAudioFileReader
         }
         catch (Exception e)
         {
-            if (TDebug.TraceAudioFileReader) TDebug.out("not a MPEG stream:" + e.getMessage());
-            throw new UnsupportedAudioFileException("not a MPEG stream:" + e.getMessage());
+            if (TDebug.TraceAudioFileReader) e.printStackTrace();
+            if (TDebug.TraceAudioFileReader) TDebug.out("not a MPEG stream: " + e.getMessage());
+            throw new UnsupportedAudioFileException("not a MPEG stream: " + e.getMessage());
         }
         // Deeper checks ?
         int cVersion = (nHeader >> 19) & 0x3;
@@ -450,12 +342,11 @@ public class MpegAudioFileReader extends TAudioFileReader
         // Look up for ID3v1 tag
         if ((size == mediaLength) && (mediaLength != AudioSystem.NOT_SPECIFIED))
         {
-            FileInputStream fis = (FileInputStream) inputStream;
             byte[] id3v1 = new byte[128];
             @SuppressWarnings("unused")
-            long bytesSkipped = fis.skip(inputStream.available() - id3v1.length);
+            long bytesSkipped = inputStream.skip(inputStream.available() - id3v1.length);
             @SuppressWarnings("unused")
-            int read = fis.read(id3v1, 0, id3v1.length);
+            int read = inputStream.read(id3v1, 0, id3v1.length);
             if ((id3v1[0] == 'T') && (id3v1[1] == 'A') && (id3v1[2] == 'G'))
             {
                 parseID3v1Frames(id3v1, aff_properties);
@@ -585,7 +476,8 @@ public class MpegAudioFileReader extends TAudioFileReader
      */
     public AudioInputStream getAudioInputStream(InputStream inputStream) throws UnsupportedAudioFileException, IOException
     {
-        if (TDebug.TraceAudioFileReader) TDebug.out("MpegAudioFileReader.getAudioInputStream(InputStream inputStream)");
+        if (TDebug.TraceAudioFileReader) { TDebug.out("MpegAudioFileReader.getAudioInputStream(InputStream inputStream)");
+                                           TDebug.out("inputStream: " + inputStream.getClass().getName() + ", mark: " + inputStream.markSupported()); }
         if (!inputStream.markSupported()) inputStream = new BufferedInputStream(inputStream);
         if (TDebug.TraceAudioFileReader) TDebug.out("available/limit: " + inputStream.available() + ", " + getMarkLimit());
         setMarkLimit(Math.min(inputStream.available(), getMarkLimit()));

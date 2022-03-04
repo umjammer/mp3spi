@@ -15,8 +15,8 @@
 ## DESCRIPTION
 
 MP3SPI is a SPI (Service Provider Interface) that adds MP3 support for JavaSound.
-It allows to play MPEG 1/2/2.5 Layer 1/2/3 files thanks to underlying JLayer
-and Tritonus libraries. This is a non-commercial project and anyone can add his
+It allows to play MPEG 1/2/2.5 Layer 1/2/3 files thanks to underlying [JLayer](https://github.com/umjammer/jlayer)
+and [Tritonus](https://github.com/umjammer/tritonus) libraries. This is a non-commercial project and anyone can add his
 contribution. MP3SPI is licensed under LGPL (see [LICENSE.txt](LICENSE.txt)).
 
 
@@ -57,9 +57,8 @@ contribution. MP3SPI is licensed under LGPL (see [LICENSE.txt](LICENSE.txt)).
 
 ### How to run jUnit tests ?
 
-  See ANT script included (ant test). You need to update test.mp3.properties file
-  with the audio properties of the MP3 you want to use for testing. You could generate
-  `test.mp3.properties` by uncommenting `//out=System.out` in jUnit test sources.
+  Run `mvn test`. You can update `src/test/resources/test.mp3.properties` file
+  with the audio properties of the MP3 you want to use for testing.
 
 ### How much memory/CPU MP3SPI needs to run ?
 
@@ -91,6 +90,7 @@ contribution. MP3SPI is licensed under LGPL (see [LICENSE.txt](LICENSE.txt)).
   Try to post a thread on Java&MP3 online forums at :
   http://www.javazoom.net/services/forums/index.jsp
   You can also contact us at mp3spi@javazoom.net for contributions.
+  or [me](https://github.com/umjammer/mp3spi/issues).
 
 ## KNOWN PROBLEMS
 

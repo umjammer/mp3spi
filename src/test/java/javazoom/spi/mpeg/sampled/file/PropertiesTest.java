@@ -25,11 +25,11 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * PropertiesContainer unit test. It matches test.mp3 properties to
- * test.mp3.properties expected results. As we don't ship test.mp3, you have to
- * generate your own test.mp3.properties Uncomment out = System.out; in setUp()
- * method to generated it on stdout from your own MP3 file.
+ * test.mp3.properties expected results.
  */
 class PropertiesTest {
+
+    private static Logger logger = Logger.getLogger(PropertiesTest.class.getName());
 
     private String basefile = null;
     private String baseurl = null;
@@ -37,7 +37,6 @@ class PropertiesTest {
     private String fileurl = null;
     private String name = null;
     private Properties props = null;
-    private Logger logger;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -49,7 +48,6 @@ class PropertiesTest {
         name = props.getProperty("filename");
         filename = basefile + name;
         fileurl = baseurl + name;
-        logger = Logger.getLogger(PropertiesTest.class.getName());
     }
 
     @Test

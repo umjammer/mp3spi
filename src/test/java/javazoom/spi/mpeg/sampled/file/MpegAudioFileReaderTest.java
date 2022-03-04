@@ -24,9 +24,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintStream;
 import java.net.URL;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
@@ -35,6 +35,7 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -45,11 +46,10 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * MpegAudioFileReader unit test.
  * It matches test.mp3 properties to test.mp3.properties expected results.
- * As we don't ship test.mp3, you have to generate your own test.mp3.properties
- * Uncomment out = System.out; in setUp() method to generated it on stdout from
- * your own MP3 file.
  */
 public class MpegAudioFileReaderTest {
+
+    private static Logger logger = Logger.getLogger(MpegAudioFileReaderTest.class.getName());
 
     private String basefile = null;
     private String baseurl = null;
@@ -57,7 +57,6 @@ public class MpegAudioFileReaderTest {
     private String fileurl = null;
     private String name = null;
     private Properties props = null;
-    private PrintStream out = null;
 
     @BeforeEach
     protected void setUp() throws Exception {
@@ -69,31 +68,16 @@ public class MpegAudioFileReaderTest {
         name = props.getProperty("filename");
         filename = basefile + name;
         fileurl = baseurl + name;
-        out = System.out;
     }
 
+    @DisplayName("Test for AudioFileFormat getAudioFileFormat(File)")
     @Test
-    public void testGetAudioFileFormat() {
-        _testGetAudioFileFormatFile();
-        _testGetAudioFileFormatURL();
-        _testGetAudioFileFormatInputStream();
-    }
-
-    @Test
-    public void testGetAudioInputStream() {
-        _testGetAudioInputStreamFile();
-        _testGetAudioInputStreamURL();
-        _testGetAudioInputStreamInputStream();
-    }
-
-    /* Test for AudioFileFormat getAudioFileFormat(File) */
     public void _testGetAudioFileFormatFile() {
-        if (out != null)
-            out.println("*** testGetAudioFileFormatFile ***");
+        logger.info("*** testGetAudioFileFormatFile ***");
         try {
             File file = new File(filename);
             AudioFileFormat baseFileFormat = AudioSystem.getAudioFileFormat(file);
-            dumpAudioFileFormat(baseFileFormat, out, file.toString());
+            dumpAudioFileFormat(baseFileFormat, file.toString());
             assertEquals(Integer.parseInt(props.getProperty("FrameLength")), baseFileFormat.getFrameLength(), "FrameLength");
             assertEquals(Integer.parseInt(props.getProperty("ByteLength")), baseFileFormat.getByteLength(), "ByteLength");
         } catch (UnsupportedAudioFileException | IOException e) {
@@ -101,14 +85,14 @@ public class MpegAudioFileReaderTest {
         }
     }
 
-    /* Test for AudioFileFormat getAudioFileFormat(URL) */
+    @DisplayName("Test for AudioFileFormat getAudioFileFormat(URL)")
+    @Test
     public void _testGetAudioFileFormatURL() {
-        if (out != null)
-            out.println("*** testGetAudioFileFormatURL ***");
+        logger.info("*** testGetAudioFileFormatURL ***");
         try {
             URL url = new URL(fileurl);
             AudioFileFormat baseFileFormat = AudioSystem.getAudioFileFormat(url);
-            dumpAudioFileFormat(baseFileFormat, out, url.toString());
+            dumpAudioFileFormat(baseFileFormat, url.toString());
             assertEquals(-1, baseFileFormat.getFrameLength(), "FrameLength");
             assertEquals(-1, baseFileFormat.getByteLength(), "ByteLength");
         } catch (UnsupportedAudioFileException | IOException e) {
@@ -116,14 +100,14 @@ public class MpegAudioFileReaderTest {
         }
     }
 
-    /* Test for AudioFileFormat getAudioFileFormat(InputStream) */
+    @DisplayName("Test for AudioFileFormat getAudioFileFormat(InputStream)")
+    @Test
     public void _testGetAudioFileFormatInputStream() {
-        if (out != null)
-            out.println("*** testGetAudioFileFormatInputStream ***");
+        logger.info("*** testGetAudioFileFormatInputStream ***");
         try {
             InputStream in = new BufferedInputStream(new FileInputStream(filename));
             AudioFileFormat baseFileFormat = AudioSystem.getAudioFileFormat(in);
-            dumpAudioFileFormat(baseFileFormat, out, in.toString());
+            dumpAudioFileFormat(baseFileFormat, in.toString());
             in.close();
             assertEquals(-1, baseFileFormat.getFrameLength(), "FrameLength");
             assertEquals(-1, baseFileFormat.getByteLength(), "ByteLength");
@@ -132,14 +116,14 @@ public class MpegAudioFileReaderTest {
         }
     }
 
-    /* Test for AudioInputStream getAudioInputStream(InputStream) */
+    @DisplayName("Test for AudioInputStream getAudioInputStream(InputStream)")
+    @Test
     public void _testGetAudioInputStreamInputStream() {
-        if (out != null)
-            out.println("*** testGetAudioInputStreamInputStream ***");
+        logger.info("*** testGetAudioInputStreamInputStream ***");
         try {
             InputStream fin = new BufferedInputStream(new FileInputStream(filename));
             AudioInputStream in = AudioSystem.getAudioInputStream(fin);
-            dumpAudioInputStream(in, out, fin.toString());
+            dumpAudioInputStream(in, fin.toString());
             assertEquals(-1, in.getFrameLength(), "FrameLength");
             assertEquals(Integer.parseInt(props.getProperty("Available")), in.available(), "Available");
             fin.close();
@@ -149,14 +133,14 @@ public class MpegAudioFileReaderTest {
         }
     }
 
-    /* Test for AudioInputStream getAudioInputStream(File) */
+    @DisplayName("Test for AudioInputStream getAudioInputStream(File)")
+    @Test
     public void _testGetAudioInputStreamFile() {
-        if (out != null)
-            out.println("*** testGetAudioInputStreamFile ***");
+        logger.info("*** testGetAudioInputStreamFile ***");
         try {
             File file = new File(filename);
             AudioInputStream in = AudioSystem.getAudioInputStream(file);
-            dumpAudioInputStream(in, out, file.toString());
+            dumpAudioInputStream(in, file.toString());
             assertEquals(-1, in.getFrameLength(), "FrameLength");
             assertEquals(Integer.parseInt(props.getProperty("Available")), in.available(), "Available");
             in.close();
@@ -165,14 +149,14 @@ public class MpegAudioFileReaderTest {
         }
     }
 
-    /* Test for AudioInputStream getAudioInputStream(URL) */
+    @DisplayName("Test for AudioInputStream getAudioInputStream(URL)")
+    @Test
     public void _testGetAudioInputStreamURL() {
-        if (out != null)
-            out.println("*** testGetAudioInputStreamURL ***");
+        logger.info("*** testGetAudioInputStreamURL ***");
         try {
             URL url = new URL(fileurl);
             AudioInputStream in = AudioSystem.getAudioInputStream(url);
-            dumpAudioInputStream(in, out, url.toString());
+            dumpAudioInputStream(in, url.toString());
             assertEquals(-1, in.getFrameLength(), "FrameLength");
             assertEquals(Integer.parseInt(props.getProperty("Available")), in.available(), "Available");
             in.close();
@@ -182,24 +166,21 @@ public class MpegAudioFileReaderTest {
     }
 
     private void dumpAudioFileFormat(AudioFileFormat baseFileFormat,
-                                     PrintStream out,
                                      String info) throws UnsupportedAudioFileException {
         AudioFormat baseFormat = baseFileFormat.getFormat();
-        if (out != null) {
-            // AudioFileFormat
-            out.println("  -----  " + info + "  -----");
-            out.println("    ByteLength=" + baseFileFormat.getByteLength());
-            out.println("    FrameLength=" + baseFileFormat.getFrameLength());
-            out.println("    Type=" + baseFileFormat.getType());
-            // AudioFormat
-            out.println("    SourceFormat=" + baseFormat.toString());
-            out.println("    Channels=" + baseFormat.getChannels());
-            out.println("    FrameRate=" + baseFormat.getFrameRate());
-            out.println("    FrameSize=" + baseFormat.getFrameSize());
-            out.println("    SampleRate=" + baseFormat.getSampleRate());
-            out.println("    SampleSizeInBits=" + baseFormat.getSampleSizeInBits());
-            out.println("    Encoding=" + baseFormat.getEncoding());
-        }
+        // AudioFileFormat
+        logger.info("  -----  " + info + "  -----");
+        logger.info("    ByteLength=" + baseFileFormat.getByteLength());
+        logger.info("    FrameLength=" + baseFileFormat.getFrameLength());
+        logger.info("    Type=" + baseFileFormat.getType());
+        // AudioFormat
+        logger.info("    SourceFormat=" + baseFormat.toString());
+        logger.info("    Channels=" + baseFormat.getChannels());
+        logger.info("    FrameRate=" + baseFormat.getFrameRate());
+        logger.info("    FrameSize=" + baseFormat.getFrameSize());
+        logger.info("    SampleRate=" + baseFormat.getSampleRate());
+        logger.info("    SampleSizeInBits=" + baseFormat.getSampleSizeInBits());
+        logger.info("    Encoding=" + baseFormat.getEncoding());
         assertEquals(props.getProperty("Type"), baseFileFormat.getType().toString(), "Type");
         assertEquals(props.getProperty("SourceFormat"), baseFormat.toString(), "SourceFormat");
         assertEquals(Integer.parseInt(props.getProperty("Channels")), baseFormat.getChannels(), "Channels");
@@ -212,21 +193,19 @@ public class MpegAudioFileReaderTest {
         assertEquals(props.getProperty("Encoding"), baseFormat.getEncoding().toString(), "Encoding");
     }
 
-    private void dumpAudioInputStream(AudioInputStream in, PrintStream out, String info) throws IOException {
+    private void dumpAudioInputStream(AudioInputStream in, String info) throws IOException {
         AudioFormat baseFormat = in.getFormat();
-        if (out != null) {
-            out.println("  -----  " + info + "  -----");
-            out.println("    Available=" + in.available());
-            out.println("    FrameLength=" + in.getFrameLength());
-            // AudioFormat
-            out.println("    SourceFormat=" + baseFormat.toString());
-            out.println("    Channels=" + baseFormat.getChannels());
-            out.println("    FrameRate=" + baseFormat.getFrameRate());
-            out.println("    FrameSize=" + baseFormat.getFrameSize());
-            out.println("    SampleRate=" + baseFormat.getSampleRate());
-            out.println("    SampleSizeInBits=" + baseFormat.getSampleSizeInBits());
-            out.println("    Encoding=" + baseFormat.getEncoding());
-        }
+        logger.info("  -----  " + info + "  -----");
+        logger.info("    Available=" + in.available());
+        logger.info("    FrameLength=" + in.getFrameLength());
+        // AudioFormat
+        logger.info("    SourceFormat=" + baseFormat.toString());
+        logger.info("    Channels=" + baseFormat.getChannels());
+        logger.info("    FrameRate=" + baseFormat.getFrameRate());
+        logger.info("    FrameSize=" + baseFormat.getFrameSize());
+        logger.info("    SampleRate=" + baseFormat.getSampleRate());
+        logger.info("    SampleSizeInBits=" + baseFormat.getSampleSizeInBits());
+        logger.info("    Encoding=" + baseFormat.getEncoding());
         assertEquals(props.getProperty("SourceFormat"), baseFormat.toString(), "SourceFormat");
         assertEquals(Integer.parseInt(props.getProperty("Channels")), baseFormat.getChannels(), "Channels");
         assertTrue(Float.parseFloat(props.getProperty("FrameRate")) == baseFormat.getFrameRate(), "FrameRate");
