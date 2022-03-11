@@ -50,16 +50,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.AccessControlException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
@@ -93,13 +91,13 @@ public class MpegAudioFileReader extends TAudioFileReader
     private static final String[] id3v1genres;
 
     static {
-        try {
-            Path path = Paths.get(MpegAudioFileReader.class.getResource("/genres.properties").toURI());
-            List<String> genres = Files.readAllLines(path);
-            id3v1genres = genres.toArray(new String[genres.size()]);
-        } catch (IOException | URISyntaxException e) {
-            throw new IllegalStateException(e);
+        Scanner scanner = new Scanner(MpegAudioFileReader.class.getResourceAsStream("/genres.properties"));
+        List<String> genres = new ArrayList<>();
+        while (scanner.hasNextLine()) {
+            genres.add(scanner.nextLine());
         }
+        scanner.close();
+        id3v1genres = genres.toArray(new String[genres.size()]);
     }
 
     public MpegAudioFileReader()

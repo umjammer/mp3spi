@@ -7,12 +7,14 @@
 import java.io.BufferedInputStream;
 import java.io.EOFException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.sound.sampled.AudioFileFormat;
@@ -22,6 +24,7 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineEvent;
 import javax.sound.sampled.SourceDataLine;
+import javax.sound.sampled.spi.AudioFileReader;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -33,6 +36,7 @@ import vavi.util.properties.annotation.Property;
 import vavi.util.properties.annotation.PropsEntity;
 
 import static javazoom.spi.mpeg.sampled.file.PlayerTest.volume;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static vavix.util.DelayedWorker.later;
 
@@ -73,7 +77,11 @@ Debug.println("time: " + time);
     @DisplayName("just play")
     void test2() throws Exception {
         AudioInputStream originalAudioInputStream = AudioSystem.getAudioInputStream(Paths.get(inFile).toFile());
-        AudioFormat originalAudioFormat = originalAudioInputStream.getFormat();
+        play(originalAudioInputStream);
+    }
+
+    void play(AudioInputStream originalAudioInputStream) throws Exception {
+    AudioFormat originalAudioFormat = originalAudioInputStream.getFormat();
 Debug.println(originalAudioFormat);
         AudioFormat targetAudioFormat = new AudioFormat( //PCM
             originalAudioFormat.getSampleRate(),
@@ -122,6 +130,32 @@ Debug.println(ais);
             e.printStackTrace();
             fail("spi cosumes all bytes, and eof make stream unresettable");
         }
+    }
+
+    @Test
+    @SuppressWarnings({ "unchecked", "rawtypes", "restriction" })
+    void test4() throws Exception {
+        List<AudioFileReader> providers = (List) com.sun.media.sound.JDK13Services.getProviders(AudioFileReader.class);
+providers.forEach(System.err::println);
+        assertTrue(providers.stream().map(o -> o.getClass().getName()).anyMatch(s -> s.contains("javazoom.spi.mpeg.sampled.file.MpegAudioFileReader")));
+    }
+
+    @Test
+    void test5() throws Exception {
+        String file = "src/test/resources/test2.mp3";
+        InputStream is = new BufferedInputStream(Files.newInputStream(Paths.get(file)));
+        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(is);
+        play(audioInputStream);
+    }
+
+    // TODO wip
+    @Test
+    void test6() throws Exception {
+        String file = "src/test/resources/test2.mp3";
+        InputStream is = new BufferedInputStream(Files.newInputStream(Paths.get(file)));
+        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(is);
+        String genre = (String) audioInputStream.getFormat().getProperty("mp3.id3tag.genre");
+Debug.println("genre: " + genre);
     }
 
     @Test
