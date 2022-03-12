@@ -49,15 +49,16 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.Charset;
 import java.security.AccessControlException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.logging.Level;
 
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
@@ -67,6 +68,9 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 import org.tritonus.share.TDebug;
 import org.tritonus.share.sampled.file.TAudioFileReader;
+
+import vavi.util.Debug;
+import vavi.util.StringUtil;
 
 import javazoom.jl.decoder.Bitstream;
 import javazoom.jl.decoder.Header;
@@ -78,7 +82,7 @@ import javazoom.spi.mpeg.sampled.file.tag.MP3Tag;
  */
 public class MpegAudioFileReader extends TAudioFileReader
 {
-    public static final String VERSION = "MP3SPI 1.9.10";
+    public static final String VERSION = "MP3SPI 1.9.12";
 //  private final int SYNC = 0xFFE00000;
     private String weak = null;
     private final AudioFormat.Encoding[][] sm_aEncodings = {
@@ -311,6 +315,7 @@ public class MpegAudioFileReader extends TAudioFileReader
             aff_properties.put("mp3.crc", m_header.checksums());
             aff_properties.put("mp3.padding", m_header.padding());
             InputStream id3v2 = m_bitstream.getRawID3v2();
+//TDebug.out("id3v2: " + id3v2);
             if (id3v2 != null)
             {
                 aff_properties.put("mp3.id3tag.v2", id3v2);
@@ -359,7 +364,6 @@ public class MpegAudioFileReader extends TAudioFileReader
                 long bytesSkipped = is.skip(inputStream.available() - id3v1.length);
                 @SuppressWarnings("unused")
                 int read = is.read(id3v1, 0, id3v1.length);
-    //            is.reset();
                 if (TDebug.TraceAudioFileReader) TDebug.out((char) id3v1[0] + ", " + (char) id3v1[1] + ", " + (char) id3v1[2]);
                 if ((id3v1[0] == 'T') && (id3v1[1] == 'A') && (id3v1[2] == 'G'))
                 {
@@ -677,25 +681,30 @@ public class MpegAudioFileReader extends TAudioFileReader
     protected String parseText(byte[] bframes, int offset, int size, int skip)
     {
         String value = null;
-        try
-        {
-            String[] ENC_TYPES = { "ISO-8859-1", "UTF16", "UTF-16BE", "UTF-8" };
-            if (bframes[offset] == 0) {
-                int length = Math.max(size - (offset + skip) - getLastZeros(bframes, offset + skip, size, 1), 0);
-                value = CharConverter.createString(bframes, offset + skip, length);
-            } else {
-                int length = Math.max(size - (offset + skip) - getLastZeros(bframes, offset + skip, size, 2), 0);
-                value = new String(bframes, offset + skip, length, ENC_TYPES[bframes[offset]]);
+        final String[] ENC_TYPES = { "ISO-8859-1", "UTF16", "UTF-16BE", "UTF-8" };
+        if (bframes[offset] == 0) {
+            int length = Math.max(size - getLastZeros(bframes, offset, offset + size, 1), 0);
+            value = CharConverter.createString(bframes, offset + skip, length);
+        } else {
+            int extra = 0;
+            String encpding = ENC_TYPES[bframes[offset]];
+Debug.println(Level.FINE, "enc: " + encpding + ", " + offset + ", " + size + "\n" + StringUtil.getDump(bframes, offset, size));
+            extra += 1; // preset encoding
+            if ((bframes[offset + 1] & 0xff) == 'e' && (bframes[offset + 2] & 0xff) == 'n' && (bframes[offset + 3] & 0xff) == 'g') {
+                extra += (3 + 2 + 2); // 'eng' + bom + 00, 00
             }
-        }
-        catch (UnsupportedEncodingException e)
-        {
-            if (TDebug.TraceAudioFileReader) TDebug.out("ID3v2 Encoding error :" + e.getMessage());
+            int length = Math.max(size - extra - getLastZeros(bframes, offset + extra, offset + size, 2), 0);
+Debug.println(Level.FINE, "string: " + (offset + extra) + ", " + size + ", " + getLastZeros(bframes, offset + extra, offset + size, 2) + "\n" + StringUtil.getDump(bframes, offset + extra, length));
+            value = new String(bframes, offset + extra, length, Charset.forName(encpding));
         }
         return value.trim();
     }
 
-    /** */
+    /**
+     * @param start start INDEX
+     * @param end end INDEX
+     * @param max how many zeros for terminating strings
+     */
     private static int getLastZeros(byte[] content, int start, int end, int max) {
         int c = 0;
         for (int i = end - 1; i >= start; i--) {
