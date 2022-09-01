@@ -591,7 +591,7 @@ Debug.println(Level.FINE, "code: " + code);
                         (code.equals("TENC")) || (code.equals("TPUB")) || (code.equals("TPE2")) ||
                         (code.equals("TLEN")) )
                     {
-                        if (code.equals("COMM")) value = parseText(bframes, i, size, 5);
+                        if (code.equals("COMM")) value = parseText(bframes, i, size, getSkipForComment(bframes, i, size, 1 + 3));
                         else value = parseText(bframes, i, size, 1);
                         if ((value != null) && (value.length() > 0))
                         {
@@ -659,6 +659,14 @@ Debug.println(Level.FINE, "code: " + code);
         if (TDebug.TraceAudioFileReader) TDebug.out("ID3v2 parsed");
     }
 
+    /** */
+    private int getSkipForComment(byte[] bframes, int offset, int size, int skip) {
+//Debug.println(Level.FINE, "\n" + StringUtil.getDump(bframes, offset, size + skip));
+        int n = skip;
+        while (bframes[offset + n] != 0) n++;
+        return n + 1;
+    }
+
     /**
      * Parse Text Frames.
      *
@@ -674,7 +682,8 @@ Debug.println(Level.FINE, "code: " + code);
         final String[] ENC_TYPES = { "ISO-8859-1", "UTF16", "UTF-16BE", "UTF-8" };
         if (bframes[offset] == 0) {
             int length = Math.max(size - getLastZeros(bframes, offset, offset + size, 1), 0);
-            value = CharConverter.createString(bframes, offset + skip, length);
+//Debug.println(Level.FINE, "length: " + length + ", size: " + size + ", skip: " + skip + ", zeros: " + getLastZeros(bframes, offset, offset + size, 1) + "\n" + StringUtil.getDump(bframes, offset, size + skip));
+            value = CharConverter.createString(bframes, offset + skip, length - skip);
         } else {
             int extra = 0;
             String encpding = ENC_TYPES[bframes[offset]];
