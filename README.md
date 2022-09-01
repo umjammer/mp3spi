@@ -74,3 +74,7 @@ contribution. MP3SPI is licensed under LGPL (see [LICENSE](LICENSE.txt)).
   http://www.javazoom.net/services/forums/index.jsp
   You can also contact us at mp3spi@javazoom.net for contributions.
   or [me](https://github.com/umjammer/mp3spi/issues).
+
+### How to specify mp3 tag's encoding
+
+  Set the system property `javazoom.spi.mpeg.encoding`. e.g `javazoom.spi.mpeg.encoding=MS932`

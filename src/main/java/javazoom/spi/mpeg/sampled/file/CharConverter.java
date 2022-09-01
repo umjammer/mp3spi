@@ -14,6 +14,9 @@ import org.mozilla.universalchardet.UniversalDetector;
 
 /**
  * CharConverter.
+ * <p>
+ * system properties
+ * <li> javazoom.spi.mpeg.encoding ... mp3 tags encoding, default is "ISO_8859_1"</li>
  *
  * @author <a href="umjammer@gmail.com">Naohide Sano</a> (nsano)
  * @version 0.00 051208 nsano initial version <br>
@@ -49,7 +52,7 @@ logger.fine("exception: " + e);
     }
 
     /** */
-    private static String encoding = System.getProperty("file.encoding");
+    private static final String encoding = System.getProperty("javazoom.spi.mpeg.encoding", "ISO_8859_1");
 
     /** */
     private static UniversalDetector detector = new UniversalDetector();
