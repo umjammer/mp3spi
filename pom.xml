@@ -3,7 +3,7 @@
 
   <groupId>net.javazoom</groupId>
   <artifactId>mp3spi</artifactId>
-  <version>1.9.11</version>
+  <version>1.9.12</version>
 
   <properties>
     <tritonus.version>0.3.11</tritonus.version>
