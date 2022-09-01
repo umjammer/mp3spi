@@ -68,14 +68,13 @@ class PropertiesTest {
         logger.info("-> Filename : " + filename + " <-");
         logger.info(baseFileFormat.toString());
         if (baseFileFormat instanceof TAudioFileFormat) {
-            Map<?, ?> properties = ((TAudioFileFormat) baseFileFormat).properties();
+            Map<?, ?> properties = baseFileFormat.properties();
             logger.info(properties.toString());
-            for (int i = 0; i < testPropsAFF.length; i++) {
-                String key = testPropsAFF[i];
+            for (String key : testPropsAFF) {
                 String val = null;
                 if (properties.get(key) != null)
                     val = (properties.get(key)).toString();
-                    logger.info(key + "='" + val + "'");
+                logger.info(key + "='" + val + "'");
                 String valexpected = props.getProperty(key);
                 assertEquals(valexpected, val, key);
             }
@@ -84,9 +83,8 @@ class PropertiesTest {
         }
 
         if (baseFormat instanceof TAudioFormat) {
-            Map<?, ?> properties = ((TAudioFormat) baseFormat).properties();
-            for (int i = 0; i < testPropsAF.length; i++) {
-                String key = testPropsAF[i];
+            Map<?, ?> properties = baseFormat.properties();
+            for (String key : testPropsAF) {
                 String val = null;
                 if (properties.get(key) != null)
                     val = (properties.get(key)).toString();
@@ -116,9 +114,8 @@ class PropertiesTest {
         logger.info("-> URL : " + filename + " <-");
         logger.info(baseFileFormat.toString());
         if (baseFileFormat instanceof TAudioFileFormat) {
-            Map<?, ?> properties = ((TAudioFileFormat) baseFileFormat).properties();
-            for (int i = 0; i < testPropsAFF.length; i++) {
-                String key = testPropsAFF[i];
+            Map<String, ?> properties = baseFileFormat.properties();
+            for (String key : testPropsAFF) {
                 String val = null;
                 if (properties.get(key) != null)
                     val = (properties.get(key)).toString();
@@ -131,9 +128,8 @@ class PropertiesTest {
         }
 
         if (baseFormat instanceof TAudioFormat) {
-            Map<?, ?> properties = ((TAudioFormat) baseFormat).properties();
-            for (int i = 0; i < testPropsAF.length; i++) {
-                String key = testPropsAF[i];
+            Map<String, ?> properties = ((TAudioFormat) baseFormat).properties();
+            for (String key : testPropsAF) {
                 String val = null;
                 if (properties.get(key) != null)
                     val = (properties.get(key)).toString();
@@ -156,10 +152,8 @@ class PropertiesTest {
         logger.info("-> URL : " + url.toString() + " <-");
         logger.info(baseFileFormat.toString());
         if (baseFileFormat instanceof TAudioFileFormat) {
-            Map<?, ?> properties = ((TAudioFileFormat) baseFileFormat).properties();
-            Iterator<?> it = properties.keySet().iterator();
-            while (it.hasNext()) {
-                String key = (String) it.next();
+            Map<String, ?> properties = baseFileFormat.properties();
+            for (String key : properties.keySet()) {
                 String val = null;
                 if (properties.get(key) != null)
                     val = (properties.get(key)).toString();
@@ -170,10 +164,8 @@ class PropertiesTest {
         }
 
         if (baseFormat instanceof TAudioFormat) {
-            Map<?, ?> properties = ((TAudioFormat) baseFormat).properties();
-            Iterator<?> it = properties.keySet().iterator();
-            while (it.hasNext()) {
-                String key = (String) it.next();
+            Map<String, ?> properties = baseFormat.properties();
+            for (String key : properties.keySet()) {
                 String val = null;
                 if (properties.get(key) != null)
                     val = (properties.get(key)).toString();
@@ -184,16 +176,15 @@ class PropertiesTest {
         }
     }
 
+    @Test
     void testDumpPropertiesURL() throws Exception {
         URL file = new URL(fileurl);
         AudioFileFormat baseFileFormat = AudioSystem.getAudioFileFormat(file);
         AudioFormat baseFormat = baseFileFormat.getFormat();
         logger.info("-> Filename : " + filename + " <-");
         if (baseFileFormat instanceof TAudioFileFormat) {
-            Map<?, ?> properties = ((TAudioFileFormat) baseFileFormat).properties();
-            Iterator<?> it = properties.keySet().iterator();
-            while (it.hasNext()) {
-                String key = (String) it.next();
+            Map<String, ?> properties = baseFileFormat.properties();
+            for (String key : properties.keySet()) {
                 String val = (properties.get(key)).toString();
                 logger.info(key + "='" + val + "'");
             }
@@ -202,10 +193,8 @@ class PropertiesTest {
         }
 
         if (baseFormat instanceof TAudioFormat) {
-            Map<?, ?> properties = ((TAudioFormat) baseFormat).properties();
-            Iterator<?> it = properties.keySet().iterator();
-            while (it.hasNext()) {
-                String key = (String) it.next();
+            Map<String, ?> properties = baseFormat.properties();
+            for (String key : properties.keySet()) {
                 String val = (properties.get(key)).toString();
                 logger.info(key + "='" + val + "'");
             }

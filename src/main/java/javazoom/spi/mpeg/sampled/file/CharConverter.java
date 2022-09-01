@@ -32,8 +32,9 @@ public final class CharConverter {
 
     /** */
     public static String createString(byte[] buffer, int start, int length) {
-        String value = null;
+        String value;
         try {
+//logger.fine("encoding: " + encoding + "\n" + StringUtil.getDump(buffer, start, length));
             value = new String(buffer, start, length, Charset.forName(encoding));
         } catch (Exception e) {
 logger.fine("exception: " + e);

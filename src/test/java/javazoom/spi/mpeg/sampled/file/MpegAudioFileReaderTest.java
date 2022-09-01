@@ -21,13 +21,13 @@ package javazoom.spi.mpeg.sampled.file;
 
 import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Properties;
 import java.util.logging.Logger;
-
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -39,7 +39,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 
@@ -105,7 +104,7 @@ public class MpegAudioFileReaderTest {
     public void _testGetAudioFileFormatInputStream() {
         logger.info("*** testGetAudioFileFormatInputStream ***");
         try {
-            InputStream in = new BufferedInputStream(new FileInputStream(filename));
+            InputStream in = new BufferedInputStream(Files.newInputStream(Paths.get(filename)));
             AudioFileFormat baseFileFormat = AudioSystem.getAudioFileFormat(in);
             dumpAudioFileFormat(baseFileFormat, in.toString());
             in.close();
@@ -121,7 +120,7 @@ public class MpegAudioFileReaderTest {
     public void _testGetAudioInputStreamInputStream() {
         logger.info("*** testGetAudioInputStreamInputStream ***");
         try {
-            InputStream fin = new BufferedInputStream(new FileInputStream(filename));
+            InputStream fin = new BufferedInputStream(Files.newInputStream(Paths.get(filename)));
             AudioInputStream in = AudioSystem.getAudioInputStream(fin);
             dumpAudioInputStream(in, fin.toString());
             assertEquals(-1, in.getFrameLength(), "FrameLength");
@@ -184,9 +183,9 @@ public class MpegAudioFileReaderTest {
         assertEquals(props.getProperty("Type"), baseFileFormat.getType().toString(), "Type");
         assertEquals(props.getProperty("SourceFormat"), baseFormat.toString(), "SourceFormat");
         assertEquals(Integer.parseInt(props.getProperty("Channels")), baseFormat.getChannels(), "Channels");
-        assertTrue(Float.parseFloat(props.getProperty("FrameRate")) == baseFormat.getFrameRate(), "FrameRate");
+        assertEquals(Float.parseFloat(props.getProperty("FrameRate")), baseFormat.getFrameRate(), "FrameRate");
         assertEquals(Integer.parseInt(props.getProperty("FrameSize")), baseFormat.getFrameSize(), "FrameSize");
-        assertTrue(Float.parseFloat(props.getProperty("SampleRate")) == baseFormat.getSampleRate(), "SampleRate");
+        assertEquals(Float.parseFloat(props.getProperty("SampleRate")), baseFormat.getSampleRate(), "SampleRate");
         assertEquals(Integer.parseInt(props.getProperty("SampleSizeInBits")),
                      baseFormat.getSampleSizeInBits(),
                      "SampleSizeInBits");
@@ -208,9 +207,9 @@ public class MpegAudioFileReaderTest {
         logger.info("    Encoding=" + baseFormat.getEncoding());
         assertEquals(props.getProperty("SourceFormat"), baseFormat.toString(), "SourceFormat");
         assertEquals(Integer.parseInt(props.getProperty("Channels")), baseFormat.getChannels(), "Channels");
-        assertTrue(Float.parseFloat(props.getProperty("FrameRate")) == baseFormat.getFrameRate(), "FrameRate");
+        assertEquals(Float.parseFloat(props.getProperty("FrameRate")), baseFormat.getFrameRate(), "FrameRate");
         assertEquals(Integer.parseInt(props.getProperty("FrameSize")), baseFormat.getFrameSize(), "FrameSize");
-        assertTrue(Float.parseFloat(props.getProperty("SampleRate")) == baseFormat.getSampleRate(), "SampleRate");
+        assertEquals(Float.parseFloat(props.getProperty("SampleRate")), baseFormat.getSampleRate(), "SampleRate");
         assertEquals(Integer.parseInt(props.getProperty("SampleSizeInBits")),
                      baseFormat.getSampleSizeInBits(),
                      "SampleSizeInBits");

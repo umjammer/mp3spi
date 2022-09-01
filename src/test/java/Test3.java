@@ -53,9 +53,7 @@ class Test3 {
     @Property
     String inFile = "src/test/resources/test.mp3";
 
-    /**
-     * @param args
-     */
+    /** */
     public static void main(String[] args) throws Exception {
         for (AudioFileFormat.Type type : AudioSystem.getAudioFileTypes()) {
             System.err.println(type);
@@ -70,7 +68,7 @@ class Test3 {
 
     @BeforeEach
     void setup() {
-        time = Boolean.valueOf(System.getProperty("vavi.test")) ? 3 * 1000 : 600 * 1000;
+        time = Boolean.parseBoolean(System.getProperty("vavi.test")) ? 3 * 1000 : 600 * 1000;
 Debug.println("time: " + time);
     }
 
