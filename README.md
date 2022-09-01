@@ -1,16 +1,17 @@
 [![Maven Package](https://github.com/umjammer/mp3spi/actions/workflows/maven-publish.yml/badge.svg)](https://github.com/umjammer/mp3spi/actions/workflows/maven-publish.yml)
 [![Java CI](https://github.com/umjammer/mp3spi/workflows/Java%20CI%20with%20Maven/badge.svg)](https://github.com/umjammer/mp3spi/actions)
 [![Parent](https://img.shields.io/badge/Parent-vavi--sound--sandbox-pink)](https://github.com/umjammer/vavi-sound-sandbox)
+![Java](https://img.shields.io/badge/Java-8-b07219)
 
 # MP3SPI
 
  JavaZOOM 1999-2005
 
  Project Homepage :<br/>
-   http://www.javazoom.net/mp3spi/mp3spi.html 
+   [http://www.javazoom.net/mp3spi/mp3spi.html](https://web.archive.org/web/20210108055829/http://www.javazoom.net/mp3spi/mp3spi.html)
 
  JAVA and MP3 online Forums :<br/>
-   http://www.javazoom.net/services/forums/index.jsp
+   [http://www.javazoom.net/services/forums/index.jsp](https://web.archive.org/web/20041010053627/http://www.javazoom.net/services/forums/index.jsp)
 
 ----
 
@@ -19,7 +20,7 @@
 MP3SPI is a SPI (Service Provider Interface) that adds MP3 support for JavaSound.
 It allows to play MPEG 1/2/2.5 Layer 1/2/3 files thanks to underlying [JLayer](https://github.com/umjammer/jlayer)
 and [Tritonus](https://github.com/umjammer/tritonus) libraries. This is a non-commercial project and anyone can add his
-contribution. MP3SPI is licensed under LGPL (see [LICENSE.txt](LICENSE.txt)).
+contribution. MP3SPI is licensed under LGPL (see [LICENSE](LICENSE.txt)).
 
 
 ## FAQ
@@ -62,28 +63,8 @@ contribution. MP3SPI is licensed under LGPL (see [LICENSE.txt](LICENSE.txt)).
   Run `mvn test`. You can update `src/test/resources/test.mp3.properties` file
   with the audio properties of the MP3 you want to use for testing.
 
-### How much memory/CPU MP3SPI needs to run ?
-
-  Here are our benchmark notes :
-
-  * Heap use range : 1380KB to 1900KB - 370 classes loaded.
-  * Footprint :
-
-|memory|environment|
-|---|---|
-| ~8MB |under WinNT4/Win2K + J2SE 1.3 (Hotspot) |
-| ~10MB |under WinNT4/Win2K + J2SE 1.4.1 (Hotspot) |
-
-  * CPU usage :
-
-|cpu|environment|
-|---|---|
-| ~12%| under PIII 800Mhz/WinNT4+J2SE 1.3 (Hotspot) |
-| ~8% | under PIII 1Ghz/Win2K+J2SE 1.3.1 (Hotspot) |
-| ~12% | under PIII 1Ghz/Win2K+J2SE 1.4.1 (Hotspot) |
-|  ~1% | under PIII 1Ghz/Win2K+J2SE 1.5.0 (Hotspot) |
-
 ### How to enable debug/traces for the MP3SPI ?
+
   Set the following system variable : `"tritonus.TraceAudioFileReader=true"`
   It means `java.exe -Dtritonus.TraceAudioFileReader=true your.package.Player`
 
@@ -94,14 +75,6 @@ contribution. MP3SPI is licensed under LGPL (see [LICENSE.txt](LICENSE.txt)).
   You can also contact us at mp3spi@javazoom.net for contributions.
   or [me](https://github.com/umjammer/mp3spi/issues).
 
-## KNOWN PROBLEMS
+### How to specify mp3 tag's encoding
 
-99% of MP3 plays well with JLayer but some (1%) return an `ArrayIndexOutOfBoundsException`
-while playing. It might come from invalid audio frames.
-
-When source is not a file, this cannot deal id3v1 tag which file size is larger than 20M bytes.
-
-### Workaround
-
-Just `try`/`catch` `ArrayIndexOutOfBoundsException` in your code to skip
-non-detected invalid frames.
+  Set the system property `javazoom.spi.mpeg.encoding`. e.g `javazoom.spi.mpeg.encoding=MS932`

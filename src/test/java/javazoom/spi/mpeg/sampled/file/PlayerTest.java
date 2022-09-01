@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 import java.util.logging.Logger;
-
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -34,19 +33,16 @@ import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
+import javazoom.spi.PropertiesContainer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static vavix.util.DelayedWorker.later;
 
-import javazoom.spi.PropertiesContainer;
-
 /**
  * Simple player (based on MP3 SPI) unit test.
- * It takes around 2-5% of CPU and 16MB RAM under Win2K/P4/1.6GHz/JDK1.5 beta
- * It takes around 10-12% of CPU and 10MB RAM under Win2K/PIII/1GHz/JDK1.4.1
- * It takes around 8-10% of CPU and 10MB RAM under Win2K/PIII/1GHz/JDK1.3.1
  */
 public class PlayerTest {
 
@@ -67,7 +63,7 @@ public class PlayerTest {
         name = props.getProperty("filename");
         filename = basefile + name;
         out = Logger.getLogger(PlayerTest.class.getName());
-        time = Boolean.valueOf(System.getProperty("vavi.test")) ? 3 * 1000 : 3000 * 1000;
+        time = Boolean.parseBoolean(System.getProperty("vavi.test")) ? 3 * 1000 : 3000 * 1000;
     }
 
     @Test
@@ -107,11 +103,7 @@ public class PlayerTest {
             if (out != null)
                 out.info("Target Format : " + decodedFormat.toString());
             din = AudioSystem.getAudioInputStream(decodedFormat, in);
-            if (din instanceof PropertiesContainer) {
-                assertTrue(true, "PropertiesContainer : OK");
-            } else {
-                assertTrue(false, "Wrong PropertiesContainer instance");
-            }
+            assertInstanceOf(PropertiesContainer.class, din, "PropertiesContainer");
             rawplay(decodedFormat, din);
             in.close();
             out.info("---  Stop : " + filename + "  ---");
@@ -120,7 +112,7 @@ public class PlayerTest {
     }
 
     private SourceDataLine getLine(AudioFormat audioFormat) throws LineUnavailableException {
-        SourceDataLine res = null;
+        SourceDataLine res;
         DataLine.Info info = new DataLine.Info(SourceDataLine.class, audioFormat);
         res = (SourceDataLine) AudioSystem.getLine(info);
         res.open(audioFormat);

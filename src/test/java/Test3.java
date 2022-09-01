@@ -36,6 +36,7 @@ import vavi.util.properties.annotation.Property;
 import vavi.util.properties.annotation.PropsEntity;
 
 import static javazoom.spi.mpeg.sampled.file.PlayerTest.volume;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static vavix.util.DelayedWorker.later;
@@ -52,9 +53,7 @@ class Test3 {
     @Property
     String inFile = "src/test/resources/test.mp3";
 
-    /**
-     * @param args
-     */
+    /** */
     public static void main(String[] args) throws Exception {
         for (AudioFileFormat.Type type : AudioSystem.getAudioFileTypes()) {
             System.err.println(type);
@@ -69,7 +68,7 @@ class Test3 {
 
     @BeforeEach
     void setup() {
-        time = Boolean.valueOf(System.getProperty("vavi.test")) ? 3 * 1000 : 600 * 1000;
+        time = Boolean.parseBoolean(System.getProperty("vavi.test")) ? 3 * 1000 : 600 * 1000;
 Debug.println("time: " + time);
     }
 
@@ -148,14 +147,19 @@ providers.forEach(System.err::println);
         play(audioInputStream);
     }
 
-    // TODO wip
     @Test
     void test6() throws Exception {
         String file = "src/test/resources/test2.mp3";
         InputStream is = new BufferedInputStream(Files.newInputStream(Paths.get(file)));
-        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(is);
-        String genre = (String) audioInputStream.getFormat().getProperty("mp3.id3tag.genre");
+        AudioFileFormat format = AudioSystem.getAudioFileFormat(is);
+format.properties().forEach((k, v) -> { System.err.println(k + ": " + v);});
+        String genre = (String) format.properties().get("mp3.id3tag.genre");
 Debug.println("genre: " + genre);
+        assertEquals("Pop", genre);
+        assertEquals("日本語", format.properties().get("title"));
+        assertEquals("アルバム", format.properties().get("album"));
+        assertEquals("にほんご", format.properties().get("author"));
+        assertEquals("コメント", format.properties().get("comment"));
     }
 
     @Test

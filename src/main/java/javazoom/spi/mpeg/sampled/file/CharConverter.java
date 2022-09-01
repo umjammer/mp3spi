@@ -6,13 +6,17 @@
 
 package javazoom.spi.mpeg.sampled.file;
 
-import java.io.IOException;
-import java.util.Properties;
+import java.nio.charset.Charset;
 import java.util.logging.Logger;
+
+import org.mozilla.universalchardet.UniversalDetector;
 
 
 /**
  * CharConverter.
+ * <p>
+ * system properties
+ * <li> javazoom.spi.mpeg.encoding ... mp3 tags encoding, default is "ISO_8859_1"</li>
  *
  * @author <a href="umjammer@gmail.com">Naohide Sano</a> (nsano)
  * @version 0.00 051208 nsano initial version <br>
@@ -28,14 +32,16 @@ public final class CharConverter {
 
     /** */
     public static String createString(byte[] buffer, int start, int length) {
-        String value = null;
+        String value;
         try {
-            // Special!!!
-            value = new String(buffer, start, length, encoding);
+//logger.fine("encoding: " + encoding + "\n" + StringUtil.getDump(buffer, start, length));
+            value = new String(buffer, start, length, Charset.forName(encoding));
         } catch (Exception e) {
-            try {
-                value = new String(buffer, start, length, "UNICODE");
-            } catch (Exception f) {
+logger.fine("exception: " + e);
+            String encoding = getCharset(buffer);
+            if (encoding != null) {
+                value = new String(buffer, start, length, Charset.forName(encoding));
+            } else {
                 value = new String(buffer, start, length);
             }
         }
@@ -47,17 +53,28 @@ public final class CharConverter {
     }
 
     /** */
-    private static String encoding = System.getProperty("file.encoding");
+    private static final String encoding = System.getProperty("javazoom.spi.mpeg.encoding", "ISO_8859_1");
 
     /** */
-    static {
-        try {
-            Properties props = new Properties();
-            props.load(CharConverter.class.getResourceAsStream("id3.properties"));
-            encoding = props.getProperty("id3.encoding");
-        } catch (IOException e) {
-            logger.warning(e.getStackTrace()[0].toString());
+    private static UniversalDetector detector = new UniversalDetector();
+
+    /** @return nullable */
+    private static String getCharset(byte[] buf) {
+
+        detector.reset();
+
+        int i = 0;
+        while (i < buf.length && !detector.isDone()) {
+            detector.handleData(buf, 0, buf[i++]);
         }
+
+        detector.dataEnd();
+
+        String encoding = detector.getDetectedCharset();
+logger.fine("encoding: " + encoding);
+        detector.reset();
+
+        return encoding;
     }
 }
 
