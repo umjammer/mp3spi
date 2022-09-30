@@ -63,7 +63,7 @@ public class PlayerTest {
         name = props.getProperty("filename");
         filename = basefile + name;
         out = Logger.getLogger(PlayerTest.class.getName());
-        time = Boolean.parseBoolean(System.getProperty("vavi.test")) ? 3 * 1000 : 3000 * 1000;
+        time = System.getProperty("vavi.test", "").equals("ide") ? 3000 * 1000 : 3 * 1000;
     }
 
     @Test

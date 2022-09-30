@@ -37,7 +37,6 @@
           <argLine>
             -Djava.util.logging.config.file=${project.build.testOutputDirectory}/logging.properties
             -Dvavi.util.logging.VaviFormatter.extraClassMethod=org.tritonus.share.TDebug#out
-            -Dvavi.test=true
           </argLine>
           <trimStackTrace>false</trimStackTrace>
         </configuration>
