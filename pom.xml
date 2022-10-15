@@ -3,7 +3,7 @@
 
   <groupId>net.javazoom</groupId>
   <artifactId>mp3spi</artifactId>
-  <version>1.9.12</version>
+  <version>1.9.13</version>
 
   <properties>
     <tritonus.version>0.3.11</tritonus.version>
@@ -60,7 +60,7 @@
       <dependency>
         <groupId>org.junit</groupId>
         <artifactId>junit-bom</artifactId>
-        <version>5.8.2</version>
+        <version>5.9.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -79,9 +79,10 @@
       <version>${tritonus.version}</version>
     </dependency>
     <dependency>
+      <!-- net.javazoom:jlayer -->
       <groupId>com.github.umjammer</groupId>
       <artifactId>jlayer</artifactId>
-      <version>1.0.1</version>
+      <version>1.0.2</version>
     </dependency>
 
     <dependency>
