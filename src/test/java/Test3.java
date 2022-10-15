@@ -68,7 +68,7 @@ class Test3 {
 
     @BeforeEach
     void setup() {
-        time = Boolean.parseBoolean(System.getProperty("vavi.test")) ? 3 * 1000 : 600 * 1000;
+        time = System.getProperty("vavi.test", "").equals("ide") ? 600 * 1000 : 3 * 1000;
 Debug.println("time: " + time);
     }
 

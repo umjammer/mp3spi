@@ -42,7 +42,7 @@ public class MonoTest {
 
     @BeforeAll
     static void setup() {
-        frames = Boolean.valueOf(System.getProperty("vavi.test")) ? 2 : 1000;
+        frames = System.getProperty("vavi.test", "").equals("ide") ? 1000 : 2;
     }
 
     @Test
