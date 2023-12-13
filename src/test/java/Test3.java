@@ -75,12 +75,13 @@ Debug.println("time: " + time);
     @Test
     @DisplayName("just play")
     void test2() throws Exception {
-        AudioInputStream originalAudioInputStream = AudioSystem.getAudioInputStream(Paths.get(inFile).toFile());
-        play(originalAudioInputStream);
+        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(Paths.get(inFile).toFile());
+        play(audioInputStream);
     }
 
+    /** */
     void play(AudioInputStream originalAudioInputStream) throws Exception {
-    AudioFormat originalAudioFormat = originalAudioInputStream.getFormat();
+        AudioFormat originalAudioFormat = originalAudioInputStream.getFormat();
 Debug.println(originalAudioFormat);
         AudioFormat targetAudioFormat = new AudioFormat( //PCM
             originalAudioFormat.getSampleRate(),
@@ -132,6 +133,7 @@ Debug.println(ais);
     }
 
     @Test
+    @DisplayName("spi settings")
     @SuppressWarnings({ "unchecked", "rawtypes", "restriction" })
     void test4() throws Exception {
         List<AudioFileReader> providers = (List) com.sun.media.sound.JDK13Services.getProviders(AudioFileReader.class);
@@ -148,6 +150,7 @@ providers.forEach(System.err::println);
     }
 
     @Test
+    @DisplayName("i18n")
     void test6() throws Exception {
         String file = "src/test/resources/test2.mp3";
         InputStream is = new BufferedInputStream(Files.newInputStream(Paths.get(file)));
@@ -164,9 +167,9 @@ Debug.println("genre: " + genre);
 
     @Test
     @Disabled
-    @DisplayName("test all mp3s in your itumes music")
+    @DisplayName("test all mp3s in your Music.app music")
     void test() throws IOException {
-        Path root = Paths.get(System.getProperty("user.home"), "Music", "iTunes", "iTunes Music");
+        Path root = Paths.get(System.getProperty("user.home"), "Music", "Media.localized", "Music");
 Debug.println("ROOT: " + Files.exists(root));
 
         AtomicInteger count = new AtomicInteger();
@@ -182,7 +185,7 @@ Debug.println("ROOT: " + Files.exists(root));
                     } catch (Exception e) {
                         try {
 Debug.println("ERROR: " + file + ", " + Files.size(file));
-                        } catch (Exception f) {}
+                        } catch (Exception ignored) {}
                         error.incrementAndGet();
                     }
                 }
