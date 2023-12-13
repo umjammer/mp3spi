@@ -1,5 +1,5 @@
 [![Maven Package](https://github.com/umjammer/mp3spi/actions/workflows/maven-publish.yml/badge.svg)](https://github.com/umjammer/mp3spi/actions/workflows/maven-publish.yml)
-[![Java CI](https://github.com/umjammer/mp3spi/workflows/Java%20CI%20with%20Maven/badge.svg)](https://github.com/umjammer/mp3spi/actions)
+[![Java CI](https://github.com/umjammer/mp3spi/actions/workflows/maven.yml/badge.svg)](https://github.com/umjammer/mp3spi/actions/workflows/maven.yml)
 [![CodeQL](https://github.com/umjammer/mp3spi/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/umjammer/mp3spi/actions/workflows/codeql-analysis.yml)
 ![Java](https://img.shields.io/badge/Java-8-b07219)
 [![Parent](https://img.shields.io/badge/Parent-vavi--sound--sandbox-pink)](https://github.com/umjammer/vavi-sound-sandbox)
