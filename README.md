@@ -6,13 +6,14 @@
 
 # MP3SPI
 
- JavaZOOM 1999-2005
+ * ~~encoder using https://github.com/nwaldispuehl/java-lame~~
+JavaZOOM 1999-2005
 
- Project Homepage :<br/>
-   [http://www.javazoom.net/mp3spi/mp3spi.html](https://web.archive.org/web/20210108055829/http://www.javazoom.net/mp3spi/mp3spi.html)
+Project Homepage :<br/>
+[http://www.javazoom.net/mp3spi/mp3spi.html](https://web.archive.org/web/20210108055829/http://www.javazoom.net/mp3spi/mp3spi.html)
 
- JAVA and MP3 online Forums :<br/>
-   [http://www.javazoom.net/services/forums/index.jsp](https://web.archive.org/web/20041010053627/http://www.javazoom.net/services/forums/index.jsp)
+JAVA and MP3 online Forums :<br/>
+[http://www.javazoom.net/services/forums/index.jsp](https://web.archive.org/web/20041010053627/http://www.javazoom.net/services/forums/index.jsp)
 
 ----
 
