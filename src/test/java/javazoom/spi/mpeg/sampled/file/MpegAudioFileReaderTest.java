@@ -46,7 +46,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * MpegAudioFileReader unit test.
  * It matches test.mp3 properties to test.mp3.properties expected results.
  */
-public class MpegAudioFileReaderTest {
+class MpegAudioFileReaderTest {
 
     private static Logger logger = Logger.getLogger(MpegAudioFileReaderTest.class.getName());
 
@@ -58,7 +58,7 @@ public class MpegAudioFileReaderTest {
     private Properties props = null;
 
     @BeforeEach
-    protected void setUp() throws Exception {
+    void setUp() throws Exception {
         props = new Properties();
         InputStream pin = getClass().getClassLoader().getResourceAsStream("test.mp3.properties");
         props.load(pin);
@@ -71,7 +71,7 @@ public class MpegAudioFileReaderTest {
 
     @DisplayName("Test for AudioFileFormat getAudioFileFormat(File)")
     @Test
-    public void _testGetAudioFileFormatFile() {
+    void _testGetAudioFileFormatFile() {
         logger.info("*** testGetAudioFileFormatFile ***");
         try {
             File file = new File(filename);
@@ -86,7 +86,7 @@ public class MpegAudioFileReaderTest {
 
     @DisplayName("Test for AudioFileFormat getAudioFileFormat(URL)")
     @Test
-    public void _testGetAudioFileFormatURL() {
+    void _testGetAudioFileFormatURL() {
         logger.info("*** testGetAudioFileFormatURL ***");
         try {
             URL url = new URL(fileurl);
@@ -101,7 +101,7 @@ public class MpegAudioFileReaderTest {
 
     @DisplayName("Test for AudioFileFormat getAudioFileFormat(InputStream)")
     @Test
-    public void _testGetAudioFileFormatInputStream() {
+    void _testGetAudioFileFormatInputStream() {
         logger.info("*** testGetAudioFileFormatInputStream ***");
         try {
             InputStream in = new BufferedInputStream(Files.newInputStream(Paths.get(filename)));
@@ -117,7 +117,7 @@ public class MpegAudioFileReaderTest {
 
     @DisplayName("Test for AudioInputStream getAudioInputStream(InputStream)")
     @Test
-    public void _testGetAudioInputStreamInputStream() {
+    void _testGetAudioInputStreamInputStream() {
         logger.info("*** testGetAudioInputStreamInputStream ***");
         try {
             InputStream fin = new BufferedInputStream(Files.newInputStream(Paths.get(filename)));
@@ -134,7 +134,7 @@ public class MpegAudioFileReaderTest {
 
     @DisplayName("Test for AudioInputStream getAudioInputStream(File)")
     @Test
-    public void _testGetAudioInputStreamFile() {
+    void _testGetAudioInputStreamFile() {
         logger.info("*** testGetAudioInputStreamFile ***");
         try {
             File file = new File(filename);
@@ -150,7 +150,7 @@ public class MpegAudioFileReaderTest {
 
     @DisplayName("Test for AudioInputStream getAudioInputStream(URL)")
     @Test
-    public void _testGetAudioInputStreamURL() {
+    void _testGetAudioInputStreamURL() {
         logger.info("*** testGetAudioInputStreamURL ***");
         try {
             URL url = new URL(fileurl);

@@ -35,11 +35,12 @@ import vavi.util.Debug;
 import vavi.util.properties.annotation.Property;
 import vavi.util.properties.annotation.PropsEntity;
 
-import static javazoom.spi.mpeg.sampled.file.PlayerTest.volume;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+import static vavi.sound.SoundUtil.volume;
 import static vavix.util.DelayedWorker.later;
+
 
 /**
  * line.
@@ -49,6 +50,8 @@ import static vavix.util.DelayedWorker.later;
  */
 @PropsEntity(url = "file://${user.dir}/local.properties")
 class Test3 {
+
+    static final double volume = Double.parseDouble(System.getProperty("vavi.test.volume",  "0.2"));
 
     @Property
     String inFile = "src/test/resources/test.mp3";
@@ -105,7 +108,7 @@ Debug.println("done");
 
         byte[] buf = new byte[8192];
         line.open(audioFormat, buf.length);
-        volume(line, .2d);
+        volume(line, volume);
         line.start();
         int r = 0;
         while (!later(time).come()) {
@@ -128,7 +131,7 @@ Debug.println("done");
 Debug.println(ais);
         } catch (EOFException e) {
             e.printStackTrace();
-            fail("spi cosumes all bytes, and eof make stream unresettable");
+            fail("spi consumes all bytes, and eof make stream unresettable");
         }
     }
 
@@ -174,7 +177,7 @@ Debug.println("ROOT: " + Files.exists(root));
 
         AtomicInteger count = new AtomicInteger();
         AtomicInteger error = new AtomicInteger();
-        Files.walkFileTree(root, new SimpleFileVisitor<Path>() {
+        Files.walkFileTree(root, new SimpleFileVisitor<>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attr) {
                 if (file.getFileName().toString().toLowerCase().endsWith(".mp3")) {
@@ -185,7 +188,8 @@ Debug.println("ROOT: " + Files.exists(root));
                     } catch (Exception e) {
                         try {
 Debug.println("ERROR: " + file + ", " + Files.size(file));
-                        } catch (Exception ignored) {}
+                        } catch (Exception ignored) {
+                        }
                         error.incrementAndGet();
                     }
                 }

@@ -38,12 +38,16 @@ import org.junit.jupiter.api.Test;
 
 import static javazoom.spi.mpeg.sampled.file.PlayerTest.volume;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static vavi.sound.SoundUtil.volume;
+
 
 /**
  * Skip bytes before playing.
  */
 class SkipTest {
     private static Logger logger = Logger.getLogger(SkipTest.class.getName());
+
+    static final double volume = Double.parseDouble(System.getProperty("vavi.test.volume",  "0.2"));
 
     private String basefile = null;
     private String baseurl = null;
@@ -143,7 +147,7 @@ class SkipTest {
         byte[] data = new byte[4096];
         SourceDataLine line = getLine(targetFormat);
         if (line != null) {
-            volume(line, .1d);
+            volume(line, volume);
             // Start
             line.start();
             int nBytesRead = 0;
