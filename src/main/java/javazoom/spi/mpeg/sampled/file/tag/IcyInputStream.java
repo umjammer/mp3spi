@@ -28,49 +28,53 @@ package javazoom.spi.mpeg.sampled.file.tag;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-/** An BufferedInputStream that parses Shoutcast's "icy" metadata
-    from the stream.  Gets headers at the beginning and if the
-    "icy-metaint" tag is found, it parses and strips in-stream
-    metadata.
-    <p>
-    <b>The deal with metaint</b>: Icy streams don't try to put
-    tags between MP3 frames the way that ID3 does.  Instead, it
-    requires the client to strip metadata from the stream before
-    it hits the decoder.  You get an
-    <code>icy-metaint</code> name/val in the beginning of the
-    stream iff you sent "Icy-Metadata" with value "1" in the
-    request headers (SimpleMP3DataSource does this if the
-    "parseStreamMetadata" boolean is true).  If this is the case
-    then the value of icy-metaint is the amount of real data
-    between metadata blocks.  Each block begins with an int
-    indicating how much metadata there is -- the block is this
-    value times 16 (it can be, and often is, 0).
-    <p>
-    Originally thought that "icy" implied Icecast, but this is
-    completely wrong -- real Icecast servers, found through
-    www.icecast.net and typified by URLs with a trailing directory
-    (like CalArts School of Music - http://65.165.174.100:8000/som)
-    do not have the "ICY 200 OK" magic string or any of the
-    CRLF-separated headers.  Apparently, "icy" means "Shoutcast".
-    Yep, that's weird.
-    @author Chris Adamson, invalidname@mac.com
+
+/**
+ * An BufferedInputStream that parses Shoutcast's "icy" metadata
+ * from the stream.  Gets headers at the beginning and if the
+ * "icy-metaint" tag is found, it parses and strips in-stream
+ * metadata.
+ * <p>
+ * <b>The deal with metaint</b>: Icy streams don't try to put
+ * tags between MP3 frames the way that ID3 does.  Instead, it
+ * requires the client to strip metadata from the stream before
+ * it hits the decoder.  You get an
+ * <code>icy-metaint</code> name/val in the beginning of the
+ * stream iff you sent "Icy-Metadata" with value "1" in the
+ * request headers (SimpleMP3DataSource does this if the
+ * "parseStreamMetadata" boolean is true).  If this is the case
+ * then the value of icy-metaint is the amount of real data
+ * between metadata blocks.  Each block begins with an int
+ * indicating how much metadata there is -- the block is this
+ * value times 16 (it can be, and often is, 0).
+ * <p>
+ * Originally thought that "icy" implied Icecast, but this is
+ * completely wrong -- real Icecast servers, found through
+ * www.icecast.net and typified by URLs with a trailing directory
+ * (like CalArts School of Music - http://65.165.174.100:8000/som)
+ * do not have the "ICY 200 OK" magic string or any of the
+ * CRLF-separated headers.  Apparently, "icy" means "Shoutcast".
+ * Yep, that's weird.
+ *
+ * @author Chris Adamson, invalidname@mac.com
  */
 public class IcyInputStream
-    extends BufferedInputStream
-    implements MP3MetadataParser {
+        extends BufferedInputStream
+        implements MP3MetadataParser {
 
     public static boolean DEBUG = false;
 
     MP3TagParseSupport tagParseSupport;
-    /** inline tags are delimited by ';', also filter out
-        null bytes
+    /**
+     * inline tags are delimited by ';', also filter out
+     * null bytes
      */
     protected static final String INLINE_TAG_SEPARATORS = ";\u0000";
     /* looks like icy streams start start with
@@ -99,28 +103,34 @@ public class IcyInputStream
            or
        icy-notice2:The resource requested is currently unavailable<BR>
      */
-    /** Tags that have been discovered in the stream.
+    /**
+     * Tags that have been discovered in the stream.
      */
     Map<String, IcyTag> tags;
-    /** Buffer for readCRLF line... note this limits lines to
-        1024 chars (I've read that WinAmp barfs at 128, so
-        this is generous)
+    /**
+     * Buffer for readCRLF line... note this limits lines to
+     * 1024 chars (I've read that WinAmp barfs at 128, so
+     * this is generous)
      */
     protected byte[] crlfBuffer = new byte[1024];
-    /** value of the "metaint" tag, which tells us how many bytes
-        of real data are between the metadata tags.  if -1, this stream
-        does not have metadata after the header.
+    /**
+     * value of the "metaint" tag, which tells us how many bytes
+     * of real data are between the metadata tags.  if -1, this stream
+     * does not have metadata after the header.
      */
     protected int metaint = -1;
-    /** how many bytes of real data remain before the next
-        block of metadata.  Only meaningful if metaint != -1.
+    /**
+     * how many bytes of real data remain before the next
+     * block of metadata.  Only meaningful if metaint != -1.
      */
     protected int bytesUntilNextMetadata = -1;
     // TODO: comment for constructor
-    /** Reads the initial headers of the stream and adds
-        tags appropriatly.  Gets set up to find, read,
-        and strip blocks of in-line metadata if the
-        <code>icy-metaint</code> header is found.
+
+    /**
+     * Reads the initial headers of the stream and adds
+     * tags appropriatly.  Gets set up to find, read,
+     * and strip blocks of in-line metadata if the
+     * <code>icy-metaint</code> header is found.
      */
     public IcyInputStream(InputStream in) throws IOException {
         super(in);
@@ -131,21 +141,21 @@ public class IcyInputStream
         // the next metadata block (if any).
         readInitialHeaders();
         IcyTag metaIntTag = (IcyTag) getTag("icy-metaint");
-        if (DEBUG) System.out.println("METATAG:"+metaIntTag);
+        if (DEBUG) System.out.println("METATAG:" + metaIntTag);
         if (metaIntTag != null) {
             String metaIntString = metaIntTag.getValueAsString();
             try {
                 metaint = Integer.parseInt(metaIntString.trim());
-                if (DEBUG) System.out.println("METAINT:"+metaint);
+                if (DEBUG) System.out.println("METAINT:" + metaint);
                 bytesUntilNextMetadata = metaint;
-            }
-            catch (NumberFormatException nfe) {
+            } catch (NumberFormatException nfe) {
             }
         }
     }
 
     /**
      * IcyInputStream constructor for know meta-interval (Icecast 2)
+     *
      * @param in
      * @param metaIntString
      * @throws IOException
@@ -154,37 +164,38 @@ public class IcyInputStream
         super(in);
         tags = new HashMap<>();
         tagParseSupport = new MP3TagParseSupport();
-        try
-        {
+        try {
             metaint = Integer.parseInt(metaIntString.trim());
-            if (DEBUG) System.out.println("METAINT:"+metaint);
+            if (DEBUG) System.out.println("METAINT:" + metaint);
             bytesUntilNextMetadata = metaint;
-        }
-        catch (NumberFormatException nfe) {
+        } catch (NumberFormatException nfe) {
         }
     }
 
-    /** Assuming we're at the top of the stream, read lines one
-        by one until we hit a completely blank \r\n.  Parse the
-        data as IcyTags.
+    /**
+     * Assuming we're at the top of the stream, read lines one
+     * by one until we hit a completely blank \r\n.  Parse the
+     * data as IcyTags.
      */
     protected void readInitialHeaders() throws IOException {
         String line = null;
-        while (!((line = readCRLFLine()).equals(""))) {
+        while (!((line = readCRLFLine()).isEmpty())) {
             int colonIndex = line.indexOf(':');
             // does it have a ':' separator
             if (colonIndex == -1)
                 continue;
             IcyTag tag =
-                new IcyTag(
-                    line.substring(0, colonIndex),
-                    line.substring(colonIndex + 1));
+                    new IcyTag(
+                            line.substring(0, colonIndex),
+                            line.substring(colonIndex + 1));
             //System.out.println(tag);
             addTag(tag);
         }
     }
-    /** Read everything up to the next CRLF, return it as
-        a String.
+
+    /**
+     * Read everything up to the next CRLF, return it as
+     * a String.
      */
     protected String readCRLFLine() throws IOException {
         int i = 0;
@@ -196,14 +207,12 @@ public class IcyInputStream
                 i++; // since we read again
                 if (anotherByte == '\n') {
                     break; // break out of while
-                }
-                else {
+                } else {
                     // oops, not end of line - put these in array
                     crlfBuffer[i - 1] = aByte;
                     crlfBuffer[i] = anotherByte;
                 }
-            }
-            else {
+            } else {
                 // if not \r
                 crlfBuffer[i] = aByte;
             }
@@ -212,36 +221,40 @@ public class IcyInputStream
         // read-ahead in crlf block
         return new String(crlfBuffer, 0, i - 1);
     }
-    /** Reads and returns a single byte.
-        If the next byte is a metadata block, then that
-        block is read, stripped, and parsed before reading
-        and returning the first byte after the metadata block.
+
+    /**
+     * Reads and returns a single byte.
+     * If the next byte is a metadata block, then that
+     * block is read, stripped, and parsed before reading
+     * and returning the first byte after the metadata block.
      */
+    @Override
     public int read() throws IOException {
         if (bytesUntilNextMetadata > 0) {
             bytesUntilNextMetadata--;
             return super.read();
-        }
-        else if (bytesUntilNextMetadata == 0) {
+        } else if (bytesUntilNextMetadata == 0) {
             // we need to read next metadata block
             readMetadata();
             bytesUntilNextMetadata = metaint - 1;
             // -1 because we read byte on next line
             return super.read();
-        }
-        else {
+        } else {
             // no metadata in this stream
             return super.read();
         }
     }
-    /** Reads a block of bytes.  If the next byte is known
-        to be a block of metadata, then that is read, parsed,
-        and stripped, and then a block of bytes is read and
-        returned.
-        Otherwise, it may read up to but
-        not into the next metadata block if
-        <code>bytesUntilNextMetadata &lt; length</code>
+
+    /**
+     * Reads a block of bytes.  If the next byte is known
+     * to be a block of metadata, then that is read, parsed,
+     * and stripped, and then a block of bytes is read and
+     * returned.
+     * Otherwise, it may read up to but
+     * not into the next metadata block if
+     * <code>bytesUntilNextMetadata &lt; length</code>
      */
+    @Override
     public int read(byte[] buf, int offset, int length) throws IOException {
         // if not on metadata, do the usual read so long as we
         // don't read past metadata
@@ -250,8 +263,7 @@ public class IcyInputStream
             int got = super.read(buf, offset, adjLength);
             bytesUntilNextMetadata -= got;
             return got;
-        }
-        else if (bytesUntilNextMetadata == 0) {
+        } else if (bytesUntilNextMetadata == 0) {
             // read/parse the metadata
             readMetadata();
             // now as above, except that we reset
@@ -270,25 +282,29 @@ public class IcyInputStream
 
 
             return got;
-        }
-        else {
+        } else {
             // not even reading metadata
             return super.read(buf, offset, length);
         }
     }
-    /** trivial <code>return read (buf, 0, buf.length)</code>
+
+    /**
+     * trivial <code>return read (buf, 0, buf.length)</code>
      */
+    @Override
     public int read(byte[] buf) throws IOException {
         return read(buf, 0, buf.length);
     }
-    /** Read the next segment of metadata.  The stream <b>must</b>
-        be right on the segment, ie, the next byte to read is
-        the metadata block count.  The metadata is parsed and
-        new tags are added with addTag(), which fires events
+
+    /**
+     * Read the next segment of metadata.  The stream <b>must</b>
+     * be right on the segment, ie, the next byte to read is
+     * the metadata block count.  The metadata is parsed and
+     * new tags are added with addTag(), which fires events
      */
     protected void readMetadata() throws IOException {
         int blockCount = super.read();
-        if (DEBUG) System.out.println("BLOCKCOUNT:"+blockCount);
+        if (DEBUG) System.out.println("BLOCKCOUNT:" + blockCount);
         // System.out.println ("blocks to read: " + blockCount);
         int byteCount = (blockCount * 16); // 16 bytes per block
         if (byteCount < 0)
@@ -305,38 +321,32 @@ public class IcyInputStream
         if (blockCount > 0)
             parseInlineIcyTags(metadataBlock);
     } // readMetadata
-    /** Parse metadata from an in-stream "block" of bytes, add
-        a tag for each one.
-        <p>
-        Hilariously, the inline data format is totally different
-        than the top-of-stream header.  For example, here's a
-        block I saw on "Final Fantasy Radio":
-    <pre>
-    StreamTitle='Final Fantasy 8 - Nobuo Uematsu - Blue Fields';StreamUrl='';
-    </pre>
-        In other words:
-        <ol>
-        <li>Tags are delimited by semicolons
-        <li>Keys/values are delimited by equals-signs
-        <li>Values are wrapped in single-quotes
-        <li>Key names are in SentenceCase, not lowercase-dashed
-        </ol>
+
+    /**
+     * Parse metadata from an in-stream "block" of bytes, add
+     * a tag for each one.
+     * <p>
+     * Hilariously, the inline data format is totally different
+     * than the top-of-stream header.  For example, here's a
+     * block I saw on "Final Fantasy Radio":
+     * <pre>
+     * StreamTitle='Final Fantasy 8 - Nobuo Uematsu - Blue Fields';StreamUrl='';
+     * </pre>
+     * In other words:
+     * <ol>
+     * <li>Tags are delimited by semicolons
+     * <li>Keys/values are delimited by equals-signs
+     * <li>Values are wrapped in single-quotes
+     * <li>Key names are in SentenceCase, not lowercase-dashed
+     * </ol>
      */
-    protected void parseInlineIcyTags(byte[] tagBlock)
-    {
+    protected void parseInlineIcyTags(byte[] tagBlock) {
         String blockString = null;
-        try
-        {
-            // Parse string as ISO-8859-1 even if meta-data are in US-ASCII.
-            blockString = new String(tagBlock,"ISO-8859-1");
-        }
-        catch(UnsupportedEncodingException e)
-        {
-            blockString = new String(tagBlock);
-        }
-        if (DEBUG) System.out.println("BLOCKSTR:"+blockString);
+        // Parse string as ISO-8859-1 even if meta-data are in US-ASCII.
+        blockString = new String(tagBlock, StandardCharsets.ISO_8859_1);
+        if (DEBUG) System.out.println("BLOCKSTR:" + blockString);
         StringTokenizer izer =
-            new StringTokenizer(blockString, INLINE_TAG_SEPARATORS);
+                new StringTokenizer(blockString, INLINE_TAG_SEPARATORS);
 //        int i = 0;
         while (izer.hasMoreTokens()) {
             String tagString = izer.nextToken();
@@ -345,13 +355,13 @@ public class IcyInputStream
                 continue; // bogus tagString if no '='
             // try to strip single-quotes around value, if present
             int valueStartIdx =
-                (tagString.charAt(separatorIdx + 1) == '\'')
-                    ? separatorIdx + 2
-                    : separatorIdx + 1;
+                    (tagString.charAt(separatorIdx + 1) == '\'')
+                            ? separatorIdx + 2
+                            : separatorIdx + 1;
             int valueEndIdx =
-                (tagString.charAt(tagString.length() - 1)) == '\''
-                    ? tagString.length() - 1
-                    : tagString.length();
+                    (tagString.charAt(tagString.length() - 1)) == '\''
+                            ? tagString.length() - 1
+                            : tagString.length();
             String name = tagString.substring(0, separatorIdx);
             String value = tagString.substring(valueStartIdx, valueEndIdx);
             // System.out.println (i++ + " " +  name + ":" + value);
@@ -359,47 +369,64 @@ public class IcyInputStream
             addTag(tag);
         }
     }
-    /** adds the tag to the HashMap of tags we have encountered
-        either in-stream or as headers, replacing any previous
-        tag with this name.
+
+    /**
+     * adds the tag to the HashMap of tags we have encountered
+     * either in-stream or as headers, replacing any previous
+     * tag with this name.
      */
     protected void addTag(IcyTag tag) {
         tags.put(tag.getName(), tag);
         // fire this as an event too
         tagParseSupport.fireTagParsed(this, tag);
     }
-    /** Get the named tag from the HashMap of headers and
-        in-line tags.  Null if no such tag has been encountered.
+
+    /**
+     * Get the named tag from the HashMap of headers and
+     * in-line tags.  Null if no such tag has been encountered.
      */
     public MP3Tag getTag(String tagName) {
         return tags.get(tagName);
     }
-    /** Get all tags (headers or in-stream) encountered thus far.
+
+    /**
+     * Get all tags (headers or in-stream) encountered thus far.
      */
+    @Override
     public MP3Tag[] getTags() {
         return tags.values().toArray(new MP3Tag[0]);
     }
-    /** Returns a HashMap of all headers and in-stream tags
-        parsed so far.
+
+    /**
+     * Returns a HashMap of all headers and in-stream tags
+     * parsed so far.
      */
     public Map<String, IcyTag> getTagHash() {
         return tags;
     }
-    /** Adds a TagParseListener to be notified when this stream
-        parses MP3Tags.
+
+    /**
+     * Adds a TagParseListener to be notified when this stream
+     * parses MP3Tags.
      */
+    @Override
     public void addTagParseListener(TagParseListener tpl) {
         tagParseSupport.addTagParseListener(tpl);
     }
-    /** Removes a TagParseListener, so it won't be notified when
-        this stream parses MP3Tags.
+
+    /**
+     * Removes a TagParseListener, so it won't be notified when
+     * this stream parses MP3Tags.
      */
+    @Override
     public void removeTagParseListener(TagParseListener tpl) {
         tagParseSupport.removeTagParseListener(tpl);
     }
-    /** Quickie unit-test.
+
+    /**
+     * Quickie unit-test.
      */
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         byte[] chow = new byte[200];
         if (args.length != 1) {
             //System.out.println("Usage: IcyInputStream <url>");
@@ -410,14 +437,13 @@ public class IcyInputStream
             URLConnection conn = url.openConnection();
             conn.setRequestProperty("Icy-Metadata", "1");
             IcyInputStream icy =
-                new IcyInputStream(
-                    new BufferedInputStream(conn.getInputStream()));
+                    new IcyInputStream(
+                            new BufferedInputStream(conn.getInputStream()));
             while (icy.available() > -1) {
                 // icy.read();
                 icy.read(chow, 0, chow.length);
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

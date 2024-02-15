@@ -29,7 +29,6 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
-import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
@@ -39,12 +38,15 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static vavi.sound.SoundUtil.volume;
 import static vavix.util.DelayedWorker.later;
 
 /**
  * Simple player (based on MP3 SPI) unit test.
  */
-public class PlayerTest {
+class PlayerTest {
+
+    static final double volume = Double.parseDouble(System.getProperty("vavi.test.volume",  "0.2"));
 
     private String basefile = null;
     private String filename = null;
@@ -55,7 +57,7 @@ public class PlayerTest {
     private long time;
 
     @BeforeEach
-    protected void setUp() throws Exception {
+    void setUp() throws Exception {
         props = new Properties();
         InputStream pin = getClass().getClassLoader().getResourceAsStream("test.mp3.properties");
         props.load(pin);
@@ -67,7 +69,7 @@ public class PlayerTest {
     }
 
     @Test
-    public void testPlay0() throws Exception {
+    void testPlay0() throws Exception {
         AudioInputStream in = AudioSystem.getAudioInputStream(new File(filename));
         AudioFormat baseFormat = in.getFormat();
         AudioFormat decodedFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED,
@@ -82,7 +84,7 @@ public class PlayerTest {
     }
 
     @Test
-    public void testPlay() throws Exception {
+    void testPlay() throws Exception {
         out.info("---  Start : " + filename + "  ---");
         File file = new File(filename);
         //URL file = new URL(props.getProperty("shoutcast"));
@@ -101,7 +103,7 @@ public class PlayerTest {
                                                         baseFormat.getSampleRate(),
                                                         false);
             if (out != null)
-                out.info("Target Format : " + decodedFormat.toString());
+                out.info("Target Format : " + decodedFormat);
             din = AudioSystem.getAudioInputStream(decodedFormat, in);
             assertInstanceOf(PropertiesContainer.class, din, "PropertiesContainer");
             rawplay(decodedFormat, din);
@@ -123,7 +125,7 @@ public class PlayerTest {
         byte[] data = new byte[4096];
         SourceDataLine line = getLine(targetFormat);
         if (line != null) {
-            volume(line, .1d);
+            volume(line, volume);
             // Start
             line.start();
             int nBytesRead = 0;
@@ -140,15 +142,5 @@ public class PlayerTest {
             line.close();
             din.close();
         }
-    }
-
-    /**
-     * @param gain number between 0 and 1 (loudest)
-     * @before {@link DataLine#open()}
-     */
-    public static void volume(DataLine line, double gain) {
-        FloatControl gainControl = (FloatControl) line.getControl(FloatControl.Type.MASTER_GAIN);
-        float dB = (float) (Math.log10(gain) * 20.0);
-        gainControl.setValue(dB);
     }
 }

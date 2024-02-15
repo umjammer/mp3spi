@@ -1,2 +1,3 @@
-# for the javalayer mp3 decoder
+# for the javalayer mp3 decoder and lame-java mp3 encoder
 javazoom.spi.mpeg.sampled.convert.MpegFormatConversionProvider
+vavi.sound.sampled.mp3.Mp3LameFormatConversionProvider

@@ -1,20 +1,47 @@
-[![Maven Package](https://github.com/umjammer/mp3spi/actions/workflows/maven-publish.yml/badge.svg)](https://github.com/umjammer/mp3spi/actions/workflows/maven-publish.yml)
-[![Java CI](https://github.com/umjammer/mp3spi/workflows/Java%20CI%20with%20Maven/badge.svg)](https://github.com/umjammer/mp3spi/actions)
+[![Maven Package](https://github.com/umjammer/mp3spi/actions/workflows/maven-publish.yml/badge.svg)](https://github.com/umjammer?tab=packages&repo_name=mp3spi)
+[![Java CI](https://github.com/umjammer/mp3spi/actions/workflows/maven.yml/badge.svg)](https://github.com/umjammer/mp3spi/actions/workflows/maven.yml)
 [![CodeQL](https://github.com/umjammer/mp3spi/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/umjammer/mp3spi/actions/workflows/codeql-analysis.yml)
-![Java](https://img.shields.io/badge/Java-8-b07219)
+![Java](https://img.shields.io/badge/Java-17-b07219)
 [![Parent](https://img.shields.io/badge/Parent-vavi--sound--sandbox-pink)](https://github.com/umjammer/vavi-sound-sandbox)
 
 # MP3SPI
 
- JavaZOOM 1999-2005
+<img alt="mp3 logo" src="https://github.com/umjammer/mp3spi/assets/493908/b718b78d-15c6-4356-a5ca-fca63ad7ffcb" width=160 /><sub><a href="https://www.iis.fraunhofer.de/de/ff/amm/unterhaltungselektronik/mp3.html">🅮 fraunhofer</a></sub>
 
- Project Homepage :<br/>
-   [http://www.javazoom.net/mp3spi/mp3spi.html](https://web.archive.org/web/20210108055829/http://www.javazoom.net/mp3spi/mp3spi.html)
+MP3 Java Sound SPI.
 
- JAVA and MP3 online Forums :<br/>
-   [http://www.javazoom.net/services/forums/index.jsp](https://web.archive.org/web/20041010053627/http://www.javazoom.net/services/forums/index.jsp)
+- decider is powered by [jlayer](https://github.com/umjammer/jlayer)
+- encoder is powered by [java-lame](https://github.com/nwaldispuehl/java-lame)
+
+Both are in pure Java.
+
+## Install
+
+ * [maven](https://github.com/umjammer?tab=packages&repo_name=mp3spi)
+
+## Usage
+
+ * [decode](src/test/java/Test3.java)
+ * [encode](src/test/java/Test4.java)
+
+## References
+
+## TODO
+
+ * ~~encoder using https://github.com/nwaldispuehl/java-lame~~
+ * rename project as vavi-sound-mp3
 
 ----
+
+# Original
+
+JavaZOOM 1999-2005
+
+Project Homepage :<br/>
+[http://www.javazoom.net/mp3spi/mp3spi.html](https://web.archive.org/web/20210108055829/http://www.javazoom.net/mp3spi/mp3spi.html)
+
+JAVA and MP3 online Forums :<br/>
+[http://www.javazoom.net/services/forums/index.jsp](https://web.archive.org/web/20041010053627/http://www.javazoom.net/services/forums/index.jsp)
 
 ## DESCRIPTION
 

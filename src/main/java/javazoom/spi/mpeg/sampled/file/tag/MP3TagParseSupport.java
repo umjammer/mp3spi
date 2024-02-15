@@ -30,8 +30,10 @@ import java.util.List;
 
 
 /**
+ *
  */
 public class MP3TagParseSupport {
+
     List<TagParseListener> tagParseListeners;
 
     /**
@@ -61,8 +63,7 @@ public class MP3TagParseSupport {
      * Fires the given event to all registered listeners
      */
     public void fireTagParseEvent(TagParseEvent tpe) {
-        for (int i = 0; i < tagParseListeners.size(); i++) {
-            TagParseListener l = tagParseListeners.get(i);
+        for (TagParseListener l : tagParseListeners) {
             l.tagParsed(tpe);
         }
     }

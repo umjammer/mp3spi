@@ -23,21 +23,21 @@ import org.mozilla.universalchardet.UniversalDetector;
  */
 public final class CharConverter {
 
-    /** */
+    /**  */
     private static Logger logger = Logger.getLogger(CharConverter.class.getName());
 
-    /** */
+    /**  */
     private CharConverter() {
     }
 
-    /** */
+    /**  */
     public static String createString(byte[] buffer, int start, int length) {
         String value;
         try {
 //logger.fine("encoding: " + encoding + "\n" + StringUtil.getDump(buffer, start, length));
             value = new String(buffer, start, length, Charset.forName(encoding));
         } catch (Exception e) {
-logger.fine("exception: " + e);
+            logger.fine("exception: " + e);
             String encoding = getCharset(buffer);
             if (encoding != null) {
                 value = new String(buffer, start, length, Charset.forName(encoding));
@@ -52,10 +52,10 @@ logger.fine("exception: " + e);
         return value;
     }
 
-    /** */
+    /**  */
     private static final String encoding = System.getProperty("javazoom.spi.mpeg.encoding", "ISO_8859_1");
 
-    /** */
+    /**  */
     private static UniversalDetector detector = new UniversalDetector();
 
     /** @return nullable */
@@ -71,7 +71,7 @@ logger.fine("exception: " + e);
         detector.dataEnd();
 
         String encoding = detector.getDetectedCharset();
-logger.fine("encoding: " + encoding);
+        logger.fine("encoding: " + encoding);
         detector.reset();
 
         return encoding;

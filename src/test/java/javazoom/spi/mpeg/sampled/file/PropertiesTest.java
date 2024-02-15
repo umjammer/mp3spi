@@ -4,7 +4,6 @@ package javazoom.spi.mpeg.sampled.file;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -52,13 +51,13 @@ class PropertiesTest {
 
     @Test
     void testPropertiesFile() throws Exception {
-        final String[] testPropsAFF = {
+        String[] testPropsAFF = {
             "duration", "title", "author", "album", "date", "comment", "copyright", "mp3.framerate.fps", "mp3.copyright",
             "mp3.padding", "mp3.original", "mp3.length.bytes", "mp3.frequency.hz", "mp3.length.frames", "mp3.mode",
             "mp3.channels", "mp3.version.mpeg", "mp3.framesize.bytes", "mp3.vbr.scale", "mp3.version.encoding",
             "mp3.header.pos", "mp3.version.layer", "mp3.crc"
         };
-        final String[] testPropsAF = {
+        String[] testPropsAF = {
             "vbr", "bitrate"
         };
 
@@ -99,13 +98,13 @@ class PropertiesTest {
 
     @Test
     void testPropertiesURL() throws Exception {
-        final String[] testPropsAFF = { /* "duration", */
+        String[] testPropsAFF = { /* "duration", */
             "title", "author", "album", "date", "comment", "copyright", "mp3.framerate.fps", "mp3.copyright", "mp3.padding",
             "mp3.original", /* "mp3.length.bytes", */"mp3.frequency.hz", /* "mp3.length.frames", */"mp3.mode", "mp3.channels",
             "mp3.version.mpeg", "mp3.framesize.bytes", "mp3.vbr.scale", "mp3.version.encoding", "mp3.header.pos",
             "mp3.version.layer", "mp3.crc"
         };
-        final String[] testPropsAF = {
+        String[] testPropsAF = {
             "vbr", "bitrate"
         };
         URL url = new URL(fileurl);
@@ -128,7 +127,7 @@ class PropertiesTest {
         }
 
         if (baseFormat instanceof TAudioFormat) {
-            Map<String, ?> properties = ((TAudioFormat) baseFormat).properties();
+            Map<String, ?> properties = baseFormat.properties();
             for (String key : testPropsAF) {
                 String val = null;
                 if (properties.get(key) != null)
@@ -149,7 +148,7 @@ class PropertiesTest {
         URL url = new URL(shoutURL);
         AudioFileFormat baseFileFormat = AudioSystem.getAudioFileFormat(url);
         AudioFormat baseFormat = baseFileFormat.getFormat();
-        logger.info("-> URL : " + url.toString() + " <-");
+        logger.info("-> URL : " + url + " <-");
         logger.info(baseFileFormat.toString());
         if (baseFileFormat instanceof TAudioFileFormat) {
             Map<String, ?> properties = baseFileFormat.properties();

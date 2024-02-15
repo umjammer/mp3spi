@@ -1,45 +1,19 @@
 /*
- * MpegAudioFileReader.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Library General Public License as published
+ * by the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * 10/10/05 : size computation bug fixed in parseID3v2Frames.
- *            RIFF/MP3 header support added.
- *            FLAC and MAC headers throw UnsupportedAudioFileException now.
- *            "mp3.id3tag.publisher" (TPUB/TPB) added.
- *            "mp3.id3tag.orchestra" (TPE2/TP2) added.
- *            "mp3.id3tag.length" (TLEN/TLE) added.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Library General Public License for more details.
  *
- * 08/15/05 : parseID3v2Frames improved.
- *
- * 12/31/04 : mp3spi.weak system property added to skip controls.
- *
- * 11/29/04 : ID3v2.2, v2.3 & v2.4 support improved.
- *            "mp3.id3tag.composer" (TCOM/TCM) added
- *            "mp3.id3tag.grouping" (TIT1/TT1) added
- *            "mp3.id3tag.disc" (TPA/TPOS) added
- *            "mp3.id3tag.encoded" (TEN/TENC) added
- *            "mp3.id3tag.v2.version" added
- *
- * 11/28/04 : String encoding bug fix in chopSubstring method.
- *
- * JavaZOOM : mp3spi@javazoom.net
- *               http://www.javazoom.net
- *
- *-----------------------------------------------------------------------
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU Library General Public License as published
- *   by the Free Software Foundation; either version 2 of the License, or
- *   (at your option) any later version.
- *
- *   This program is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *   GNU Library General Public License for more details.
- *
- *   You should have received a copy of the GNU Library General Public
- *   License along with this program; if not, write to the Free Software
- *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *----------------------------------------------------------------------
+ * You should have received a copy of the GNU Library General Public
+ * License along with this program; if not, write to the Free Software
+ * d  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
+
 package javazoom.spi.mpeg.sampled.file;
 
 import java.io.BufferedInputStream;
@@ -52,7 +26,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.security.AccessControlException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -74,18 +47,36 @@ import org.tritonus.share.sampled.file.TAudioFileReader;
 import vavi.util.Debug;
 import vavi.util.StringUtil;
 
+
 /**
  * This class implements AudioFileReader for MP3 SPI.
+ *
+ * @author JavaZOOM mp3spi@javazoom.net http://www.javazoom.net
+ * @version 10/10/05 : size computation bug fixed in parseID3v2Frames.
+ * RIFF/MP3 header support added.
+ * FLAC and MAC headers throw UnsupportedAudioFileException now.
+ * "mp3.id3tag.publisher" (TPUB/TPB) added.
+ * "mp3.id3tag.orchestra" (TPE2/TP2) added.
+ * "mp3.id3tag.length" (TLEN/TLE) added.
+ * 08/15/05 : parseID3v2Frames improved.
+ * 12/31/04 : mp3spi.weak system property added to skip controls.
+ * 11/29/04 : ID3v2.2, v2.3 & v2.4 support improved.
+ * "mp3.id3tag.composer" (TCOM/TCM) added
+ * "mp3.id3tag.grouping" (TIT1/TT1) added
+ * "mp3.id3tag.disc" (TPA/TPOS) added
+ * "mp3.id3tag.encoded" (TEN/TENC) added
+ * "mp3.id3tag.v2.version" added
+ * 11/28/04 : String encoding bug fix in chopSubstring method.
  */
-public class MpegAudioFileReader extends TAudioFileReader
-{
+public class MpegAudioFileReader extends TAudioFileReader {
+
     public static final String VERSION = "MP3SPI 1.9.12";
-//  private final int SYNC = 0xFFE00000;
+    //  private final int SYNC = 0xFFE00000;
     private String weak = null;
     private final AudioFormat.Encoding[][] sm_aEncodings = {
-            { MpegEncoding.MPEG2L1, MpegEncoding.MPEG2L2, MpegEncoding.MPEG2L3 },
-            { MpegEncoding.MPEG1L1, MpegEncoding.MPEG1L2, MpegEncoding.MPEG1L3 },
-            { MpegEncoding.MPEG2DOT5L1, MpegEncoding.MPEG2DOT5L2, MpegEncoding.MPEG2DOT5L3 }, };
+            {MpegEncoding.MPEG2L1, MpegEncoding.MPEG2L2, MpegEncoding.MPEG2L3},
+            {MpegEncoding.MPEG1L1, MpegEncoding.MPEG1L2, MpegEncoding.MPEG1L3},
+            {MpegEncoding.MPEG2DOT5L1, MpegEncoding.MPEG2DOT5L2, MpegEncoding.MPEG2DOT5L3},};
     public static final int INITAL_READ_LENGTH = 1024 * 1024 * 20; // TODO limitation
     private static final int MARK_LIMIT = INITAL_READ_LENGTH + 1;
 
@@ -101,34 +92,26 @@ public class MpegAudioFileReader extends TAudioFileReader
         id3v1genres = genres.toArray(new String[0]);
     }
 
-    public MpegAudioFileReader()
-    {
+    public MpegAudioFileReader() {
         super(MARK_LIMIT, true);
         if (TDebug.TraceAudioFileReader) TDebug.out(VERSION);
-        try
-        {
-            weak = System.getProperty("mp3spi.weak");
-        }
-        catch (AccessControlException ignored)
-        {
-        }
+        weak = System.getProperty("mp3spi.weak");
     }
 
     /**
      * Returns AudioFileFormat from File.
      */
-    public AudioFileFormat getAudioFileFormat(File file) throws UnsupportedAudioFileException, IOException
-    {
+    @Override
+    public AudioFileFormat getAudioFileFormat(File file) throws UnsupportedAudioFileException, IOException {
         return super.getAudioFileFormat(file);
     }
 
     /**
      * Returns AudioFileFormat from URL.
      */
-    public AudioFileFormat getAudioFileFormat(URL url) throws UnsupportedAudioFileException, IOException
-    {
-        if (TDebug.TraceAudioFileReader)
-        {
+    @Override
+    public AudioFileFormat getAudioFileFormat(URL url) throws UnsupportedAudioFileException, IOException {
+        if (TDebug.TraceAudioFileReader) {
             TDebug.out("MpegAudioFileReader.getAudioFileFormat(URL): begin");
         }
         long lFileLengthInBytes = AudioSystem.NOT_SPECIFIED;
@@ -137,16 +120,12 @@ public class MpegAudioFileReader extends TAudioFileReader
         conn.setRequestProperty("Icy-Metadata", "1");
         InputStream inputStream = conn.getInputStream();
         AudioFileFormat audioFileFormat = null;
-        try
-        {
+        try {
             audioFileFormat = getAudioFileFormat(inputStream, lFileLengthInBytes);
-        }
-        finally
-        {
+        } finally {
             inputStream.close();
         }
-        if (TDebug.TraceAudioFileReader)
-        {
+        if (TDebug.TraceAudioFileReader) {
             TDebug.out("MpegAudioFileReader.getAudioFileFormat(URL): end");
         }
         return audioFileFormat;
@@ -155,9 +134,10 @@ public class MpegAudioFileReader extends TAudioFileReader
     /**
      * Returns AudioFileFormat from inputstream and medialength.
      */
-    public AudioFileFormat getAudioFileFormat(InputStream inputStream, long mediaLength) throws UnsupportedAudioFileException, IOException
-    {
-        if (TDebug.TraceAudioFileReader) TDebug.out(">MpegAudioFileReader.getAudioFileFormat(InputStream inputStream, long mediaLength): begin");
+    @Override
+    public AudioFileFormat getAudioFileFormat(InputStream inputStream, long mediaLength) throws UnsupportedAudioFileException, IOException {
+        if (TDebug.TraceAudioFileReader)
+            TDebug.out(">MpegAudioFileReader.getAudioFileFormat(InputStream inputStream, long mediaLength): begin");
         Map<String, Object> aff_properties = new HashMap<>();
         Map<String, Object> af_properties = new HashMap<>();
         int mLength = (int) mediaLength;
@@ -170,16 +150,19 @@ public class MpegAudioFileReader extends TAudioFileReader
                     throw new RuntimeException("stop reading, prevent form eof");
                 }
             }
+
             @Override
             public int read() throws IOException {
                 check(1);
                 return super.read();
             }
+
             @Override
             public int read(byte[] b) throws IOException {
                 check(b.length);
                 return super.read(b);
             }
+
             @Override
             public int read(byte[] b, int off, int len) throws IOException {
                 check(len);
@@ -190,59 +173,45 @@ public class MpegAudioFileReader extends TAudioFileReader
         byte[] head = new byte[22];
         int r = pis.read(head);
         assert r == head.length : "read header bytes";
-        if (TDebug.TraceAudioFileReader)
-        {
+        if (TDebug.TraceAudioFileReader) {
             TDebug.out("InputStream : " + inputStream + " =>" + new String(head));
         }
 
         // Check for WAV, AU, and AIFF, Ogg Vorbis, Flac, MAC file formats.
         // Next check for Shoutcast (supported) and OGG (unsupported) streams.
-        if ((head[0] == 'R') && (head[1] == 'I') && (head[2] == 'F') && (head[3] == 'F') && (head[8] == 'W') && (head[9] == 'A') && (head[10] == 'V') && (head[11] == 'E'))
-        {
+        if ((head[0] == 'R') && (head[1] == 'I') && (head[2] == 'F') && (head[3] == 'F') && (head[8] == 'W') && (head[9] == 'A') && (head[10] == 'V') && (head[11] == 'E')) {
             if (TDebug.TraceAudioFileReader) TDebug.out("RIFF/WAV stream found");
-            int isPCM = ((head[21]<<8)&0x0000FF00) | ((head[20])&0x00000FF);
-            if (weak == null)
-            {
+            int isPCM = ((head[21] << 8) & 0x0000FF00) | ((head[20]) & 0x00000FF);
+            if (weak == null) {
                 if (isPCM == 1) throw new UnsupportedAudioFileException("WAV PCM stream found");
             }
 
-        }
-        else if ((head[0] == '.') && (head[1] == 's') && (head[2] == 'n') && (head[3] == 'd'))
-        {
+        } else if ((head[0] == '.') && (head[1] == 's') && (head[2] == 'n') && (head[3] == 'd')) {
             if (TDebug.TraceAudioFileReader) TDebug.out("AU stream found");
             if (weak == null) throw new UnsupportedAudioFileException("AU stream found");
-        }
-        else if ((head[0] == 'F') && (head[1] == 'O') && (head[2] == 'R') && (head[3] == 'M') && (head[8] == 'A') && (head[9] == 'I') && (head[10] == 'F') && (head[11] == 'F'))
-        {
+        } else if ((head[0] == 'F') && (head[1] == 'O') && (head[2] == 'R') && (head[3] == 'M') && (head[8] == 'A') && (head[9] == 'I') && (head[10] == 'F') && (head[11] == 'F')) {
             if (TDebug.TraceAudioFileReader) TDebug.out("AIFF stream found");
             if (weak == null) throw new UnsupportedAudioFileException("AIFF stream found");
-        }
-        else if (((head[0] == 'M') | (head[0] == 'm')) && ((head[1] == 'A') | (head[1] == 'a')) && ((head[2] == 'C') | (head[2] == 'c')))
-        {
+        } else if (((head[0] == 'M') | (head[0] == 'm')) && ((head[1] == 'A') | (head[1] == 'a')) && ((head[2] == 'C') | (head[2] == 'c'))) {
             if (TDebug.TraceAudioFileReader) TDebug.out("APE stream found");
             if (weak == null) throw new UnsupportedAudioFileException("APE stream found");
-        }
-        else if (((head[0] == 'F') | (head[0] == 'f')) && ((head[1] == 'L') | (head[1] == 'l')) && ((head[2] == 'A') | (head[2] == 'a')) && ((head[3] == 'C') | (head[3] == 'c')))
-        {
+        } else if (((head[0] == 'F') | (head[0] == 'f')) && ((head[1] == 'L') | (head[1] == 'l')) && ((head[2] == 'A') | (head[2] == 'a')) && ((head[3] == 'C') | (head[3] == 'c'))) {
             if (TDebug.TraceAudioFileReader) TDebug.out("FLAC stream found");
             if (weak == null) throw new UnsupportedAudioFileException("FLAC stream found");
         }
         // Shoutcast stream ?
-        else if (((head[0] == 'I') | (head[0] == 'i')) && ((head[1] == 'C') | (head[1] == 'c')) && ((head[2] == 'Y') | (head[2] == 'y')))
-        {
+        else if (((head[0] == 'I') | (head[0] == 'i')) && ((head[1] == 'C') | (head[1] == 'c')) && ((head[2] == 'Y') | (head[2] == 'y'))) {
             pis.unread(head);
             // Load shoutcast meta data.
             loadShoutcastInfo(pis, aff_properties);
         }
         // Ogg stream ?
-        else if (((head[0] == 'O') | (head[0] == 'o')) && ((head[1] == 'G') | (head[1] == 'g')) && ((head[2] == 'G') | (head[2] == 'g')))
-        {
+        else if (((head[0] == 'O') | (head[0] == 'o')) && ((head[1] == 'G') | (head[1] == 'g')) && ((head[2] == 'G') | (head[2] == 'g'))) {
             if (TDebug.TraceAudioFileReader) TDebug.out("Ogg stream found");
             if (weak == null) throw new UnsupportedAudioFileException("Ogg stream found");
         }
         // No, so pushback.
-        else
-        {
+        else {
             pis.unread(head);
         }
         // MPEG header info.
@@ -262,8 +231,7 @@ public class MpegAudioFileReader extends TAudioFileReader
         int nTotalMS;
         boolean nVBR;
         AudioFormat.Encoding encoding;
-        try
-        {
+        try {
             Bitstream m_bitstream = new Bitstream(pis);
             aff_properties.put("mp3.header.pos", m_bitstream.header_pos());
             Header m_header = m_bitstream.readFrame();
@@ -274,7 +242,7 @@ public class MpegAudioFileReader extends TAudioFileReader
             // nLayer = 1,2,3
             nLayer = m_header.layer();
             aff_properties.put("mp3.version.layer", Integer.toString(nLayer));
-            nSFIndex = m_header.sample_frequency();
+            nSFIndex = m_header.sampleFrequency();
             nMode = m_header.mode();
             aff_properties.put("mp3.mode", nMode);
             nChannels = nMode == 3 ? 1 : 2;
@@ -282,19 +250,18 @@ public class MpegAudioFileReader extends TAudioFileReader
             nVBR = m_header.vbr();
             af_properties.put("vbr", nVBR);
             aff_properties.put("mp3.vbr", nVBR);
-            aff_properties.put("mp3.vbr.scale", m_header.vbr_scale());
-            FrameSize = m_header.calculate_framesize();
+            aff_properties.put("mp3.vbr.scale", m_header.vbrScale());
+            FrameSize = m_header.calculateFrameSize();
             aff_properties.put("mp3.framesize.bytes", FrameSize);
             if (FrameSize < 0) throw new UnsupportedAudioFileException("Invalid FrameSize : " + FrameSize);
             nFrequency = m_header.frequency();
             aff_properties.put("mp3.frequency.hz", nFrequency);
-            FrameRate = (float) ((1.0 / (m_header.ms_per_frame())) * 1000.0);
+            FrameRate = (float) ((1.0 / (m_header.msPerFrame())) * 1000.0);
             aff_properties.put("mp3.framerate.fps", FrameRate);
             if (FrameRate < 0) throw new UnsupportedAudioFileException("Invalid FrameRate : " + FrameRate);
-            if (mLength != AudioSystem.NOT_SPECIFIED)
-            {
+            if (mLength != AudioSystem.NOT_SPECIFIED) {
                 aff_properties.put("mp3.length.bytes", mLength);
-                nTotalFrames = m_header.max_number_of_frames(mLength);
+                nTotalFrames = m_header.maxNumberOfFrames(mLength);
                 aff_properties.put("mp3.length.frames", nTotalFrames);
             }
             BitRate = m_header.bitrate();
@@ -303,9 +270,8 @@ public class MpegAudioFileReader extends TAudioFileReader
             nHeader = m_header.getSyncHeader();
             encoding = sm_aEncodings[nVersion][nLayer - 1];
             aff_properties.put("mp3.version.encoding", encoding.toString());
-            if (mLength != AudioSystem.NOT_SPECIFIED)
-            {
-                nTotalMS = Math.round(m_header.total_ms(mLength));
+            if (mLength != AudioSystem.NOT_SPECIFIED) {
+                nTotalMS = Math.round(m_header.totalMs(mLength));
                 aff_properties.put("duration", nTotalMS * 1000L);
             }
             aff_properties.put("mp3.copyright", m_header.copyright());
@@ -314,42 +280,35 @@ public class MpegAudioFileReader extends TAudioFileReader
             aff_properties.put("mp3.padding", m_header.padding());
             InputStream id3v2 = m_bitstream.getRawID3v2();
 //TDebug.out("id3v2: " + id3v2);
-            if (id3v2 != null)
-            {
+            if (id3v2 != null) {
                 aff_properties.put("mp3.id3tag.v2", id3v2);
                 parseID3v2Frames(id3v2, aff_properties);
             }
             if (TDebug.TraceAudioFileReader) TDebug.out(m_header.toString());
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             if (TDebug.TraceAudioFileReader) e.printStackTrace();
             if (TDebug.TraceAudioFileReader) TDebug.out("not a MPEG stream: " + e.getMessage());
             throw new UnsupportedAudioFileException("not a MPEG stream: " + e.getMessage());
         }
         // Deeper checks ?
         int cVersion = (nHeader >> 19) & 0x3;
-        if (cVersion == 1)
-        {
+        if (cVersion == 1) {
             if (TDebug.TraceAudioFileReader) TDebug.out("not a MPEG stream: wrong version");
             throw new UnsupportedAudioFileException("not a MPEG stream: wrong version");
         }
         int cSFIndex = (nHeader >> 10) & 0x3;
-        if (cSFIndex == 3)
-        {
+        if (cSFIndex == 3) {
             if (TDebug.TraceAudioFileReader) TDebug.out("not a MPEG stream: wrong sampling rate");
             throw new UnsupportedAudioFileException("not a MPEG stream: wrong sampling rate");
         }
         // Look up for ID3v1 tag
-        if ((size == mediaLength) && (mediaLength != AudioSystem.NOT_SPECIFIED))
-        {
+        if ((size == mediaLength) && (mediaLength != AudioSystem.NOT_SPECIFIED)) {
             byte[] id3v1 = new byte[128];
             @SuppressWarnings("unused")
             long bytesSkipped = inputStream.skip(inputStream.available() - id3v1.length);
             @SuppressWarnings("unused")
             int read = inputStream.read(id3v1, 0, id3v1.length);
-            if ((id3v1[0] == 'T') && (id3v1[1] == 'A') && (id3v1[2] == 'G'))
-            {
+            if ((id3v1[0] == 'T') && (id3v1[1] == 'A') && (id3v1[2] == 'G')) {
                 parseID3v1Frames(id3v1, aff_properties);
             }
         } else {
@@ -362,9 +321,9 @@ public class MpegAudioFileReader extends TAudioFileReader
                 long bytesSkipped = is.skip(inputStream.available() - id3v1.length);
                 @SuppressWarnings("unused")
                 int read = is.read(id3v1, 0, id3v1.length);
-                if (TDebug.TraceAudioFileReader) TDebug.out((char) id3v1[0] + ", " + (char) id3v1[1] + ", " + (char) id3v1[2]);
-                if ((id3v1[0] == 'T') && (id3v1[1] == 'A') && (id3v1[2] == 'G'))
-                {
+                if (TDebug.TraceAudioFileReader)
+                    TDebug.out((char) id3v1[0] + ", " + (char) id3v1[1] + ", " + (char) id3v1[2]);
+                if ((id3v1[0] == 'T') && (id3v1[1] == 'A') && (id3v1[2] == 'G')) {
                     parseID3v1Frames(id3v1, aff_properties);
                 }
             } else {
@@ -382,16 +341,13 @@ public class MpegAudioFileReader extends TAudioFileReader
     /**
      * Returns AudioInputStream from file.
      */
-    public AudioInputStream getAudioInputStream(File file) throws UnsupportedAudioFileException, IOException
-    {
+    @Override
+    public AudioInputStream getAudioInputStream(File file) throws UnsupportedAudioFileException, IOException {
         if (TDebug.TraceAudioFileReader) TDebug.out("getAudioInputStream(File file)");
         InputStream inputStream = Files.newInputStream(file.toPath());
-        try
-        {
+        try {
             return getAudioInputStream(inputStream);
-        }
-        catch (UnsupportedAudioFileException | IOException e)
-        {
+        } catch (UnsupportedAudioFileException | IOException e) {
             inputStream.close();
             throw e;
         }
@@ -400,10 +356,9 @@ public class MpegAudioFileReader extends TAudioFileReader
     /**
      * Returns AudioInputStream from url.
      */
-    public AudioInputStream getAudioInputStream(URL url) throws UnsupportedAudioFileException, IOException
-    {
-        if (TDebug.TraceAudioFileReader)
-        {
+    @Override
+    public AudioInputStream getAudioInputStream(URL url) throws UnsupportedAudioFileException, IOException {
+        if (TDebug.TraceAudioFileReader) {
             TDebug.out("MpegAudioFileReader.getAudioInputStream(URL): begin");
         }
         long lFileLengthInBytes = AudioSystem.NOT_SPECIFIED;
@@ -416,46 +371,37 @@ public class MpegAudioFileReader extends TAudioFileReader
         BufferedInputStream bInputStream = new BufferedInputStream(conn.getInputStream());
         bInputStream.mark(toRead);
         int read = bInputStream.read(head, 0, toRead);
-        if ((read > 2) && (((head[0] == 'I') | (head[0] == 'i')) && ((head[1] == 'C') | (head[1] == 'c')) && ((head[2] == 'Y') | (head[2] == 'y')))) isShout = true;
+        if ((read > 2) && (((head[0] == 'I') | (head[0] == 'i')) && ((head[1] == 'C') | (head[1] == 'c')) && ((head[2] == 'Y') | (head[2] == 'y'))))
+            isShout = true;
         bInputStream.reset();
         InputStream inputStream = null;
         // Is a shoutcast server ?
-        if (isShout)
-        {
+        if (isShout) {
             // Yes
             IcyInputStream icyStream = new IcyInputStream(bInputStream);
             icyStream.addTagParseListener(IcyListener.getInstance());
             inputStream = icyStream;
-        }
-        else
-        {
+        } else {
             // No, is Icecast 2 ?
             String metaint = conn.getHeaderField("icy-metaint");
-            if (metaint != null)
-            {
+            if (metaint != null) {
                 // Yes, it might be icecast 2 mp3 stream.
                 IcyInputStream icyStream = new IcyInputStream(bInputStream, metaint);
                 icyStream.addTagParseListener(IcyListener.getInstance());
                 inputStream = icyStream;
-            }
-            else
-            {
+            } else {
                 // No
                 inputStream = bInputStream;
             }
         }
         AudioInputStream audioInputStream = null;
-        try
-        {
+        try {
             audioInputStream = getAudioInputStream(inputStream, lFileLengthInBytes);
-        }
-        catch (UnsupportedAudioFileException | IOException e)
-        {
+        } catch (UnsupportedAudioFileException | IOException e) {
             inputStream.close();
             throw e;
         }
-        if (TDebug.TraceAudioFileReader)
-        {
+        if (TDebug.TraceAudioFileReader) {
             TDebug.out("MpegAudioFileReader.getAudioInputStream(URL): end");
         }
         return audioInputStream;
@@ -464,71 +410,70 @@ public class MpegAudioFileReader extends TAudioFileReader
     /**
      * Return the AudioInputStream from the given InputStream.
      */
-    public AudioInputStream getAudioInputStream(InputStream inputStream) throws UnsupportedAudioFileException, IOException
-    {
-        if (TDebug.TraceAudioFileReader) { TDebug.out("MpegAudioFileReader.getAudioInputStream(InputStream inputStream)");
-                                           TDebug.out("inputStream: " + inputStream.getClass().getName() + ", mark: " + inputStream.markSupported()); }
+    @Override
+    public AudioInputStream getAudioInputStream(InputStream inputStream) throws UnsupportedAudioFileException, IOException {
+        if (TDebug.TraceAudioFileReader) {
+            TDebug.out("MpegAudioFileReader.getAudioInputStream(InputStream inputStream)");
+            TDebug.out("inputStream: " + inputStream.getClass().getName() + ", mark: " + inputStream.markSupported());
+        }
         if (!inputStream.markSupported()) inputStream = new BufferedInputStream(inputStream);
-        if (TDebug.TraceAudioFileReader) TDebug.out("available/limit: " + inputStream.available() + ", " + getMarkLimit());
+        if (TDebug.TraceAudioFileReader)
+            TDebug.out("available/limit: " + inputStream.available() + ", " + getMarkLimit());
         setMarkLimit(Math.min(inputStream.available(), getMarkLimit()));
         return super.getAudioInputStream(inputStream);
     }
 
     /**
      * Parser ID3v1 frames
+     *
      * @param frames
      * @param props
      */
-    protected void parseID3v1Frames(byte[] frames, Map<String, Object> props)
-    {
+    protected void parseID3v1Frames(byte[] frames, Map<String, Object> props) {
         if (TDebug.TraceAudioFileReader) TDebug.out("Parsing ID3v1");
         String titlev1 = CharConverter.createString(frames, 3, 30).trim();
         String titlev2 = (String) props.get("title");
-        if (((titlev2 == null) || (titlev2.length() == 0)) && (titlev1 != null)) props.put("title", titlev1);
+        if (((titlev2 == null) || (titlev2.isEmpty())) && (titlev1 != null)) props.put("title", titlev1);
         String artistv1 = CharConverter.createString(frames, 33, 30).trim();
         String artistv2 = (String) props.get("author");
-        if (((artistv2 == null) || (artistv2.length() == 0)) && (artistv1 != null)) props.put("author", artistv1);
+        if (((artistv2 == null) || (artistv2.isEmpty())) && (artistv1 != null)) props.put("author", artistv1);
         String albumv1 = CharConverter.createString(frames, 63, 30).trim();
         String albumv2 = (String) props.get("album");
-        if (((albumv2 == null) || (albumv2.length() == 0)) && (albumv1 != null)) props.put("album", albumv1);
+        if (((albumv2 == null) || (albumv2.isEmpty())) && (albumv1 != null)) props.put("album", albumv1);
         String yearv1 = CharConverter.createString(frames, 93, 4).trim();
         String yearv2 = (String) props.get("year");
-        if (((yearv2 == null) || (yearv2.length() == 0)) && (yearv1 != null)) props.put("date", yearv1);
+        if (((yearv2 == null) || (yearv2.isEmpty())) && (yearv1 != null)) props.put("date", yearv1);
         String commentv1 = CharConverter.createString(frames, 97, 29).trim();
         String commentv2 = (String) props.get("comment");
-        if (((commentv2 == null) || (commentv2.length() == 0)) && (commentv1 != null)) props.put("comment", commentv1);
+        if (((commentv2 == null) || (commentv2.isEmpty())) && (commentv1 != null)) props.put("comment", commentv1);
         String trackv1 = "" + (frames[126] & 0xff);
         String trackv2 = (String) props.get("mp3.id3tag.track");
-        if (((trackv2 == null) || (trackv2.length() == 0)) && (trackv1 != null)) props.put("mp3.id3tag.track", trackv1);
+        if (((trackv2 == null) || (trackv2.isEmpty())) && (trackv1 != null)) props.put("mp3.id3tag.track", trackv1);
         int genrev1 = (frames[127] & 0xff);
-        if ((genrev1 >= 0) && (genrev1 < id3v1genres.length))
-        {
+        if ((genrev1 >= 0) && (genrev1 < id3v1genres.length)) {
             String genrev2 = (String) props.get("mp3.id3tag.genre");
-            if (((genrev2 == null) || (genrev2.length() == 0))) props.put("mp3.id3tag.genre", id3v1genres[genrev1]);
+            if (((genrev2 == null) || (genrev2.isEmpty()))) props.put("mp3.id3tag.genre", id3v1genres[genrev1]);
         }
         if (TDebug.TraceAudioFileReader) TDebug.out("ID3v1 parsed");
     }
 
     /**
      * Extract
+     *
      * @param s
      * @param start
      * @param end
      * @return
      */
     @SuppressWarnings("unused")
-    private String chopSubstring(String s, int start, int end)
-    {
+    private String chopSubstring(String s, int start, int end) {
         String str = null;
         // 11/28/04 - String encoding bug fix.
-        try
-        {
+        try {
             str = s.substring(start, end);
             int loc = str.indexOf('\0');
             if (loc != -1) str = str.substring(0, loc);
-        }
-        catch (StringIndexOutOfBoundsException e)
-        {
+        } catch (StringIndexOutOfBoundsException e) {
             // Skip encoding issues.
             if (TDebug.TraceAudioFileReader) TDebug.out("Cannot chopSubString " + e.getMessage());
         }
@@ -537,129 +482,120 @@ public class MpegAudioFileReader extends TAudioFileReader
 
     /**
      * Parse ID3v2 frames to add album (TALB), title (TIT2), date (TYER), author (TPE1), copyright (TCOP), comment (COMM) ...
+     *
      * @param frames
      * @param props
      */
-    protected void parseID3v2Frames(InputStream frames, Map<String, Object> props)
-    {
+    protected void parseID3v2Frames(InputStream frames, Map<String, Object> props) {
         if (TDebug.TraceAudioFileReader) TDebug.out("Parsing ID3v2");
         byte[] bframes = null;
         int size = -1;
-        try
-        {
+        try {
             size = frames.available();
             bframes = new byte[size];
             frames.mark(size);
             int r = frames.read(bframes);
             assert r == bframes.length : "read ID3v2 tags";
             frames.reset();
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             if (TDebug.TraceAudioFileReader) TDebug.out("Cannot parse ID3v2 :" + e.getMessage());
         }
-        if (!"ID3".equals(new String(bframes, 0, 3)))
-        {
+        if (!"ID3".equals(new String(bframes, 0, 3))) {
             TDebug.out("No ID3v2 header found!");
             return;
         }
         int v2version = bframes[3] & 0xff;
         props.put("mp3.id3tag.v2.version", String.valueOf(v2version));
-        if (v2version < 2 || v2version > 4)
-        {
+        if (v2version < 2 || v2version > 4) {
             TDebug.out("Unsupported ID3v2 version " + v2version + "!");
             return;
         }
-        try
-        {
-            if (TDebug.TraceAudioFileReader) TDebug.out("ID3v2 frame dump(" + bframes.length + ")='" + new String(bframes, 0, bframes.length) + "'");
+        try {
+            if (TDebug.TraceAudioFileReader)
+                TDebug.out("ID3v2 frame dump(" + bframes.length + ")='" + new String(bframes) + "'");
             // ID3 tags : http://www.unixgods.org/~tilo/ID3/docs/ID3_comparison.html
             String value;
-            for (int i = 10; i < bframes.length && bframes[i] > 0; i += size)
-            {
-                if (v2version == 3 || v2version == 4)
-                {
+            for (int i = 10; i < bframes.length && bframes[i] > 0; i += size) {
+                if (v2version == 3 || v2version == 4) {
                     // ID3v2.3 & ID3v2.4
                     String code = new String(bframes, i, 4);
-Debug.println(Level.FINE, "code: " + code);
+                    Debug.println(Level.FINE, "code: " + code);
                     size = ((bframes[i + 4] << 24) & 0xFF000000 | (bframes[i + 5] << 16) & 0x00FF0000 | (bframes[i + 6] << 8) & 0x0000FF00 | (bframes[i + 7]) & 0x000000FF);
                     i += 10;
                     if ((code.equals("TALB")) || (code.equals("TIT2")) || (code.equals("TYER")) ||
-                        (code.equals("TPE1")) || (code.equals("TCOP")) || (code.equals("COMM")) ||
-                        (code.equals("TCON")) || (code.equals("TRCK")) || (code.equals("TPOS")) ||
-                        (code.equals("TDRC")) || (code.equals("TCOM")) || (code.equals("TIT1")) ||
-                        (code.equals("TENC")) || (code.equals("TPUB")) || (code.equals("TPE2")) ||
-                        (code.equals("TLEN")) )
-                    {
-                        if (code.equals("COMM")) value = parseText(bframes, i, size, getSkipForComment(bframes, i, size, 1 + 3));
+                            (code.equals("TPE1")) || (code.equals("TCOP")) || (code.equals("COMM")) ||
+                            (code.equals("TCON")) || (code.equals("TRCK")) || (code.equals("TPOS")) ||
+                            (code.equals("TDRC")) || (code.equals("TCOM")) || (code.equals("TIT1")) ||
+                            (code.equals("TENC")) || (code.equals("TPUB")) || (code.equals("TPE2")) ||
+                            (code.equals("TLEN"))) {
+                        if (code.equals("COMM"))
+                            value = parseText(bframes, i, size, getSkipForComment(bframes, i, size, 1 + 3));
                         else value = parseText(bframes, i, size, 1);
-                        if ((value != null) && (value.length() > 0))
-                        {
-                            if (code.equals("TALB")) props.put("album", value);
-                            else if (code.equals("TIT2")) props.put("title", value);
-                            else if (code.equals("TYER")) props.put("date", value);
+                        if ((value != null) && (!value.isEmpty())) {
+                            switch (code) {
+                            case "TALB" -> props.put("album", value);
+                            case "TIT2" -> props.put("title", value);
+                            case "TYER" -> props.put("date", value);
+
                             // ID3v2.4 date fix.
-                            else if (code.equals("TDRC")) props.put("date", value);
-                            else if (code.equals("TPE1")) props.put("author", value);
-                            else if (code.equals("TCOP")) props.put("copyright", value);
-                            else if (code.equals("COMM")) props.put("comment", value);
-                            else if (code.equals("TCON")) props.put("mp3.id3tag.genre", value);
-                            else if (code.equals("TRCK")) props.put("mp3.id3tag.track", value);
-                            else if (code.equals("TPOS")) props.put("mp3.id3tag.disc", value);
-                            else if (code.equals("TCOM")) props.put("mp3.id3tag.composer", value);
-                            else if (code.equals("TIT1")) props.put("mp3.id3tag.grouping", value);
-                            else if (code.equals("TENC")) props.put("mp3.id3tag.encoded", value);
-                            else if (code.equals("TPUB")) props.put("mp3.id3tag.publisher", value);
-                            else if (code.equals("TPE2")) props.put("mp3.id3tag.orchestra", value);
-                            else if (code.equals("TLEN")) props.put("mp3.id3tag.length", value);
+                            case "TDRC" -> props.put("date", value);
+                            case "TPE1" -> props.put("author", value);
+                            case "TCOP" -> props.put("copyright", value);
+                            case "COMM" -> props.put("comment", value);
+                            case "TCON" -> props.put("mp3.id3tag.genre", value);
+                            case "TRCK" -> props.put("mp3.id3tag.track", value);
+                            case "TPOS" -> props.put("mp3.id3tag.disc", value);
+                            case "TCOM" -> props.put("mp3.id3tag.composer", value);
+                            case "TIT1" -> props.put("mp3.id3tag.grouping", value);
+                            case "TENC" -> props.put("mp3.id3tag.encoded", value);
+                            case "TPUB" -> props.put("mp3.id3tag.publisher", value);
+                            case "TPE2" -> props.put("mp3.id3tag.orchestra", value);
+                            case "TLEN" -> props.put("mp3.id3tag.length", value);
+                            }
                         }
                     }
-                }
-                else
-                {
+                } else {
                     // ID3v2.2
                     String scode = new String(bframes, i, 3);
                     size = (0x00000000) + (bframes[i + 3] << 16) + (bframes[i + 4] << 8) + (bframes[i + 5]);
                     i += 6;
                     if ((scode.equals("TAL")) || (scode.equals("TT2")) || (scode.equals("TP1")) ||
-                        (scode.equals("TYE")) || (scode.equals("TRK")) || (scode.equals("TPA")) ||
-                        (scode.equals("TCR")) || (scode.equals("TCO")) || (scode.equals("TCM")) ||
-                        (scode.equals("COM")) || (scode.equals("TT1")) || (scode.equals("TEN")) ||
-                        (scode.equals("TPB")) || (scode.equals("TP2")) || (scode.equals("TLE")) )
-                    {
+                            (scode.equals("TYE")) || (scode.equals("TRK")) || (scode.equals("TPA")) ||
+                            (scode.equals("TCR")) || (scode.equals("TCO")) || (scode.equals("TCM")) ||
+                            (scode.equals("COM")) || (scode.equals("TT1")) || (scode.equals("TEN")) ||
+                            (scode.equals("TPB")) || (scode.equals("TP2")) || (scode.equals("TLE"))) {
                         if (scode.equals("COM")) value = parseText(bframes, i, size, 5);
                         else value = parseText(bframes, i, size, 1);
-                        if ((value != null) && (value.length() > 0))
-                        {
-                            if (scode.equals("TAL")) props.put("album", value);
-                            else if (scode.equals("TT2")) props.put("title", value);
-                            else if (scode.equals("TYE")) props.put("date", value);
-                            else if (scode.equals("TP1")) props.put("author", value);
-                            else if (scode.equals("TCR")) props.put("copyright", value);
-                            else if (scode.equals("COM")) props.put("comment", value);
-                            else if (scode.equals("TCO")) props.put("mp3.id3tag.genre", value);
-                            else if (scode.equals("TRK")) props.put("mp3.id3tag.track", value);
-                            else if (scode.equals("TPA")) props.put("mp3.id3tag.disc", value);
-                            else if (scode.equals("TCM")) props.put("mp3.id3tag.composer", value);
-                            else if (scode.equals("TT1")) props.put("mp3.id3tag.grouping", value);
-                            else if (scode.equals("TEN")) props.put("mp3.id3tag.encoded", value);
-                            else if (scode.equals("TPB")) props.put("mp3.id3tag.publisher", value);
-                            else if (scode.equals("TP2")) props.put("mp3.id3tag.orchestra", value);
-                            else if (scode.equals("TLE")) props.put("mp3.id3tag.length", value);
+                        if ((value != null) && (!value.isEmpty())) {
+                            switch (scode) {
+                            case "TAL" -> props.put("album", value);
+                            case "TT2" -> props.put("title", value);
+                            case "TYE" -> props.put("date", value);
+                            case "TP1" -> props.put("author", value);
+                            case "TCR" -> props.put("copyright", value);
+                            case "COM" -> props.put("comment", value);
+                            case "TCO" -> props.put("mp3.id3tag.genre", value);
+                            case "TRK" -> props.put("mp3.id3tag.track", value);
+                            case "TPA" -> props.put("mp3.id3tag.disc", value);
+                            case "TCM" -> props.put("mp3.id3tag.composer", value);
+                            case "TT1" -> props.put("mp3.id3tag.grouping", value);
+                            case "TEN" -> props.put("mp3.id3tag.encoded", value);
+                            case "TPB" -> props.put("mp3.id3tag.publisher", value);
+                            case "TP2" -> props.put("mp3.id3tag.orchestra", value);
+                            case "TLE" -> props.put("mp3.id3tag.length", value);
+                            }
                         }
                     }
                 }
             }
-        }
-        catch (RuntimeException e)
-        {
+        } catch (RuntimeException e) {
             // Ignore all parsing errors.
             if (TDebug.TraceAudioFileReader) TDebug.out("Cannot parse ID3v2 :" + e.getMessage());
         }
         if (TDebug.TraceAudioFileReader) TDebug.out("ID3v2 parsed");
     }
 
-    /** */
+    /**  */
     private int getSkipForComment(byte[] bframes, int offset, int size, int skip) {
 //Debug.println(Level.FINE, "\n" + StringUtil.getDump(bframes, offset, size + skip));
         int n = skip;
@@ -676,10 +612,9 @@ Debug.println(Level.FINE, "code: " + code);
      * @param skip
      * @return
      */
-    protected String parseText(byte[] bframes, int offset, int size, int skip)
-    {
+    protected String parseText(byte[] bframes, int offset, int size, int skip) {
         String value;
-        final String[] ENC_TYPES = { "ISO-8859-1", "UTF16", "UTF-16BE", "UTF-8" };
+        String[] ENC_TYPES = {"ISO-8859-1", "UTF16", "UTF-16BE", "UTF-8"};
         if (bframes[offset] == 0) {
             int length = Math.max(size - getLastZeros(bframes, offset, offset + size, 1), 0);
 //Debug.println(Level.FINE, "length: " + length + ", size: " + size + ", skip: " + skip + ", zeros: " + getLastZeros(bframes, offset, offset + size, 1) + "\n" + StringUtil.getDump(bframes, offset, size + skip));
@@ -687,13 +622,13 @@ Debug.println(Level.FINE, "code: " + code);
         } else {
             int extra = 0;
             String encpding = ENC_TYPES[bframes[offset]];
-Debug.println(Level.FINE, "enc: " + encpding + ", " + offset + ", " + size + "\n" + StringUtil.getDump(bframes, offset, size));
+            Debug.println(Level.FINE, "enc: " + encpding + ", " + offset + ", " + size + "\n" + StringUtil.getDump(bframes, offset, size));
             extra += 1; // preset encoding
             if ((bframes[offset + 1] & 0xff) == 'e' && (bframes[offset + 2] & 0xff) == 'n' && (bframes[offset + 3] & 0xff) == 'g') {
                 extra += (3 + 2 + 2); // 'eng' + bom + 00, 00
             }
             int length = Math.max(size - extra - getLastZeros(bframes, offset + extra, offset + size, 2), 0);
-Debug.println(Level.FINE, "string: " + (offset + extra) + ", " + size + ", " + getLastZeros(bframes, offset + extra, offset + size, 2) + "\n" + StringUtil.getDump(bframes, offset + extra, length));
+            Debug.println(Level.FINE, "string: " + (offset + extra) + ", " + size + ", " + getLastZeros(bframes, offset + extra, offset + size, 2) + "\n" + StringUtil.getDump(bframes, offset + extra, length));
             value = new String(bframes, offset + extra, length, Charset.forName(encpding));
         }
         return value.trim();
@@ -701,8 +636,8 @@ Debug.println(Level.FINE, "string: " + (offset + extra) + ", " + size + ", " + g
 
     /**
      * @param start start INDEX
-     * @param end end INDEX
-     * @param max how many zeros for terminating strings
+     * @param end   end INDEX
+     * @param max   how many zeros for terminating strings
      */
     private static int getLastZeros(byte[] content, int start, int end, int max) {
         int c = 0;
@@ -727,15 +662,13 @@ Debug.println(Level.FINE, "string: " + (offset + extra) + ", " + size + ", " + g
      * @param props
      * @throws IOException
      */
-    protected void loadShoutcastInfo(InputStream input, Map<String, Object> props) throws IOException
-    {
+    protected void loadShoutcastInfo(InputStream input, Map<String, Object> props) throws IOException {
         IcyInputStream icy = new IcyInputStream(new BufferedInputStream(input));
 //      Map<?, ?> metadata = icy.getTagHash();
         MP3Tag titleMP3Tag = icy.getTag("icy-name");
         if (titleMP3Tag != null) props.put("title", ((String) titleMP3Tag.getValue()).trim());
         MP3Tag[] meta = icy.getTags();
-        if (meta != null)
-        {
+        if (meta != null) {
 //          StringBuffer metaStr = new StringBuffer();
             for (MP3Tag mp3Tag : meta) {
                 String key = mp3Tag.getName();

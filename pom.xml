@@ -3,16 +3,15 @@
 
   <groupId>net.javazoom</groupId>
   <artifactId>mp3spi</artifactId>
-  <version>1.9.13</version>
+  <version>1.9.14</version>
 
   <properties>
-    <tritonus.version>0.3.11</tritonus.version>
+    <tritonus.version>0.3.12</tritonus.version>
   </properties>
 
   <distributionManagement>
     <repository>
       <id>github</id>
-      <name>GitHub umjammer Apache Maven Packages</name>
       <url>https://maven.pkg.github.com/umjammer/mp3spi</url>
     </repository>
   </distributionManagement>
@@ -22,21 +21,26 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.10.1</version>
+        <version>3.11.0</version>
         <configuration>
-          <source>8</source>
-          <target>8</target>
-          <encoding>UTF-8</encoding>
+          <target>17</target>
+          <source>17</source>
+          <compilerArgs>
+            <arg>--add-exports</arg>
+            <arg>java.desktop/com.sun.media.sound=ALL-UNNAMED</arg>
+          </compilerArgs>
         </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.0.0-M7</version>
+        <version>3.2.2</version>
         <configuration>
           <argLine>
+            --add-opens java.desktop/com.sun.media.sound=ALL-UNNAMED
             -Djava.util.logging.config.file=${project.build.testOutputDirectory}/logging.properties
-            -Dvavi.util.logging.VaviFormatter.extraClassMethod=org.tritonus.share.TDebug#out
+            -Dvavi.util.logging.VaviFormatter.extraClassMethod=org\\.tritonus\\.share\\.TDebug#out
+            -Dvavi.test.volume=0.02
           </argLine>
           <trimStackTrace>false</trimStackTrace>
         </configuration>
@@ -60,7 +64,7 @@
       <dependency>
         <groupId>org.junit</groupId>
         <artifactId>junit-bom</artifactId>
-        <version>5.9.0</version>
+        <version>5.10.1</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -68,6 +72,12 @@
   </dependencyManagement>
 
   <dependencies>
+    <dependency>
+      <groupId>com.github.umjammer</groupId>
+      <artifactId>vavi-commons</artifactId>
+      <version>1.1.10</version>
+    </dependency>
+
     <dependency>
       <groupId>org.tritonus</groupId>
       <artifactId>tritonus-share</artifactId>
@@ -79,10 +89,9 @@
       <version>${tritonus.version}</version>
     </dependency>
     <dependency>
-      <!-- net.javazoom:jlayer -->
-      <groupId>com.github.umjammer</groupId>
+      <groupId>com.github.umjammer</groupId> <!-- net.javazoom:jlayer / com.github.umjammer -->
       <artifactId>jlayer</artifactId>
-      <version>1.0.2</version>
+      <version>1.0.3</version>
     </dependency>
 
     <dependency>
@@ -92,9 +101,9 @@
     </dependency>
 
     <dependency>
-      <groupId>com.github.umjammer</groupId>
-      <artifactId>vavi-commons</artifactId>
-      <version>1.1.6</version>
+      <groupId>com.github.nwaldispuehl</groupId>
+      <artifactId>java-lame</artifactId>
+      <version>v3.98.4</version>
     </dependency>
 
     <dependency>
@@ -110,6 +119,13 @@
     <dependency>
       <groupId>org.junit.platform</groupId>
       <artifactId>junit-platform-commons</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.github.umjammer</groupId>
+      <artifactId>vavi-sound</artifactId>
+      <version>1.0.16</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

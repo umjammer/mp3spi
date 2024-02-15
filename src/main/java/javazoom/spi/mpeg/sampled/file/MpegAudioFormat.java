@@ -24,18 +24,19 @@
 package javazoom.spi.mpeg.sampled.file;
 
 import java.util.Map;
-
 import javax.sound.sampled.AudioFormat;
 
 import org.tritonus.share.sampled.TAudioFormat;
 
+
 /**
  * @author JavaZOOM
  */
-public class MpegAudioFormat extends TAudioFormat
-{
+public class MpegAudioFormat extends TAudioFormat {
+
     /**
      * Constructor.
+     *
      * @param encoding
      * @param nFrequency
      * @param SampleSizeInBits
@@ -45,8 +46,7 @@ public class MpegAudioFormat extends TAudioFormat
      * @param isBigEndian
      * @param properties
      */
-    public MpegAudioFormat(AudioFormat.Encoding encoding, float nFrequency, int SampleSizeInBits, int nChannels, int FrameSize, float FrameRate, boolean isBigEndian, Map<String, Object> properties)
-    {
+    public MpegAudioFormat(AudioFormat.Encoding encoding, float nFrequency, int SampleSizeInBits, int nChannels, int FrameSize, float FrameRate, boolean isBigEndian, Map<String, Object> properties) {
         super(encoding, nFrequency, SampleSizeInBits, nChannels, FrameSize, FrameRate, isBigEndian, properties);
     }
 
@@ -60,8 +60,8 @@ public class MpegAudioFormat extends TAudioFormat
      * <li><b>vbr</b> [Boolean], VBR flag.
      * </ul>
      */
-    public Map<String, Object> properties()
-    {
+    @Override
+    public Map<String, Object> properties() {
         return super.properties();
     }
 }
