@@ -142,25 +142,27 @@ public class DecodedMpegAudioInputStream extends TAsynchronousFilteredAudioInput
      * mp3.shoutcast.metadata.StreamUrl=Url info.
      * </ul>
      */
+    @Override
     public Map<String, Object> properties() {
-        properties.put("mp3.frame", new Long(currentFrame));
-        properties.put("mp3.frame.bitrate", new Integer(currentBitrate));
-        properties.put("mp3.frame.size.bytes", new Integer(currentFramesize));
-        properties.put("mp3.position.byte", new Long(currentByte));
-        properties.put("mp3.position.microseconds", new Long(currentMicrosecond));
+        properties.put("mp3.frame", currentFrame);
+        properties.put("mp3.frame.bitrate", currentBitrate);
+        properties.put("mp3.frame.size.bytes", currentFramesize);
+        properties.put("mp3.position.byte", currentByte);
+        properties.put("mp3.position.microseconds", currentMicrosecond);
         properties.put("mp3.equalizer", m_equalizer_values);
         // Optionnal shoutcast stream meta-data.
         if (shoutlst != null) {
             String surl = shoutlst.getStreamUrl();
             String stitle = shoutlst.getStreamTitle();
-            if ((stitle != null) && (stitle.trim().length() > 0))
+            if ((stitle != null) && (!stitle.trim().isEmpty()))
                 properties.put("mp3.shoutcast.metadata.StreamTitle", stitle);
-            if ((surl != null) && (surl.trim().length() > 0))
+            if ((surl != null) && (!surl.trim().isEmpty()))
                 properties.put("mp3.shoutcast.metadata.StreamUrl", surl);
         }
         return properties;
     }
 
+    @Override
     public void execute() {
         if (TDebug.TraceAudioConverter)
             TDebug.out("execute() : begin");
@@ -195,11 +197,7 @@ public class DecodedMpegAudioInputStream extends TAsynchronousFilteredAudioInput
             m_oBuffer.reset();
             if (m_header != null)
                 m_header = null;
-        } catch (BitstreamException e) {
-            if (TDebug.TraceAudioConverter) {
-                TDebug.out(e);
-            }
-        } catch (DecoderException e) {
+        } catch (BitstreamException | DecoderException e) {
             if (TDebug.TraceAudioConverter) {
                 TDebug.out(e);
             }
@@ -208,6 +206,7 @@ public class DecodedMpegAudioInputStream extends TAsynchronousFilteredAudioInput
             TDebug.out("execute() : end");
     }
 
+    @Override
     public long skip(long bytes) {
         if ((byteslength > 0) && (frameslength > 0)) {
             float ratio = bytes * 1.0f / byteslength * 1.0f;
@@ -255,6 +254,7 @@ public class DecodedMpegAudioInputStream extends TAsynchronousFilteredAudioInput
         return getFormat().isBigEndian();
     }
 
+    @Override
     public void close() throws IOException {
         super.close();
         m_encodedStream.close();
@@ -278,6 +278,7 @@ public class DecodedMpegAudioInputStream extends TAsynchronousFilteredAudioInput
             m_bIsBigEndian = DecodedMpegAudioInputStream.this.isBigEndian();
         }
 
+        @Override
         public void append(int nChannel, short sValue) {
             byte bFirstByte;
             byte bSecondByte;
@@ -294,15 +295,19 @@ public class DecodedMpegAudioInputStream extends TAsynchronousFilteredAudioInput
             m_anBufferPointers[nChannel] += m_nChannels * 2;
         }
 
+        @Override
         public void setStopFlag() {
         }
 
+        @Override
         public void close() {
         }
 
+        @Override
         public void writeBuffer(int nValue) {
         }
 
+        @Override
         public void clearBuffer() {
         }
 
@@ -324,6 +329,7 @@ public class DecodedMpegAudioInputStream extends TAsynchronousFilteredAudioInput
         }
     }
 
+    @Override
     public void tagParsed(TagParseEvent tpe) {
         System.out.println("TAG:" + tpe.getTag());
     }

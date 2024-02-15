@@ -30,7 +30,7 @@ package javazoom.spi.mpeg.sampled.file.tag;
  * Abstract just so that subclasses will indicate their
  * tagging scheme (Icy, ID3, etc.).
  */
-public abstract class MP3Tag extends Object {
+public abstract class MP3Tag {
 
     protected String name;
     protected Object value;

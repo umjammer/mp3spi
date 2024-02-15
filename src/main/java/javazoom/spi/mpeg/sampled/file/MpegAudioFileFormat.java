@@ -100,6 +100,7 @@ public class MpegAudioFileFormat extends TAudioFileFormat {
      * <br>and so on ...
      * </ul>
      */
+    @Override
     public Map<String, Object> properties() {
         return super.properties();
     }

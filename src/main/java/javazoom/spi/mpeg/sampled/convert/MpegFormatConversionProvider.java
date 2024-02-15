@@ -72,6 +72,7 @@ public class MpegFormatConversionProvider extends TEncodingFormatConversionProvi
         }
     }
 
+    @Override
     public AudioInputStream getAudioInputStream(AudioFormat targetFormat, AudioInputStream audioInputStream) {
         if (TDebug.TraceAudioConverter) {
             TDebug.out(">MpegFormatConversionProvider.getAudioInputStream(AudioFormat targetFormat, AudioInputStream audioInputStream):");
@@ -86,6 +87,7 @@ public class MpegFormatConversionProvider extends TEncodingFormatConversionProvi
      * @param sourceFormat
      * @return
      */
+    @Override
     public boolean isConversionSupported(AudioFormat targetFormat, AudioFormat sourceFormat) {
         if (TDebug.TraceAudioConverter) {
             TDebug.out(">MpegFormatConversionProvider.isConversionSupported(AudioFormat targetFormat, AudioFormat sourceFormat):");
@@ -95,7 +97,7 @@ public class MpegFormatConversionProvider extends TEncodingFormatConversionProvi
         }
 
         boolean conversion = super.isConversionSupported(targetFormat, sourceFormat);
-        if (conversion == false) {
+        if (!conversion) {
             AudioFormat.Encoding enc = sourceFormat.getEncoding();
             if (enc instanceof MpegEncoding) {
                 if ((sourceFormat.getFrameRate() != AudioSystem.NOT_SPECIFIED) || (sourceFormat.getFrameSize() != AudioSystem.NOT_SPECIFIED)) {

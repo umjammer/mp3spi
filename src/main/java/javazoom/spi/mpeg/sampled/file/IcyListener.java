@@ -54,6 +54,7 @@ public class IcyListener implements TagParseListener {
     /* (non-Javadoc)
      * @see javazoom.spi.mpeg.sampled.file.tag.TagParseListener#tagParsed(javazoom.spi.mpeg.sampled.file.tag.TagParseEvent)
      */
+    @Override
     public void tagParsed(TagParseEvent tpe) {
         lastTag = tpe.getTag();
         String name = lastTag.getName();

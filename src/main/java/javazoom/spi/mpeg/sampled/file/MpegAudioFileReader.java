@@ -95,18 +95,13 @@ public class MpegAudioFileReader extends TAudioFileReader {
     public MpegAudioFileReader() {
         super(MARK_LIMIT, true);
         if (TDebug.TraceAudioFileReader) TDebug.out(VERSION);
-        try
-        {
         weak = System.getProperty("mp3spi.weak");
-    }
-        catch (AccessControlException ignored)
-        {
-        }
     }
 
     /**
      * Returns AudioFileFormat from File.
      */
+    @Override
     public AudioFileFormat getAudioFileFormat(File file) throws UnsupportedAudioFileException, IOException {
         return super.getAudioFileFormat(file);
     }
@@ -114,6 +109,7 @@ public class MpegAudioFileReader extends TAudioFileReader {
     /**
      * Returns AudioFileFormat from URL.
      */
+    @Override
     public AudioFileFormat getAudioFileFormat(URL url) throws UnsupportedAudioFileException, IOException {
         if (TDebug.TraceAudioFileReader) {
             TDebug.out("MpegAudioFileReader.getAudioFileFormat(URL): begin");
@@ -138,6 +134,7 @@ public class MpegAudioFileReader extends TAudioFileReader {
     /**
      * Returns AudioFileFormat from inputstream and medialength.
      */
+    @Override
     public AudioFileFormat getAudioFileFormat(InputStream inputStream, long mediaLength) throws UnsupportedAudioFileException, IOException {
         if (TDebug.TraceAudioFileReader)
             TDebug.out(">MpegAudioFileReader.getAudioFileFormat(InputStream inputStream, long mediaLength): begin");
@@ -344,6 +341,7 @@ public class MpegAudioFileReader extends TAudioFileReader {
     /**
      * Returns AudioInputStream from file.
      */
+    @Override
     public AudioInputStream getAudioInputStream(File file) throws UnsupportedAudioFileException, IOException {
         if (TDebug.TraceAudioFileReader) TDebug.out("getAudioInputStream(File file)");
         InputStream inputStream = Files.newInputStream(file.toPath());
@@ -358,6 +356,7 @@ public class MpegAudioFileReader extends TAudioFileReader {
     /**
      * Returns AudioInputStream from url.
      */
+    @Override
     public AudioInputStream getAudioInputStream(URL url) throws UnsupportedAudioFileException, IOException {
         if (TDebug.TraceAudioFileReader) {
             TDebug.out("MpegAudioFileReader.getAudioInputStream(URL): begin");
@@ -411,6 +410,7 @@ public class MpegAudioFileReader extends TAudioFileReader {
     /**
      * Return the AudioInputStream from the given InputStream.
      */
+    @Override
     public AudioInputStream getAudioInputStream(InputStream inputStream) throws UnsupportedAudioFileException, IOException {
         if (TDebug.TraceAudioFileReader) {
             TDebug.out("MpegAudioFileReader.getAudioInputStream(InputStream inputStream)");
@@ -433,26 +433,26 @@ public class MpegAudioFileReader extends TAudioFileReader {
         if (TDebug.TraceAudioFileReader) TDebug.out("Parsing ID3v1");
         String titlev1 = CharConverter.createString(frames, 3, 30).trim();
         String titlev2 = (String) props.get("title");
-        if (((titlev2 == null) || (titlev2.length() == 0)) && (titlev1 != null)) props.put("title", titlev1);
+        if (((titlev2 == null) || (titlev2.isEmpty())) && (titlev1 != null)) props.put("title", titlev1);
         String artistv1 = CharConverter.createString(frames, 33, 30).trim();
         String artistv2 = (String) props.get("author");
-        if (((artistv2 == null) || (artistv2.length() == 0)) && (artistv1 != null)) props.put("author", artistv1);
+        if (((artistv2 == null) || (artistv2.isEmpty())) && (artistv1 != null)) props.put("author", artistv1);
         String albumv1 = CharConverter.createString(frames, 63, 30).trim();
         String albumv2 = (String) props.get("album");
-        if (((albumv2 == null) || (albumv2.length() == 0)) && (albumv1 != null)) props.put("album", albumv1);
+        if (((albumv2 == null) || (albumv2.isEmpty())) && (albumv1 != null)) props.put("album", albumv1);
         String yearv1 = CharConverter.createString(frames, 93, 4).trim();
         String yearv2 = (String) props.get("year");
-        if (((yearv2 == null) || (yearv2.length() == 0)) && (yearv1 != null)) props.put("date", yearv1);
+        if (((yearv2 == null) || (yearv2.isEmpty())) && (yearv1 != null)) props.put("date", yearv1);
         String commentv1 = CharConverter.createString(frames, 97, 29).trim();
         String commentv2 = (String) props.get("comment");
-        if (((commentv2 == null) || (commentv2.length() == 0)) && (commentv1 != null)) props.put("comment", commentv1);
+        if (((commentv2 == null) || (commentv2.isEmpty())) && (commentv1 != null)) props.put("comment", commentv1);
         String trackv1 = "" + (frames[126] & 0xff);
         String trackv2 = (String) props.get("mp3.id3tag.track");
-        if (((trackv2 == null) || (trackv2.length() == 0)) && (trackv1 != null)) props.put("mp3.id3tag.track", trackv1);
+        if (((trackv2 == null) || (trackv2.isEmpty())) && (trackv1 != null)) props.put("mp3.id3tag.track", trackv1);
         int genrev1 = (frames[127] & 0xff);
         if ((genrev1 >= 0) && (genrev1 < id3v1genres.length)) {
             String genrev2 = (String) props.get("mp3.id3tag.genre");
-            if (((genrev2 == null) || (genrev2.length() == 0))) props.put("mp3.id3tag.genre", id3v1genres[genrev1]);
+            if (((genrev2 == null) || (genrev2.isEmpty()))) props.put("mp3.id3tag.genre", id3v1genres[genrev1]);
         }
         if (TDebug.TraceAudioFileReader) TDebug.out("ID3v1 parsed");
     }
@@ -512,7 +512,7 @@ public class MpegAudioFileReader extends TAudioFileReader {
         }
         try {
             if (TDebug.TraceAudioFileReader)
-                TDebug.out("ID3v2 frame dump(" + bframes.length + ")='" + new String(bframes, 0, bframes.length) + "'");
+                TDebug.out("ID3v2 frame dump(" + bframes.length + ")='" + new String(bframes) + "'");
             // ID3 tags : http://www.unixgods.org/~tilo/ID3/docs/ID3_comparison.html
             String value;
             for (int i = 10; i < bframes.length && bframes[i] > 0; i += size) {
@@ -531,24 +531,27 @@ public class MpegAudioFileReader extends TAudioFileReader {
                         if (code.equals("COMM"))
                             value = parseText(bframes, i, size, getSkipForComment(bframes, i, size, 1 + 3));
                         else value = parseText(bframes, i, size, 1);
-                        if ((value != null) && (value.length() > 0)) {
-                            if (code.equals("TALB")) props.put("album", value);
-                            else if (code.equals("TIT2")) props.put("title", value);
-                            else if (code.equals("TYER")) props.put("date", value);
-                                // ID3v2.4 date fix.
-                            else if (code.equals("TDRC")) props.put("date", value);
-                            else if (code.equals("TPE1")) props.put("author", value);
-                            else if (code.equals("TCOP")) props.put("copyright", value);
-                            else if (code.equals("COMM")) props.put("comment", value);
-                            else if (code.equals("TCON")) props.put("mp3.id3tag.genre", value);
-                            else if (code.equals("TRCK")) props.put("mp3.id3tag.track", value);
-                            else if (code.equals("TPOS")) props.put("mp3.id3tag.disc", value);
-                            else if (code.equals("TCOM")) props.put("mp3.id3tag.composer", value);
-                            else if (code.equals("TIT1")) props.put("mp3.id3tag.grouping", value);
-                            else if (code.equals("TENC")) props.put("mp3.id3tag.encoded", value);
-                            else if (code.equals("TPUB")) props.put("mp3.id3tag.publisher", value);
-                            else if (code.equals("TPE2")) props.put("mp3.id3tag.orchestra", value);
-                            else if (code.equals("TLEN")) props.put("mp3.id3tag.length", value);
+                        if ((value != null) && (!value.isEmpty())) {
+                            switch (code) {
+                            case "TALB" -> props.put("album", value);
+                            case "TIT2" -> props.put("title", value);
+                            case "TYER" -> props.put("date", value);
+
+                            // ID3v2.4 date fix.
+                            case "TDRC" -> props.put("date", value);
+                            case "TPE1" -> props.put("author", value);
+                            case "TCOP" -> props.put("copyright", value);
+                            case "COMM" -> props.put("comment", value);
+                            case "TCON" -> props.put("mp3.id3tag.genre", value);
+                            case "TRCK" -> props.put("mp3.id3tag.track", value);
+                            case "TPOS" -> props.put("mp3.id3tag.disc", value);
+                            case "TCOM" -> props.put("mp3.id3tag.composer", value);
+                            case "TIT1" -> props.put("mp3.id3tag.grouping", value);
+                            case "TENC" -> props.put("mp3.id3tag.encoded", value);
+                            case "TPUB" -> props.put("mp3.id3tag.publisher", value);
+                            case "TPE2" -> props.put("mp3.id3tag.orchestra", value);
+                            case "TLEN" -> props.put("mp3.id3tag.length", value);
+                            }
                         }
                     }
                 } else {
@@ -563,22 +566,24 @@ public class MpegAudioFileReader extends TAudioFileReader {
                             (scode.equals("TPB")) || (scode.equals("TP2")) || (scode.equals("TLE"))) {
                         if (scode.equals("COM")) value = parseText(bframes, i, size, 5);
                         else value = parseText(bframes, i, size, 1);
-                        if ((value != null) && (value.length() > 0)) {
-                            if (scode.equals("TAL")) props.put("album", value);
-                            else if (scode.equals("TT2")) props.put("title", value);
-                            else if (scode.equals("TYE")) props.put("date", value);
-                            else if (scode.equals("TP1")) props.put("author", value);
-                            else if (scode.equals("TCR")) props.put("copyright", value);
-                            else if (scode.equals("COM")) props.put("comment", value);
-                            else if (scode.equals("TCO")) props.put("mp3.id3tag.genre", value);
-                            else if (scode.equals("TRK")) props.put("mp3.id3tag.track", value);
-                            else if (scode.equals("TPA")) props.put("mp3.id3tag.disc", value);
-                            else if (scode.equals("TCM")) props.put("mp3.id3tag.composer", value);
-                            else if (scode.equals("TT1")) props.put("mp3.id3tag.grouping", value);
-                            else if (scode.equals("TEN")) props.put("mp3.id3tag.encoded", value);
-                            else if (scode.equals("TPB")) props.put("mp3.id3tag.publisher", value);
-                            else if (scode.equals("TP2")) props.put("mp3.id3tag.orchestra", value);
-                            else if (scode.equals("TLE")) props.put("mp3.id3tag.length", value);
+                        if ((value != null) && (!value.isEmpty())) {
+                            switch (scode) {
+                            case "TAL" -> props.put("album", value);
+                            case "TT2" -> props.put("title", value);
+                            case "TYE" -> props.put("date", value);
+                            case "TP1" -> props.put("author", value);
+                            case "TCR" -> props.put("copyright", value);
+                            case "COM" -> props.put("comment", value);
+                            case "TCO" -> props.put("mp3.id3tag.genre", value);
+                            case "TRK" -> props.put("mp3.id3tag.track", value);
+                            case "TPA" -> props.put("mp3.id3tag.disc", value);
+                            case "TCM" -> props.put("mp3.id3tag.composer", value);
+                            case "TT1" -> props.put("mp3.id3tag.grouping", value);
+                            case "TEN" -> props.put("mp3.id3tag.encoded", value);
+                            case "TPB" -> props.put("mp3.id3tag.publisher", value);
+                            case "TP2" -> props.put("mp3.id3tag.orchestra", value);
+                            case "TLE" -> props.put("mp3.id3tag.length", value);
+                            }
                         }
                     }
                 }
@@ -609,7 +614,7 @@ public class MpegAudioFileReader extends TAudioFileReader {
      */
     protected String parseText(byte[] bframes, int offset, int size, int skip) {
         String value;
-        final String[] ENC_TYPES = {"ISO-8859-1", "UTF16", "UTF-16BE", "UTF-8"};
+        String[] ENC_TYPES = {"ISO-8859-1", "UTF16", "UTF-16BE", "UTF-8"};
         if (bframes[offset] == 0) {
             int length = Math.max(size - getLastZeros(bframes, offset, offset + size, 1), 0);
 //Debug.println(Level.FINE, "length: " + length + ", size: " + size + ", skip: " + skip + ", zeros: " + getLastZeros(bframes, offset, offset + size, 1) + "\n" + StringUtil.getDump(bframes, offset, size + skip));

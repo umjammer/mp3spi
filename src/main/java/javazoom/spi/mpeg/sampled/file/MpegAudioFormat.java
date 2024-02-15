@@ -60,6 +60,7 @@ public class MpegAudioFormat extends TAudioFormat {
      * <li><b>vbr</b> [Boolean], VBR flag.
      * </ul>
      */
+    @Override
     public Map<String, Object> properties() {
         return super.properties();
     }

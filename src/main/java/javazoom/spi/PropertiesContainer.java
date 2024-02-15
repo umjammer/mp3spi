@@ -28,5 +28,5 @@ import java.util.Map;
 
 public interface PropertiesContainer {
 
-    public Map<?, ?> properties();
+    Map<?, ?> properties();
 }

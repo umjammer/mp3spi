@@ -35,5 +35,5 @@ public interface StringableTag {
     /**
      * Return the value of this tag as a string.
      */
-    public String getValueAsString();
+    String getValueAsString();
 }

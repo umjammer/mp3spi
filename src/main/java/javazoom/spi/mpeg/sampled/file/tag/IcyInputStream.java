@@ -28,9 +28,9 @@ package javazoom.spi.mpeg.sampled.file.tag;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -179,7 +179,7 @@ public class IcyInputStream
      */
     protected void readInitialHeaders() throws IOException {
         String line = null;
-        while (!((line = readCRLFLine()).equals(""))) {
+        while (!((line = readCRLFLine()).isEmpty())) {
             int colonIndex = line.indexOf(':');
             // does it have a ':' separator
             if (colonIndex == -1)
@@ -228,6 +228,7 @@ public class IcyInputStream
      * block is read, stripped, and parsed before reading
      * and returning the first byte after the metadata block.
      */
+    @Override
     public int read() throws IOException {
         if (bytesUntilNextMetadata > 0) {
             bytesUntilNextMetadata--;
@@ -253,6 +254,7 @@ public class IcyInputStream
      * not into the next metadata block if
      * <code>bytesUntilNextMetadata &lt; length</code>
      */
+    @Override
     public int read(byte[] buf, int offset, int length) throws IOException {
         // if not on metadata, do the usual read so long as we
         // don't read past metadata
@@ -289,6 +291,7 @@ public class IcyInputStream
     /**
      * trivial <code>return read (buf, 0, buf.length)</code>
      */
+    @Override
     public int read(byte[] buf) throws IOException {
         return read(buf, 0, buf.length);
     }
@@ -339,12 +342,8 @@ public class IcyInputStream
      */
     protected void parseInlineIcyTags(byte[] tagBlock) {
         String blockString = null;
-        try {
-            // Parse string as ISO-8859-1 even if meta-data are in US-ASCII.
-            blockString = new String(tagBlock, "ISO-8859-1");
-        } catch (UnsupportedEncodingException e) {
-            blockString = new String(tagBlock);
-        }
+        // Parse string as ISO-8859-1 even if meta-data are in US-ASCII.
+        blockString = new String(tagBlock, StandardCharsets.ISO_8859_1);
         if (DEBUG) System.out.println("BLOCKSTR:" + blockString);
         StringTokenizer izer =
                 new StringTokenizer(blockString, INLINE_TAG_SEPARATORS);
@@ -393,6 +392,7 @@ public class IcyInputStream
     /**
      * Get all tags (headers or in-stream) encountered thus far.
      */
+    @Override
     public MP3Tag[] getTags() {
         return tags.values().toArray(new MP3Tag[0]);
     }
@@ -409,6 +409,7 @@ public class IcyInputStream
      * Adds a TagParseListener to be notified when this stream
      * parses MP3Tags.
      */
+    @Override
     public void addTagParseListener(TagParseListener tpl) {
         tagParseSupport.addTagParseListener(tpl);
     }
@@ -417,6 +418,7 @@ public class IcyInputStream
      * Removes a TagParseListener, so it won't be notified when
      * this stream parses MP3Tags.
      */
+    @Override
     public void removeTagParseListener(TagParseListener tpl) {
         tagParseSupport.removeTagParseListener(tpl);
     }
@@ -424,7 +426,7 @@ public class IcyInputStream
     /**
      * Quickie unit-test.
      */
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         byte[] chow = new byte[200];
         if (args.length != 1) {
             //System.out.println("Usage: IcyInputStream <url>");

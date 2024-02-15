@@ -36,7 +36,6 @@ import javax.sound.sampled.SourceDataLine;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static javazoom.spi.mpeg.sampled.file.PlayerTest.volume;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static vavi.sound.SoundUtil.volume;
 
@@ -83,7 +82,7 @@ class SkipTest {
                                                     baseFormat.getChannels() * 2,
                                                     baseFormat.getSampleRate(),
                                                     false);
-        logger.info("Target Format : " + decodedFormat.toString());
+        logger.info("Target Format : " + decodedFormat);
         din = AudioSystem.getAudioInputStream(decodedFormat, in);
         long toSkip = file.length() * 19 / 20;
         long skipped = skip(din, toSkip);
@@ -110,7 +109,7 @@ class SkipTest {
                                                     baseFormat.getChannels() * 2,
                                                     baseFormat.getSampleRate(),
                                                     false);
-        logger.info("Target Format : " + decodedFormat.toString());
+        logger.info("Target Format : " + decodedFormat);
         din = AudioSystem.getAudioInputStream(decodedFormat, in);
         long toSkip = in.available() * 19L / 20;
         long skipped = skip(din, toSkip);

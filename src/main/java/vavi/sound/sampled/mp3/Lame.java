@@ -433,8 +433,8 @@ public class Lame {
         map.put(P_BITRATE, getEffectiveBitRate());
         map.put(P_CHMODE, chmode2string(getEffectiveChannelMode()));
         map.put(P_VBR, getEffectiveVBR());
-        // map.put(P_SAMPLERATE, getEffectiveSampleRate());
-        // map.put(P_ENCODING,getEffectiveEncoding());
+//        map.put(P_SAMPLERATE, getEffectiveSampleRate());
+//        map.put(P_ENCODING, getEffectiveEncoding());
         map.put("encoder.name", "LAME");
         map.put("encoder.version", getEncoderVersion());
         int channels = 2;
@@ -538,7 +538,7 @@ public class Lame {
         }
     }
 
-    private String quality2string(int quality) {
+    private static String quality2string(int quality) {
         if (quality >= QUALITY_LOWEST) {
             return "lowest";
         } else if (quality >= QUALITY_LOW) {
@@ -551,23 +551,18 @@ public class Lame {
         return "highest";
     }
 
-    private int string2quality(String quality, int def) {
-        switch (quality) {
-        case "lowest":
-            return QUALITY_LOWEST;
-        case "low":
-            return QUALITY_LOW;
-        case "middle":
-            return QUALITY_MIDDLE;
-        case "high":
-            return QUALITY_HIGH;
-        case "highest":
-            return QUALITY_HIGHEST;
-        }
-        return def;
+    private static int string2quality(String quality, int def) {
+        return switch (quality) {
+            case "lowest" -> QUALITY_LOWEST;
+            case "low" -> QUALITY_LOW;
+            case "middle" -> QUALITY_MIDDLE;
+            case "high" -> QUALITY_HIGH;
+            case "highest" -> QUALITY_HIGHEST;
+            default -> def;
+        };
     }
 
-    private String chmode2string(int chmode) {
+    private static String chmode2string(int chmode) {
         if (chmode == CHANNEL_MODE_STEREO) {
             return "stereo";
         } else if (chmode == CHANNEL_MODE_JOINT_STEREO) {
@@ -582,20 +577,15 @@ public class Lame {
         return "auto";
     }
 
-    private int string2chmode(String chmode, int def) {
-        switch (chmode) {
-        case "stereo":
-            return CHANNEL_MODE_STEREO;
-        case "jointstereo":
-            return CHANNEL_MODE_JOINT_STEREO;
-        case "dual":
-            return CHANNEL_MODE_DUAL_CHANNEL;
-        case "mono":
-            return CHANNEL_MODE_MONO;
-        case "auto":
-            return CHANNEL_MODE_AUTO;
-        }
-        return def;
+    private static int string2chmode(String chmode, int def) {
+        return switch (chmode) {
+            case "stereo" -> CHANNEL_MODE_STEREO;
+            case "jointstereo" -> CHANNEL_MODE_JOINT_STEREO;
+            case "dual" -> CHANNEL_MODE_DUAL_CHANNEL;
+            case "mono" -> CHANNEL_MODE_MONO;
+            case "auto" -> CHANNEL_MODE_AUTO;
+            default -> def;
+        };
     }
 
     /**
@@ -604,7 +594,7 @@ public class Lame {
      * @throws IllegalArgumentException if val is neither true nor false
      */
     private static boolean string2bool(String val) {
-        if (val.length() > 0) {
+        if (!val.isEmpty()) {
             if ((val.charAt(0) == 'f') // false
                     || (val.charAt(0) == 'n') // no
                     || (val.equals("off"))) {
@@ -625,7 +615,7 @@ public class Lame {
         String strValue = def ? "true" : "false";
         try {
             String s = System.getProperty(strPropertyName);
-            if (s != null && s.length() > 0) {
+            if (s != null && !s.isEmpty()) {
                 hadSystemProps = true;
                 strValue = s;
             }
@@ -636,7 +626,7 @@ public class Lame {
         }
         strValue = strValue.toLowerCase();
         boolean bValue = false;
-        if (strValue.length() > 0) {
+        if (!strValue.isEmpty()) {
             if (def) {
                 bValue = (strValue.charAt(0) != 'f') // false
                         && (strValue.charAt(0) != 'n') // no
@@ -655,7 +645,7 @@ public class Lame {
         String strValue = def;
         try {
             String s = System.getProperty(strPropertyName);
-            if (s != null && s.length() > 0) {
+            if (s != null && !s.isEmpty()) {
                 hadSystemProps = true;
                 strValue = s;
             }
@@ -672,7 +662,7 @@ public class Lame {
         int value = def;
         try {
             String s = System.getProperty(strPropertyName);
-            if (s != null && s.length() > 0) {
+            if (s != null && !s.isEmpty()) {
                 hadSystemProps = true;
                 value = Integer.parseInt(s);
             }

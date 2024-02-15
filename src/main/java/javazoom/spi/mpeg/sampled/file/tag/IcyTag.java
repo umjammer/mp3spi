@@ -40,6 +40,7 @@ public class IcyTag extends MP3Tag implements StringableTag {
     }
 
     // so far as I know, all Icecast tags are strings
+    @Override
     public String getValueAsString() {
         return (String) getValue();
     }

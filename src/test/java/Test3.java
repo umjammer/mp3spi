@@ -158,7 +158,7 @@ providers.forEach(System.err::println);
         String file = "src/test/resources/test2.mp3";
         InputStream is = new BufferedInputStream(Files.newInputStream(Paths.get(file)));
         AudioFileFormat format = AudioSystem.getAudioFileFormat(is);
-format.properties().forEach((k, v) -> { System.err.println(k + ": " + v);});
+format.properties().forEach((k, v) -> System.err.println(k + ": " + v));
         String genre = (String) format.properties().get("mp3.id3tag.genre");
 Debug.println("genre: " + genre);
         assertEquals("Pop", genre);

@@ -17,7 +17,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static javazoom.spi.mpeg.sampled.file.PlayerTest.volume;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static vavi.sound.SoundUtil.volume;
 
@@ -61,7 +60,7 @@ logger.info("In Format: " + inFormat.toString());
                                                 inFormat.getChannels(),
                                                 inFormat.getSampleRate(),
                                                 false);
-logger.info("Out Format: " + outFormat.toString());
+logger.info("Out Format: " + outFormat);
         AudioInputStream out = AudioSystem.getAudioInputStream(outFormat, in);
         Clip c = AudioSystem.getClip();
         c.open(out);
@@ -83,7 +82,7 @@ logger.info("Out Format: " + outFormat.toString());
                                                 4,
                                                 inFormat.getSampleRate(),
                                                 false);
-logger.info("Out Format: " + outFormat.toString());
+logger.info("Out Format: " + outFormat);
         AudioInputStream out = AudioSystem.getAudioInputStream(outFormat, in);
         AudioFormat outFormat2 = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED,
                                                  outFormat.getSampleRate(),
@@ -92,7 +91,7 @@ logger.info("Out Format: " + outFormat.toString());
                                                  2,
                                                  outFormat.getSampleRate(),
                                                  false);
-logger.info("Out Format 2: " + outFormat2.toString());
+logger.info("Out Format 2: " + outFormat2);
         AudioInputStream out2 = AudioSystem.getAudioInputStream(outFormat2, out);
         Clip c = AudioSystem.getClip();
         c.open(out2);
@@ -114,7 +113,7 @@ logger.info("Out Format 2: " + outFormat2.toString());
                                                 2,
                                                 inFormat.getSampleRate(),
                                                 false);
-logger.info("Out Format: " + outFormat.toString());
+logger.info("Out Format: " + outFormat);
         AudioInputStream out = AudioSystem.getAudioInputStream(outFormat, in);
         AudioFormat outFormat2 = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED,
                                                  outFormat.getSampleRate(),
@@ -123,7 +122,7 @@ logger.info("Out Format: " + outFormat.toString());
                                                  4,
                                                  outFormat.getSampleRate(),
                                                  false);
-logger.info("Out Format 2: " + outFormat2.toString());
+logger.info("Out Format 2: " + outFormat2);
         AudioInputStream out2 = AudioSystem.getAudioInputStream(outFormat2, out);
         Clip c = AudioSystem.getClip();
         c.open(out2);

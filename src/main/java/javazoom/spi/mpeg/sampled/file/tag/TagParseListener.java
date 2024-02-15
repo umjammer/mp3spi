@@ -38,5 +38,5 @@ public interface TagParseListener extends EventListener {
      * Called when a tag is found (parsed from the stream,
      * received via UDP, etc.)
      */
-    public void tagParsed(TagParseEvent tpe);
+    void tagParsed(TagParseEvent tpe);
 }

@@ -35,13 +35,13 @@ public interface MP3MetadataParser {
      * Adds a TagParseListener to be notified when this object
      * parses MP3Tags.
      */
-    public void addTagParseListener(TagParseListener tpl);
+    void addTagParseListener(TagParseListener tpl);
 
     /**
      * Removes a TagParseListener, so it won't be notified when
      * this object parses MP3Tags.
      */
-    public void removeTagParseListener(TagParseListener tpl);
+    void removeTagParseListener(TagParseListener tpl);
 
     /**
      * Get all tags (headers or in-stream) encountered thusfar.
@@ -53,5 +53,5 @@ public interface MP3MetadataParser {
      * call.  Callers should first use this call to get initial
      * tags, then subscribe for events as the stream continues.
      */
-    public MP3Tag[] getTags();
+    MP3Tag[] getTags();
 }

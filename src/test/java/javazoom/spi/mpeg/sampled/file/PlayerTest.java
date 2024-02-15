@@ -29,7 +29,6 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
-import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
@@ -104,7 +103,7 @@ class PlayerTest {
                                                         baseFormat.getSampleRate(),
                                                         false);
             if (out != null)
-                out.info("Target Format : " + decodedFormat.toString());
+                out.info("Target Format : " + decodedFormat);
             din = AudioSystem.getAudioInputStream(decodedFormat, in);
             assertInstanceOf(PropertiesContainer.class, din, "PropertiesContainer");
             rawplay(decodedFormat, din);
