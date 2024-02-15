@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 
@@ -42,7 +41,6 @@ import javazoom.spi.PropertiesContainer;
 import javazoom.spi.mpeg.sampled.file.IcyListener;
 import javazoom.spi.mpeg.sampled.file.tag.TagParseEvent;
 import javazoom.spi.mpeg.sampled.file.tag.TagParseListener;
-
 import org.tritonus.share.TDebug;
 import org.tritonus.share.sampled.convert.TAsynchronousFilteredAudioInputStream;
 
@@ -51,6 +49,7 @@ import org.tritonus.share.sampled.convert.TAsynchronousFilteredAudioInputStream;
  * Main decoder.
  */
 public class DecodedMpegAudioInputStream extends TAsynchronousFilteredAudioInputStream implements PropertiesContainer, TagParseListener {
+
     private InputStream m_encodedStream;
 
     private Bitstream m_bitstream;
@@ -262,6 +261,7 @@ public class DecodedMpegAudioInputStream extends TAsynchronousFilteredAudioInput
     }
 
     private class DMAISObuffer extends Obuffer {
+
         private int m_nChannels;
 
         private byte[] m_abBuffer;

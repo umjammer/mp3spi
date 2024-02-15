@@ -28,7 +28,7 @@ import org.tritonus.share.sampled.file.THeaderlessAudioFileWriter;
 
 /**
  * Class for writing mpeg files
- *
+ * <p>
  * This file is part of Tritonus: http://www.tritonus.org/
  *
  * @author Florian Bomers

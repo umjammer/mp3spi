@@ -24,13 +24,11 @@
 package javazoom.spi.mpeg.sampled.convert;
 
 import java.util.Arrays;
-
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 
 import javazoom.spi.mpeg.sampled.file.MpegEncoding;
-
 import org.tritonus.share.TDebug;
 import org.tritonus.share.sampled.Encodings;
 import org.tritonus.share.sampled.convert.TEncodingFormatConversionProvider;
@@ -41,48 +39,41 @@ import static javax.sound.sampled.AudioSystem.NOT_SPECIFIED;
 /**
  * ConversionProvider for MPEG files.
  */
-public class MpegFormatConversionProvider extends TEncodingFormatConversionProvider
-{
-    private static final AudioFormat.Encoding    MP3 = Encodings.getEncoding("MP3");
-    private static final AudioFormat.Encoding    PCM_SIGNED = Encodings.getEncoding("PCM_SIGNED");
+public class MpegFormatConversionProvider extends TEncodingFormatConversionProvider {
 
-    private static final AudioFormat[]    INPUT_FORMATS =
-    {
-        // mono
-        new AudioFormat(MP3, NOT_SPECIFIED, NOT_SPECIFIED, 1, NOT_SPECIFIED, NOT_SPECIFIED, false),
-        new AudioFormat(MP3, NOT_SPECIFIED, NOT_SPECIFIED, 1, NOT_SPECIFIED, NOT_SPECIFIED, true),
-        // stereo
-        new AudioFormat(MP3, NOT_SPECIFIED, NOT_SPECIFIED, 2, NOT_SPECIFIED, NOT_SPECIFIED, false),
-        new AudioFormat(MP3, NOT_SPECIFIED, NOT_SPECIFIED, 2, NOT_SPECIFIED, NOT_SPECIFIED, true),
+    private static final AudioFormat.Encoding MP3 = Encodings.getEncoding("MP3");
+    private static final AudioFormat.Encoding PCM_SIGNED = Encodings.getEncoding("PCM_SIGNED");
+
+    private static final AudioFormat[] INPUT_FORMATS = {
+            // mono
+            new AudioFormat(MP3, NOT_SPECIFIED, NOT_SPECIFIED, 1, NOT_SPECIFIED, NOT_SPECIFIED, false),
+            new AudioFormat(MP3, NOT_SPECIFIED, NOT_SPECIFIED, 1, NOT_SPECIFIED, NOT_SPECIFIED, true),
+            // stereo
+            new AudioFormat(MP3, NOT_SPECIFIED, NOT_SPECIFIED, 2, NOT_SPECIFIED, NOT_SPECIFIED, false),
+            new AudioFormat(MP3, NOT_SPECIFIED, NOT_SPECIFIED, 2, NOT_SPECIFIED, NOT_SPECIFIED, true),
     };
 
-
-    private static final AudioFormat[]    OUTPUT_FORMATS =
-    {
-        // mono, 16 bit signed
-        new AudioFormat(PCM_SIGNED, NOT_SPECIFIED, 16, 1, 2, NOT_SPECIFIED, false),
-        new AudioFormat(PCM_SIGNED, NOT_SPECIFIED, 16, 1, 2, NOT_SPECIFIED, true),
-        // stereo, 16 bit signed
-        new AudioFormat(PCM_SIGNED, NOT_SPECIFIED, 16, 2, 4, NOT_SPECIFIED, false),
-        new AudioFormat(PCM_SIGNED, NOT_SPECIFIED, 16, 2, 4, NOT_SPECIFIED, true),
+    private static final AudioFormat[] OUTPUT_FORMATS = {
+            // mono, 16 bit signed
+            new AudioFormat(PCM_SIGNED, NOT_SPECIFIED, 16, 1, 2, NOT_SPECIFIED, false),
+            new AudioFormat(PCM_SIGNED, NOT_SPECIFIED, 16, 1, 2, NOT_SPECIFIED, true),
+            // stereo, 16 bit signed
+            new AudioFormat(PCM_SIGNED, NOT_SPECIFIED, 16, 2, 4, NOT_SPECIFIED, false),
+            new AudioFormat(PCM_SIGNED, NOT_SPECIFIED, 16, 2, 4, NOT_SPECIFIED, true),
     };
 
     /**
      * Constructor.
      */
-    public MpegFormatConversionProvider()
-    {
+    public MpegFormatConversionProvider() {
         super(Arrays.asList(INPUT_FORMATS), Arrays.asList(OUTPUT_FORMATS));
-        if (TDebug.TraceAudioConverter)
-        {
+        if (TDebug.TraceAudioConverter) {
             TDebug.out(">MpegFormatConversionProvider()");
         }
     }
 
-    public AudioInputStream getAudioInputStream(AudioFormat targetFormat, AudioInputStream audioInputStream)
-    {
-        if (TDebug.TraceAudioConverter)
-        {
+    public AudioInputStream getAudioInputStream(AudioFormat targetFormat, AudioInputStream audioInputStream) {
+        if (TDebug.TraceAudioConverter) {
             TDebug.out(">MpegFormatConversionProvider.getAudioInputStream(AudioFormat targetFormat, AudioInputStream audioInputStream):");
         }
         return new DecodedMpegAudioInputStream(targetFormat, audioInputStream);
@@ -90,28 +81,24 @@ public class MpegFormatConversionProvider extends TEncodingFormatConversionProvi
 
     /**
      * Add conversion support for any MpegEncoding source with FrameRate or FrameSize not empty.
+     *
      * @param targetFormat
      * @param sourceFormat
      * @return
      */
-    public boolean isConversionSupported(AudioFormat targetFormat, AudioFormat sourceFormat)
-    {
-        if (TDebug.TraceAudioConverter)
-        {
-                    TDebug.out(">MpegFormatConversionProvider.isConversionSupported(AudioFormat targetFormat, AudioFormat sourceFormat):");
-                    TDebug.out("checking if conversion possible");
-                    TDebug.out("from: " + sourceFormat);
-                    TDebug.out("to: " + targetFormat);
+    public boolean isConversionSupported(AudioFormat targetFormat, AudioFormat sourceFormat) {
+        if (TDebug.TraceAudioConverter) {
+            TDebug.out(">MpegFormatConversionProvider.isConversionSupported(AudioFormat targetFormat, AudioFormat sourceFormat):");
+            TDebug.out("checking if conversion possible");
+            TDebug.out("from: " + sourceFormat);
+            TDebug.out("to: " + targetFormat);
         }
 
         boolean conversion = super.isConversionSupported(targetFormat, sourceFormat);
-        if (conversion == false)
-        {
+        if (conversion == false) {
             AudioFormat.Encoding enc = sourceFormat.getEncoding();
-            if (enc instanceof MpegEncoding)
-            {
-                if ((sourceFormat.getFrameRate() != AudioSystem.NOT_SPECIFIED) || (sourceFormat.getFrameSize() != AudioSystem.NOT_SPECIFIED))
-                {
+            if (enc instanceof MpegEncoding) {
+                if ((sourceFormat.getFrameRate() != AudioSystem.NOT_SPECIFIED) || (sourceFormat.getFrameSize() != AudioSystem.NOT_SPECIFIED)) {
                     if (sourceFormat.getChannels() == targetFormat.getChannels()) {
                         conversion = true;
                     }

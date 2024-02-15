@@ -243,7 +243,7 @@ public class Lame {
      * parameters are not supported by LAME.
      */
     private void nInitParams(AudioFormat format, int channels, int sampleRate, int bitrate,
-                            int mode, int quality, boolean vbr, boolean bigEndian) {
+                             int mode, int quality, boolean vbr, boolean bigEndian) {
 
         MPEGMode lameMode = mode == -1 ? MPEGMode.STEREO : MPEGMode.values()[mode];
 
@@ -264,7 +264,7 @@ public class Lame {
 
     public String getEncoderVersion() {
         String sRes = this.lameApi.getEncoderVersion();
-Debug.println(Level.FINE, "getEncoderVersion: " + sRes);
+        Debug.println(Level.FINE, "getEncoderVersion: " + sRes);
         return sRes;
     }
 
@@ -273,6 +273,7 @@ Debug.println(Level.FINE, "getEncoderVersion: " + sRes);
      * wished buffer size. The implementation of the encoder may return a lower
      * or higher buffer size. The encoder must be initialized (i.e. not closed)
      * at this point.
+     *
      * @return value of <0 denotes an error.
      */
     public int getPCMBufferSize() {
@@ -291,12 +292,12 @@ Debug.println(Level.FINE, "getEncoderVersion: " + sRes);
     /**
      * @return result of lame_encode_buffer:
      * return code     number of bytes output in mp3buf. Can be 0
-     *                 -1:  mp3buf was too small
-     *                 -2:  malloc() problem
-     *                 -3:  lame_init_params() not called
-     *                 -4:  psycho acoustic problems
-     *                 -5:  ogg cleanup encoding error
-     *                 -6:  ogg frame encoding error
+     * -1:  mp3buf was too small
+     * -2:  malloc() problem
+     * -3:  lame_init_params() not called
+     * -4:  psycho acoustic problems
+     * -5:  ogg cleanup encoding error
+     * -6:  ogg frame encoding error
      */
     private int nEncodeBuffer(byte[] pcm, int length, byte[] encoded) {
 

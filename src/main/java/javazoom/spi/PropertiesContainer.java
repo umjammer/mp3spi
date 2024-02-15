@@ -25,7 +25,8 @@ package javazoom.spi;
 
 import java.util.Map;
 
-public interface PropertiesContainer
-{
+
+public interface PropertiesContainer {
+
     public Map<?, ?> properties();
 }

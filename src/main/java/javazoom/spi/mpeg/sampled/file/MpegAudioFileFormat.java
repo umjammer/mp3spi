@@ -20,28 +20,29 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *----------------------------------------------------------------------
  */
+
 package javazoom.spi.mpeg.sampled.file;
 
 import java.util.Map;
-
 import javax.sound.sampled.AudioFormat;
 
 import org.tritonus.share.sampled.file.TAudioFileFormat;
 
+
 /**
  * @author JavaZOOM
  */
-public class MpegAudioFileFormat extends TAudioFileFormat
-{
+public class MpegAudioFileFormat extends TAudioFileFormat {
+
     /**
      * Contructor.
+     *
      * @param type
      * @param audioFormat
      * @param nLengthInFrames
      * @param nLengthInBytes
      */
-    public MpegAudioFileFormat(Type type, AudioFormat audioFormat, int nLengthInFrames, int nLengthInBytes, Map<String, Object> properties)
-    {
+    public MpegAudioFileFormat(Type type, AudioFormat audioFormat, int nLengthInFrames, int nLengthInBytes, Map<String, Object> properties) {
         super(type, audioFormat, nLengthInFrames, nLengthInBytes, properties);
     }
 
@@ -99,8 +100,7 @@ public class MpegAudioFileFormat extends TAudioFileFormat
      * <br>and so on ...
      * </ul>
      */
-    public Map<String, Object> properties()
-    {
+    public Map<String, Object> properties() {
         return super.properties();
     }
 }
