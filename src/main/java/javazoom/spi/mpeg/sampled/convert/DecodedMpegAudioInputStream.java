@@ -115,7 +115,7 @@ public class DecodedMpegAudioInputStream extends TAsynchronousFilteredAudioInput
         try {
             m_header = m_bitstream.readFrame();
             if ((m_header != null) && (frameslength == -1) && (byteslength > 0))
-                frameslength = m_header.max_number_of_frames((int) byteslength);
+                frameslength = m_header.maxNumberOfFrames((int) byteslength);
         } catch (BitstreamException e) {
             TDebug.out("DecodedMpegAudioInputStream : Cannot read first frame : " + e.getMessage());
             byteslength = -1;
@@ -182,10 +182,10 @@ public class DecodedMpegAudioInputStream extends TAsynchronousFilteredAudioInput
                 return;
             }
             currentFrame++;
-            currentBitrate = header.bitrate_instant();
-            currentFramesize = header.calculate_framesize();
+            currentBitrate = header.bitrateInstant();
+            currentFramesize = header.calculateFrameSize();
             currentByte = currentByte + currentFramesize;
-            currentMicrosecond = (long) (currentFrame * header.ms_per_frame() * 1000.0f);
+            currentMicrosecond = (long) (currentFrame * header.msPerFrame() * 1000.0f);
             for (int b = 0; b < m_equalizer_values.length; b++) {
                 m_equalizer.setBand(b, m_equalizer_values[b]);
             }
@@ -236,7 +236,7 @@ public class DecodedMpegAudioInputStream extends TAsynchronousFilteredAudioInput
             for (int i = 0; i < frames; i++) {
                 Header header = m_bitstream.readFrame();
                 if (header != null) {
-                    int fsize = header.calculate_framesize();
+                    int fsize = header.calculateFrameSize();
                     bytesReads = bytesReads + fsize;
                 }
                 m_bitstream.closeFrame();
@@ -294,16 +294,16 @@ public class DecodedMpegAudioInputStream extends TAsynchronousFilteredAudioInput
             m_anBufferPointers[nChannel] += m_nChannels * 2;
         }
 
-        public void set_stop_flag() {
+        public void setStopFlag() {
         }
 
         public void close() {
         }
 
-        public void write_buffer(int nValue) {
+        public void writeBuffer(int nValue) {
         }
 
-        public void clear_buffer() {
+        public void clearBuffer() {
         }
 
         public byte[] getBuffer() {

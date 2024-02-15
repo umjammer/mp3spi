@@ -25,18 +25,18 @@
  *               http://www.javazoom.net
  *
  *-----------------------------------------------------------------------
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU Library General Public License as published
- *   by the Free Software Foundation; either version 2 of the License, or
- *   (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Library General Public License as published
+ * by the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- *   This program is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *   GNU Library General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Library General Public License for more details.
  *
- *   You should have received a copy of the GNU Library General Public
- *   License along with this program; if not, write to the Free Software
+ * You should have received a copy of the GNU Library General Public
+ * License along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *----------------------------------------------------------------------
  */
@@ -107,8 +107,8 @@ public class MpegAudioFileReader extends TAudioFileReader
         if (TDebug.TraceAudioFileReader) TDebug.out(VERSION);
         try
         {
-            weak = System.getProperty("mp3spi.weak");
-        }
+        weak = System.getProperty("mp3spi.weak");
+    }
         catch (AccessControlException ignored)
         {
         }
@@ -274,7 +274,7 @@ public class MpegAudioFileReader extends TAudioFileReader
             // nLayer = 1,2,3
             nLayer = m_header.layer();
             aff_properties.put("mp3.version.layer", Integer.toString(nLayer));
-            nSFIndex = m_header.sample_frequency();
+            nSFIndex = m_header.sampleFrequency();
             nMode = m_header.mode();
             aff_properties.put("mp3.mode", nMode);
             nChannels = nMode == 3 ? 1 : 2;
@@ -282,19 +282,19 @@ public class MpegAudioFileReader extends TAudioFileReader
             nVBR = m_header.vbr();
             af_properties.put("vbr", nVBR);
             aff_properties.put("mp3.vbr", nVBR);
-            aff_properties.put("mp3.vbr.scale", m_header.vbr_scale());
-            FrameSize = m_header.calculate_framesize();
+            aff_properties.put("mp3.vbr.scale", m_header.vbrScale());
+            FrameSize = m_header.calculateFrameSize();
             aff_properties.put("mp3.framesize.bytes", FrameSize);
             if (FrameSize < 0) throw new UnsupportedAudioFileException("Invalid FrameSize : " + FrameSize);
             nFrequency = m_header.frequency();
             aff_properties.put("mp3.frequency.hz", nFrequency);
-            FrameRate = (float) ((1.0 / (m_header.ms_per_frame())) * 1000.0);
+            FrameRate = (float) ((1.0 / (m_header.msPerFrame())) * 1000.0);
             aff_properties.put("mp3.framerate.fps", FrameRate);
             if (FrameRate < 0) throw new UnsupportedAudioFileException("Invalid FrameRate : " + FrameRate);
             if (mLength != AudioSystem.NOT_SPECIFIED)
             {
                 aff_properties.put("mp3.length.bytes", mLength);
-                nTotalFrames = m_header.max_number_of_frames(mLength);
+                nTotalFrames = m_header.maxNumberOfFrames(mLength);
                 aff_properties.put("mp3.length.frames", nTotalFrames);
             }
             BitRate = m_header.bitrate();
@@ -305,7 +305,7 @@ public class MpegAudioFileReader extends TAudioFileReader
             aff_properties.put("mp3.version.encoding", encoding.toString());
             if (mLength != AudioSystem.NOT_SPECIFIED)
             {
-                nTotalMS = Math.round(m_header.total_ms(mLength));
+                nTotalMS = Math.round(m_header.totalMs(mLength));
                 aff_properties.put("duration", nTotalMS * 1000L);
             }
             aff_properties.put("mp3.copyright", m_header.copyright());
