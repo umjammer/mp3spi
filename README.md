@@ -1,3 +1,4 @@
+[![Release](https://jitpack.io/v/umjammer/mp3spi.svg)](https://jitpack.io/#umjammer/mp3spi)
 [![Maven Package](https://github.com/umjammer/mp3spi/actions/workflows/maven-publish.yml/badge.svg)](https://github.com/umjammer?tab=packages&repo_name=mp3spi)
 [![Java CI](https://github.com/umjammer/mp3spi/actions/workflows/maven.yml/badge.svg)](https://github.com/umjammer/mp3spi/actions/workflows/maven.yml)
 [![CodeQL](https://github.com/umjammer/mp3spi/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/umjammer/mp3spi/actions/workflows/codeql-analysis.yml)
@@ -17,7 +18,7 @@ Both are in pure Java.
 
 ## Install
 
- * [maven](https://github.com/umjammer?tab=packages&repo_name=mp3spi)
+ * [maven](https://jitpack.io/#umjammer/mp3spi)
 
 ## Usage
 
@@ -29,7 +30,7 @@ Both are in pure Java.
 ## TODO
 
  * ~~encoder using https://github.com/nwaldispuehl/java-lame~~
- * rename project as vavi-sound-mp3
+ * rename project as vavi-sound-mp3-javazoom
 
 ----
 
