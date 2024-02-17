@@ -6,7 +6,8 @@
   <version>1.9.14</version>
 
   <properties>
-    <tritonus.version>0.3.12</tritonus.version>
+    <tritonus.groupId>com.github.umjammer.tritonus</tritonus.groupId> <!-- org.tritonus / com.github.umjammer.tritonus -->
+    <tritonus.version>0.3.13</tritonus.version>
   </properties>
 
   <distributionManagement>
@@ -79,12 +80,12 @@
     </dependency>
 
     <dependency>
-      <groupId>org.tritonus</groupId>
+      <groupId>${tritonus.groupId}</groupId>
       <artifactId>tritonus-share</artifactId>
       <version>${tritonus.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.tritonus</groupId>
+      <groupId>${tritonus.groupId}</groupId>
       <artifactId>tritonus-remaining</artifactId>
       <version>${tritonus.version}</version>
     </dependency>

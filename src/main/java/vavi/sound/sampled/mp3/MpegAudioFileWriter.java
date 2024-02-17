@@ -18,12 +18,15 @@
 
 package vavi.sound.sampled.mp3;
 
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.util.Arrays;
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
 
-import org.tritonus.share.TDebug;
 import org.tritonus.share.sampled.file.THeaderlessAudioFileWriter;
+
+import static java.lang.System.getLogger;
 
 
 /**
@@ -35,6 +38,8 @@ import org.tritonus.share.sampled.file.THeaderlessAudioFileWriter;
  */
 public class MpegAudioFileWriter extends THeaderlessAudioFileWriter {
 
+    private static final Logger logger = getLogger("org.tritonus.TraceAudioFileWriter");
+    
     public static final AudioFileFormat.Type MP3 = new AudioFileFormat.Type("MP3", "mp3");
     public static final AudioFileFormat.Type MP2 = new AudioFileFormat.Type("MP2", "mp2");
 
@@ -65,13 +70,8 @@ public class MpegAudioFileWriter extends THeaderlessAudioFileWriter {
     };
 
     public MpegAudioFileWriter() {
-        super(Arrays.asList(FILE_TYPES),
-                Arrays.asList(AUDIO_FORMATS));
-        if (TDebug.TraceAudioFileWriter) {
-            TDebug.out("MpegAudioFileWriter.<init>(): begin");
-        }
-        if (TDebug.TraceAudioFileWriter) {
-            TDebug.out("MpegAudioFileWriter.<init>(): end");
-        }
+        super(Arrays.asList(FILE_TYPES), Arrays.asList(AUDIO_FORMATS));
+        logger.log(Level.TRACE, "MpegAudioFileWriter.<init>(): begin");
+        logger.log(Level.TRACE, "MpegAudioFileWriter.<init>(): end");
     }
 }

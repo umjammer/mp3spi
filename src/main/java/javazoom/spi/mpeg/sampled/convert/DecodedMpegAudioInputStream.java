@@ -25,6 +25,8 @@ package javazoom.spi.mpeg.sampled.convert;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.util.HashMap;
 import java.util.Map;
 import javax.sound.sampled.AudioFormat;
@@ -41,8 +43,9 @@ import javazoom.spi.PropertiesContainer;
 import javazoom.spi.mpeg.sampled.file.IcyListener;
 import javazoom.spi.mpeg.sampled.file.tag.TagParseEvent;
 import javazoom.spi.mpeg.sampled.file.tag.TagParseListener;
-import org.tritonus.share.TDebug;
 import org.tritonus.share.sampled.convert.TAsynchronousFilteredAudioInputStream;
+
+import static java.lang.System.getLogger;
 
 
 /**
@@ -50,6 +53,8 @@ import org.tritonus.share.sampled.convert.TAsynchronousFilteredAudioInputStream;
  */
 public class DecodedMpegAudioInputStream extends TAsynchronousFilteredAudioInputStream implements PropertiesContainer, TagParseListener {
 
+    private static final Logger logger = getLogger("org.tritonus.TraceAudioConverter");
+    
     private InputStream m_encodedStream;
 
     private Bitstream m_bitstream;
@@ -88,14 +93,12 @@ public class DecodedMpegAudioInputStream extends TAsynchronousFilteredAudioInput
 
     public DecodedMpegAudioInputStream(AudioFormat outputFormat, AudioInputStream inputStream) {
         super(outputFormat, -1);
-        if (TDebug.TraceAudioConverter) {
-            TDebug.out(">DecodedMpegAudioInputStream(AudioFormat outputFormat, AudioInputStream inputStream)");
-        }
+        logger.log(Level.TRACE, ">DecodedMpegAudioInputStream(AudioFormat outputFormat, AudioInputStream inputStream)");
         try {
             // Try to find out inputstream length to allow skip.
             byteslength = inputStream.available();
         } catch (IOException e) {
-            TDebug.out("DecodedMpegAudioInputStream : Cannot run inputStream.available() : " + e.getMessage());
+            logger.log(Level.TRACE, "DecodedMpegAudioInputStream : Cannot run inputStream.available() : " + e.getMessage());
             byteslength = -1;
         }
         m_encodedStream = inputStream;
@@ -116,7 +119,7 @@ public class DecodedMpegAudioInputStream extends TAsynchronousFilteredAudioInput
             if ((m_header != null) && (frameslength == -1) && (byteslength > 0))
                 frameslength = m_header.maxNumberOfFrames((int) byteslength);
         } catch (BitstreamException e) {
-            TDebug.out("DecodedMpegAudioInputStream : Cannot read first frame : " + e.getMessage());
+            logger.log(Level.TRACE, "DecodedMpegAudioInputStream : Cannot read first frame : " + e.getMessage());
             byteslength = -1;
         }
         properties = new HashMap<>();
@@ -164,8 +167,7 @@ public class DecodedMpegAudioInputStream extends TAsynchronousFilteredAudioInput
 
     @Override
     public void execute() {
-        if (TDebug.TraceAudioConverter)
-            TDebug.out("execute() : begin");
+        logger.log(Level.TRACE, "execute() : begin");
         try {
             // Following line hangs when FrameSize is available in AudioFormat.
             Header header = null;
@@ -173,12 +175,9 @@ public class DecodedMpegAudioInputStream extends TAsynchronousFilteredAudioInput
                 header = m_bitstream.readFrame();
             else
                 header = m_header;
-            if (TDebug.TraceAudioConverter)
-                TDebug.out("execute() : header = " + header);
+            logger.log(Level.TRACE, "execute() : header = " + header);
             if (header == null) {
-                if (TDebug.TraceAudioConverter) {
-                    TDebug.out("header is null (end of mpeg stream)");
-                }
+                logger.log(Level.TRACE, "header is null (end of mpeg stream)");
                 getCircularBuffer().close();
                 return;
             }
@@ -198,12 +197,9 @@ public class DecodedMpegAudioInputStream extends TAsynchronousFilteredAudioInput
             if (m_header != null)
                 m_header = null;
         } catch (BitstreamException | DecoderException e) {
-            if (TDebug.TraceAudioConverter) {
-                TDebug.out(e);
-            }
+            logger.log(Level.ERROR, e.getMessage(), e);
         }
-        if (TDebug.TraceAudioConverter)
-            TDebug.out("execute() : end");
+        logger.log(Level.TRACE, "execute() : end");
     }
 
     @Override
@@ -226,8 +222,7 @@ public class DecodedMpegAudioInputStream extends TAsynchronousFilteredAudioInput
      * @return bytes length skipped matching to frames skipped.
      */
     public long skipFrames(long frames) {
-        if (TDebug.TraceAudioConverter)
-            TDebug.out("skip(long frames) : begin");
+        logger.log(Level.TRACE, "skip(long frames) : begin");
         int framesRead = 0;
         int bytesReads = 0;
         try {
@@ -241,11 +236,9 @@ public class DecodedMpegAudioInputStream extends TAsynchronousFilteredAudioInput
                 framesRead++;
             }
         } catch (BitstreamException e) {
-            if (TDebug.TraceAudioConverter)
-                TDebug.out(e);
+            logger.log(Level.ERROR, e.getMessage(), e);
         }
-        if (TDebug.TraceAudioConverter)
-            TDebug.out("skip(long frames) : end");
+        logger.log(Level.TRACE, "skip(long frames) : end");
         currentFrame = currentFrame + framesRead;
         return bytesReads;
     }

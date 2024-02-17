@@ -23,16 +23,18 @@
 
 package javazoom.spi.mpeg.sampled.convert;
 
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.util.Arrays;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 
 import javazoom.spi.mpeg.sampled.file.MpegEncoding;
-import org.tritonus.share.TDebug;
 import org.tritonus.share.sampled.Encodings;
 import org.tritonus.share.sampled.convert.TEncodingFormatConversionProvider;
 
+import static java.lang.System.getLogger;
 import static javax.sound.sampled.AudioSystem.NOT_SPECIFIED;
 
 
@@ -40,6 +42,8 @@ import static javax.sound.sampled.AudioSystem.NOT_SPECIFIED;
  * ConversionProvider for MPEG files.
  */
 public class MpegFormatConversionProvider extends TEncodingFormatConversionProvider {
+
+    private static final Logger logger = getLogger("org.tritonus.TraceAudioConverter");
 
     private static final AudioFormat.Encoding MP3 = Encodings.getEncoding("MP3");
     private static final AudioFormat.Encoding PCM_SIGNED = Encodings.getEncoding("PCM_SIGNED");
@@ -67,16 +71,12 @@ public class MpegFormatConversionProvider extends TEncodingFormatConversionProvi
      */
     public MpegFormatConversionProvider() {
         super(Arrays.asList(INPUT_FORMATS), Arrays.asList(OUTPUT_FORMATS));
-        if (TDebug.TraceAudioConverter) {
-            TDebug.out(">MpegFormatConversionProvider()");
-        }
+        logger.log(Level.TRACE, ">MpegFormatConversionProvider()");
     }
 
     @Override
     public AudioInputStream getAudioInputStream(AudioFormat targetFormat, AudioInputStream audioInputStream) {
-        if (TDebug.TraceAudioConverter) {
-            TDebug.out(">MpegFormatConversionProvider.getAudioInputStream(AudioFormat targetFormat, AudioInputStream audioInputStream):");
-        }
+        logger.log(Level.TRACE, ">MpegFormatConversionProvider.getAudioInputStream(AudioFormat targetFormat, AudioInputStream audioInputStream):");
         return new DecodedMpegAudioInputStream(targetFormat, audioInputStream);
     }
 
@@ -89,12 +89,10 @@ public class MpegFormatConversionProvider extends TEncodingFormatConversionProvi
      */
     @Override
     public boolean isConversionSupported(AudioFormat targetFormat, AudioFormat sourceFormat) {
-        if (TDebug.TraceAudioConverter) {
-            TDebug.out(">MpegFormatConversionProvider.isConversionSupported(AudioFormat targetFormat, AudioFormat sourceFormat):");
-            TDebug.out("checking if conversion possible");
-            TDebug.out("from: " + sourceFormat);
-            TDebug.out("to: " + targetFormat);
-        }
+        logger.log(Level.TRACE, ">MpegFormatConversionProvider.isConversionSupported(AudioFormat targetFormat, AudioFormat sourceFormat):");
+        logger.log(Level.TRACE, "checking if conversion possible");
+        logger.log(Level.TRACE, "from: " + sourceFormat);
+        logger.log(Level.TRACE, "to: " + targetFormat);
 
         boolean conversion = super.isConversionSupported(targetFormat, sourceFormat);
         if (!conversion) {
