@@ -62,9 +62,9 @@
 
   <dependencies>
     <dependency>
-      <groupId>com.github.umjammer</groupId>
-      <artifactId>vavi-commons</artifactId>
-      <version>1.1.10</version>
+      <groupId>com.github.umjammer</groupId> <!-- vavi / com.github.umjammer -->
+      <artifactId>vavi-sound</artifactId>
+      <version>1.0.18</version>
     </dependency>
 
     <dependency>
@@ -108,13 +108,6 @@
     <dependency>
       <groupId>org.junit.platform</groupId>
       <artifactId>junit-platform-commons</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.github.umjammer</groupId> <!-- vavi / com.github.umjammer -->
-      <artifactId>vavi-sound</artifactId>
-      <version>1.0.16</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

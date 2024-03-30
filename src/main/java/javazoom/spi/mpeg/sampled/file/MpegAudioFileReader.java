@@ -18,7 +18,6 @@ package javazoom.spi.mpeg.sampled.file;
 
 import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
@@ -45,6 +44,7 @@ import javazoom.jl.decoder.Header;
 import javazoom.spi.mpeg.sampled.file.tag.IcyInputStream;
 import javazoom.spi.mpeg.sampled.file.tag.MP3Tag;
 import org.tritonus.share.sampled.file.TAudioFileReader;
+import vavi.sound.LimitedInputStream;
 import vavi.util.StringUtil;
 
 import static java.lang.System.getLogger;
@@ -59,21 +59,21 @@ import static java.lang.System.getLogger;
  * </ul>
  *
  * @author JavaZOOM mp3spi@javazoom.net http://www.javazoom.net
- * @version 10/10/05 : size computation bug fixed in parseID3v2Frames.
+ * @version 10/10/05 size computation bug fixed in parseID3v2Frames.
  *                   RIFF/MP3 header support added.
  *                   FLAC and MAC headers throw UnsupportedAudioFileException now.
  *                   "mp3.id3tag.publisher" (TPUB/TPB) added.
  *                   "mp3.id3tag.orchestra" (TPE2/TP2) added.
  *                   "mp3.id3tag.length" (TLEN/TLE) added.
- * 08/15/05 : parseID3v2Frames improved.
- * 12/31/04 : mp3spi.weak system property added to skip controls.
- * 11/29/04 : ID3v2.2, v2.3 & v2.4 support improved.
+ *          08/15/05 parseID3v2Frames improved.
+ *          12/31/04 mp3spi.weak system property added to skip controls.
+ *          11/29/04 ID3v2.2, v2.3 & v2.4 support improved.
  *                   "mp3.id3tag.composer" (TCOM/TCM) added
  *                   "mp3.id3tag.grouping" (TIT1/TT1) added
  *                   "mp3.id3tag.disc" (TPA/TPOS) added
  *                   "mp3.id3tag.encoded" (TEN/TENC) added
  *                   "mp3.id3tag.v2.version" added
- * 11/28/04 : String encoding bug fix in chopSubstring method.
+ *         11/28/04  String encoding bug fix in chopSubstring method.
  */
 public class MpegAudioFileReader extends TAudioFileReader {
 
@@ -102,8 +102,16 @@ public class MpegAudioFileReader extends TAudioFileReader {
             {MpegEncoding.MPEG2L1, MpegEncoding.MPEG2L2, MpegEncoding.MPEG2L3},
             {MpegEncoding.MPEG1L1, MpegEncoding.MPEG1L2, MpegEncoding.MPEG1L3},
             {MpegEncoding.MPEG2DOT5L1, MpegEncoding.MPEG2DOT5L2, MpegEncoding.MPEG2DOT5L3},};
-    public static final int INITAL_READ_LENGTH = 1024 * 1024 * 20; // TODO limitation
-    private static final int MARK_LIMIT = INITAL_READ_LENGTH + 1;
+    /**
+     * SPI must not consume all input stream and must not cause EOF exception
+     * for following other SPIs those take over to analyze audio stream.
+     * but ID3v1 is located at end of mp3 data. there is a risk to consume all input data
+     * when analysing ID3v1. so we determine max size of buffer to reset
+     * and if it reached to max size when analysis this spi will throw an exception
+     * and give up to deal the stream as a mp3.
+     */
+    public static final int INITIAL_READ_LENGTH = 1024 * 1024 * 20; // TODO limitation
+    private static final int MARK_LIMIT = INITIAL_READ_LENGTH + 1;
 
     private static final String[] id3v1genres;
 
@@ -114,12 +122,12 @@ public class MpegAudioFileReader extends TAudioFileReader {
             genres.add(scanner.nextLine());
         }
         scanner.close();
-        id3v1genres = genres.toArray(new String[0]);
+        id3v1genres = genres.toArray(String[]::new);
     }
 
     public MpegAudioFileReader() {
         super(MARK_LIMIT, true);
-        logger.log(Level.TRACE, VERSION);
+        logger.log(Level.TRACE, "MP3SPI " + VERSION);
         weak = System.getProperty("mp3spi.weak");
     }
 
@@ -153,42 +161,25 @@ public class MpegAudioFileReader extends TAudioFileReader {
     }
 
     /**
-     * Returns AudioFileFormat from inputstream and medialength.
+     * Returns AudioFileFormat from {@code inputstream} and {@code medialength}.
+     *
+     * @param inputStream it's user's responsibility to prepare enough read buffer for mp3 tag analysis like
+     *                    <pre>
+     *                    ... = getAudioFileFormat(new BufferedInputStream(your_input_stream, INITIAL_READ_LENGTH)) ...
+     *                    </pre>
+     *                    and max buffer size is defined in {@link #INITIAL_READ_LENGTH}.
+     * @see #INITIAL_READ_LENGTH
      */
     @Override
     public AudioFileFormat getAudioFileFormat(InputStream inputStream, long mediaLength) throws UnsupportedAudioFileException, IOException {
         logger.log(Level.TRACE, ">MpegAudioFileReader.getAudioFileFormat(InputStream inputStream, long mediaLength): begin");
-        Map<String, Object> aff_properties = new HashMap<>();
-        Map<String, Object> af_properties = new HashMap<>();
-        int mLength = (int) mediaLength;
+
+        MpegContext context = new MpegContext();
+
+        context.mLength = (int) mediaLength;
         int size = inputStream.available();
         // https://github.com/umjammer/mp3spi/issues/5
-        inputStream = new FilterInputStream(inputStream) {
-            private void check(int r) throws IOException {
-                if (in.available() < r) {
-                    logger.log(Level.TRACE, "stop reading, prevent form eof");
-                    throw new RuntimeException("stop reading, prevent form eof");
-                }
-            }
-
-            @Override
-            public int read() throws IOException {
-                check(1);
-                return super.read();
-            }
-
-            @Override
-            public int read(byte[] b) throws IOException {
-                check(b.length);
-                return super.read(b);
-            }
-
-            @Override
-            public int read(byte[] b, int off, int len) throws IOException {
-                check(len);
-                return super.read(b, off, len);
-            }
-        };
+        inputStream = new LimitedInputStream(inputStream);
         PushbackInputStream pis = new PushbackInputStream(inputStream, MARK_LIMIT);
         byte[] head = new byte[22];
         int r = pis.read(head);
@@ -216,40 +207,99 @@ logger.log(Level.TRACE, "InputStream : " + inputStream + " =>" + new String(head
         } else if (((head[0] == 'F') | (head[0] == 'f')) && ((head[1] == 'L') | (head[1] == 'l')) && ((head[2] == 'A') | (head[2] == 'a')) && ((head[3] == 'C') | (head[3] == 'c'))) {
             logger.log(Level.TRACE, "FLAC stream found");
             if (weak == null) throw new UnsupportedAudioFileException("FLAC stream found");
-        }
+        } else if (((head[0] == 'I') | (head[0] == 'i')) && ((head[1] == 'C') | (head[1] == 'c')) && ((head[2] == 'Y') | (head[2] == 'y'))) {
             // Shoutcast stream ?
-        else if (((head[0] == 'I') | (head[0] == 'i')) && ((head[1] == 'C') | (head[1] == 'c')) && ((head[2] == 'Y') | (head[2] == 'y'))) {
             pis.unread(head);
             // Load shoutcast meta data.
-            loadShoutcastInfo(pis, aff_properties);
-        }
+            loadShoutcastInfo(pis, context.aff_properties);
+        } else if (((head[0] == 'O') | (head[0] == 'o')) && ((head[1] == 'G') | (head[1] == 'g')) && ((head[2] == 'G') | (head[2] == 'g'))) {
             // Ogg stream ?
-        else if (((head[0] == 'O') | (head[0] == 'o')) && ((head[1] == 'G') | (head[1] == 'g')) && ((head[2] == 'G') | (head[2] == 'g'))) {
             logger.log(Level.TRACE, "Ogg stream found");
             if (weak == null) throw new UnsupportedAudioFileException("Ogg stream found");
-        }
+        } else {
             // No, so pushback.
-        else {
             pis.unread(head);
         }
+
+        try {
+            context.fill(pis);
+        } catch (Exception e) {
+            logger.log(Level.DEBUG, e.getMessage());
+            logger.log(Level.TRACE, "not a MPEG stream: " + e.getMessage(), e);
+            throw new UnsupportedAudioFileException("not a MPEG stream: " + e.getMessage());
+        }
+        // Deeper checks ?
+        int cVersion = (context.nHeader >> 19) & 0x3;
+        if (cVersion == 1) {
+            logger.log(Level.TRACE, "not a MPEG stream: wrong version");
+            throw new UnsupportedAudioFileException("not a MPEG stream: wrong version");
+        }
+        int cSFIndex = (context.nHeader >> 10) & 0x3;
+        if (cSFIndex == 3) {
+            logger.log(Level.TRACE, "not a MPEG stream: wrong sampling rate");
+            throw new UnsupportedAudioFileException("not a MPEG stream: wrong sampling rate");
+        }
+        // Look up for ID3v1 tag
+        if ((size == mediaLength) && (mediaLength != AudioSystem.NOT_SPECIFIED)) {
+            byte[] id3v1 = new byte[128];
+            @SuppressWarnings("unused")
+            long bytesSkipped = inputStream.skip(inputStream.available() - id3v1.length);
+            @SuppressWarnings("unused")
+            int read = inputStream.read(id3v1, 0, id3v1.length);
+            if ((id3v1[0] == 'T') && (id3v1[1] == 'A') && (id3v1[2] == 'G')) {
+                parseID3v1Frames(id3v1, context.aff_properties);
+            }
+        } else {
+            logger.log(Level.TRACE, "unknown size, maybe not a file: " + inputStream.available());
+            if (inputStream.available() <= INITIAL_READ_LENGTH) {
+                InputStream is = new BufferedInputStream(inputStream, inputStream.available());
+                byte[] id3v1 = new byte[128];
+                is.mark(inputStream.available());
+                @SuppressWarnings("unused")
+                long bytesSkipped = is.skip(inputStream.available() - id3v1.length);
+                @SuppressWarnings("unused")
+                int read = is.read(id3v1, 0, id3v1.length);
+                logger.log(Level.TRACE, (char) id3v1[0] + ", " + (char) id3v1[1] + ", " + (char) id3v1[2]);
+                if ((id3v1[0] == 'T') && (id3v1[1] == 'A') && (id3v1[2] == 'G')) {
+                    parseID3v1Frames(id3v1, context.aff_properties);
+                }
+            } else {
+                logger.log(Level.TRACE, "larger than limit 20MB, skip id3v1");
+            }
+        }
+        AudioFormat format = new MpegAudioFormat(context.encoding, context.nFrequency,
+                AudioSystem.NOT_SPECIFIED,  // SampleSizeInBits - The size of a sample
+                context.nChannels,          // Channels - The number of channels
+                AudioSystem.NOT_SPECIFIED,  // The number of bytes in each frame
+                context.frameRate,          // FrameRate - The number of frames played or recorded per second
+                true, context.af_properties);
+        return new MpegAudioFileFormat(MpegFileFormatType.MP3,
+                format, context.nTotalFrames, context.mLength, context.aff_properties);
+    }
+
     // MPEG header info.
+    private class MpegContext {
+        int mLength;
         int nVersion;
         int nLayer;
         @SuppressWarnings("unused")
         int nSFIndex = AudioSystem.NOT_SPECIFIED;
         int nMode;
-        int FrameSize;
+        int frameSize;
         //        int nFrameSize = AudioSystem.NOT_SPECIFIED;
         int nFrequency;
         int nTotalFrames = AudioSystem.NOT_SPECIFIED;
-        float FrameRate;
-        int BitRate;
+        float frameRate;
+        int bitRate;
         int nChannels;
         int nHeader;
         int nTotalMS;
         boolean nVBR;
         AudioFormat.Encoding encoding;
-        try {
+        Map<String, Object> aff_properties = new HashMap<>();
+        Map<String, Object> af_properties = new HashMap<>();
+
+        void fill(PushbackInputStream pis) throws Exception {
             Bitstream m_bitstream = new Bitstream(pis);
             aff_properties.put("mp3.header.pos", m_bitstream.header_pos());
             Header m_header = m_bitstream.readFrame();
@@ -269,22 +319,22 @@ logger.log(Level.TRACE, "InputStream : " + inputStream + " =>" + new String(head
             af_properties.put("vbr", nVBR);
             aff_properties.put("mp3.vbr", nVBR);
             aff_properties.put("mp3.vbr.scale", m_header.vbrScale());
-            FrameSize = m_header.calculateFrameSize();
-            aff_properties.put("mp3.framesize.bytes", FrameSize);
-            if (FrameSize < 0) throw new UnsupportedAudioFileException("Invalid FrameSize : " + FrameSize);
+            frameSize = m_header.calculateFrameSize();
+            aff_properties.put("mp3.framesize.bytes", frameSize);
+            if (frameSize < 0) throw new UnsupportedAudioFileException("Invalid frameSize : " + frameSize);
             nFrequency = m_header.frequency();
             aff_properties.put("mp3.frequency.hz", nFrequency);
-            FrameRate = (float) ((1.0 / (m_header.msPerFrame())) * 1000.0);
-            aff_properties.put("mp3.framerate.fps", FrameRate);
-            if (FrameRate < 0) throw new UnsupportedAudioFileException("Invalid FrameRate : " + FrameRate);
+            frameRate = (float) ((1.0 / (m_header.msPerFrame())) * 1000.0);
+            aff_properties.put("mp3.framerate.fps", frameRate);
+            if (frameRate < 0) throw new UnsupportedAudioFileException("Invalid FrameRate : " + frameRate);
             if (mLength != AudioSystem.NOT_SPECIFIED) {
                 aff_properties.put("mp3.length.bytes", mLength);
                 nTotalFrames = m_header.maxNumberOfFrames(mLength);
                 aff_properties.put("mp3.length.frames", nTotalFrames);
             }
-            BitRate = m_header.bitrate();
-            af_properties.put("bitrate", BitRate);
-            aff_properties.put("mp3.bitrate.nominal.bps", BitRate);
+            bitRate = m_header.bitrate();
+            af_properties.put("bitrate", bitRate);
+            aff_properties.put("mp3.bitrate.nominal.bps", bitRate);
             nHeader = m_header.getSyncHeader();
             encoding = sm_aEncodings[nVersion][nLayer - 1];
             aff_properties.put("mp3.version.encoding", encoding.toString());
@@ -303,56 +353,7 @@ logger.log(Level.TRACE, "InputStream : " + inputStream + " =>" + new String(head
                 parseID3v2Frames(id3v2, aff_properties);
             }
 logger.log(Level.TRACE, m_header.toString());
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.log(Level.TRACE, "not a MPEG stream: " + e.getMessage());
-            throw new UnsupportedAudioFileException("not a MPEG stream: " + e.getMessage());
         }
-        // Deeper checks ?
-        int cVersion = (nHeader >> 19) & 0x3;
-        if (cVersion == 1) {
-            logger.log(Level.TRACE, "not a MPEG stream: wrong version");
-            throw new UnsupportedAudioFileException("not a MPEG stream: wrong version");
-        }
-        int cSFIndex = (nHeader >> 10) & 0x3;
-        if (cSFIndex == 3) {
-            logger.log(Level.TRACE, "not a MPEG stream: wrong sampling rate");
-            throw new UnsupportedAudioFileException("not a MPEG stream: wrong sampling rate");
-        }
-        // Look up for ID3v1 tag
-        if ((size == mediaLength) && (mediaLength != AudioSystem.NOT_SPECIFIED)) {
-            byte[] id3v1 = new byte[128];
-            @SuppressWarnings("unused")
-            long bytesSkipped = inputStream.skip(inputStream.available() - id3v1.length);
-            @SuppressWarnings("unused")
-            int read = inputStream.read(id3v1, 0, id3v1.length);
-            if ((id3v1[0] == 'T') && (id3v1[1] == 'A') && (id3v1[2] == 'G')) {
-                parseID3v1Frames(id3v1, aff_properties);
-            }
-        } else {
-            logger.log(Level.TRACE, "unknown size, maybe not a file: " + inputStream.available());
-            if (inputStream.available() <= INITAL_READ_LENGTH) {
-                InputStream is = new BufferedInputStream(inputStream, inputStream.available());
-                byte[] id3v1 = new byte[128];
-                is.mark(inputStream.available());
-                @SuppressWarnings("unused")
-                long bytesSkipped = is.skip(inputStream.available() - id3v1.length);
-                @SuppressWarnings("unused")
-                int read = is.read(id3v1, 0, id3v1.length);
-                logger.log(Level.TRACE, (char) id3v1[0] + ", " + (char) id3v1[1] + ", " + (char) id3v1[2]);
-                if ((id3v1[0] == 'T') && (id3v1[1] == 'A') && (id3v1[2] == 'G')) {
-                    parseID3v1Frames(id3v1, aff_properties);
-        }
-            } else {
-                logger.log(Level.TRACE, "larger than limit 20MB, skip id3v1");
-            }
-        }
-        AudioFormat format = new MpegAudioFormat(encoding, nFrequency, AudioSystem.NOT_SPECIFIED // SampleSizeInBits - The size of a sample
-                , nChannels // Channels - The number of channels
-                , -1 // The number of bytes in each frame
-                , FrameRate // FrameRate - The number of frames played or recorded per second
-                , true, af_properties);
-        return new MpegAudioFileFormat(MpegFileFormatType.MP3, format, nTotalFrames, mLength, aff_properties);
     }
 
     /**
@@ -436,8 +437,8 @@ logger.log(Level.TRACE, "available/limit: " + inputStream.available() + ", " + g
     /**
      * Parser ID3v1 frames
      *
-     * @param frames
-     * @param props
+     * @param frames one tag
+     * @param props in/out
      */
     protected void parseID3v1Frames(byte[] frames, Map<String, Object> props) {
 logger.log(Level.TRACE, "Parsing ID3v1");
@@ -470,10 +471,10 @@ logger.log(Level.TRACE, "ID3v1 parsed");
     /**
      * Extract
      *
-     * @param s
-     * @param start
-     * @param end
-     * @return
+     * @param s source string
+     * @param start start position to chop
+     * @param end end position to chop
+     * @return chopped string
      */
     @SuppressWarnings("unused")
     private String chopSubstring(String s, int start, int end) {
@@ -493,8 +494,8 @@ logger.log(Level.TRACE, "Cannot chopSubString " + e.getMessage());
     /**
      * Parse ID3v2 frames to add album (TALB), title (TIT2), date (TYER), author (TPE1), copyright (TCOP), comment (COMM) ...
      *
-     * @param frames
-     * @param props
+     * @param frames one tag
+     * @param props out
      */
     protected void parseID3v2Frames(InputStream frames, Map<String, Object> props) {
         logger.log(Level.TRACE, "Parsing ID3v2");
@@ -605,7 +606,7 @@ logger.log(Level.DEBUG, "code: " + code);
     }
 
     /** */
-    private int getSkipForComment(byte[] bframes, int offset, int size, int skip) {
+    private static int getSkipForComment(byte[] bframes, int offset, int size, int skip) {
 //logger.log(Level.DEBUG, "\n" + StringUtil.getDump(bframes, offset, size + skip));
         int n = skip;
         while (bframes[offset + n] != 0) n++;
