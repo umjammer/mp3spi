@@ -68,9 +68,11 @@ class Test4 {
         for (AudioFileFormat.Type type : AudioSystem.getAudioFileTypes()) {
             System.err.println(type);
         }
-        Test3 app = new Test3();
-        PropsEntity.Util.bind(app);
-        app.test2();
+        Test4 app = new Test4();
+        if (localPropertiesExists()) {
+            PropsEntity.Util.bind(app);
+        }
+        app.test4();
     }
 
     // TODO FileChannel#transfarXXX doesn't work???
