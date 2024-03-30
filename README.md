@@ -26,10 +26,14 @@ Both are in pure Java.
 
 ## References
 
+ * [Java Sound Programmer Guide](https://docs.oracle.com/javase/8/docs/technotes/guides/sound/programmer_guide/contents.html)
+
 ## TODO
 
  * ~~encoder using https://github.com/nwaldispuehl/java-lame~~
- * rename project as vavi-sound-mp3-javazoom
+ * rename project as vavi-sound-mp3
+ * out source tag parser (use like vavi-util-tag)
+ * out source version
 
 ----
 
@@ -49,7 +53,6 @@ MP3SPI is a SPI (Service Provider Interface) that adds MP3 support for JavaSound
 It allows to play MPEG 1/2/2.5 Layer 1/2/3 files thanks to underlying [JLayer](https://github.com/umjammer/jlayer)
 and [Tritonus](https://github.com/umjammer/tritonus) libraries. This is a non-commercial project and anyone can add his
 contribution. MP3SPI is licensed under LGPL (see [LICENSE](LICENSE.txt)).
-
 
 ## FAQ
 

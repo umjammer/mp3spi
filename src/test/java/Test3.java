@@ -5,7 +5,6 @@
  */
 
 import java.io.BufferedInputStream;
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.FileVisitResult;
@@ -16,7 +15,6 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -24,20 +22,20 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineEvent;
 import javax.sound.sampled.SourceDataLine;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.sound.sampled.spi.AudioFileReader;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
 import vavi.util.Debug;
 import vavi.util.properties.annotation.Property;
 import vavi.util.properties.annotation.PropsEntity;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 import static vavi.sound.SoundUtil.volume;
 import static vavix.util.DelayedWorker.later;
 
@@ -51,7 +49,9 @@ import static vavix.util.DelayedWorker.later;
 @PropsEntity(url = "file://${user.dir}/local.properties")
 class Test3 {
 
-    static final double volume = Double.parseDouble(System.getProperty("vavi.test.volume",  "0.2"));
+    static boolean localPropertiesExists() {
+        return Files.exists(Paths.get("local.properties"));
+    }
 
     @Property
     String inFile = "src/test/resources/test.mp3";
@@ -62,15 +62,23 @@ class Test3 {
             System.err.println(type);
         }
         Test3 app = new Test3();
-        PropsEntity.Util.bind(app);
+        if (localPropertiesExists()) {
+            PropsEntity.Util.bind(app);
+        }
         app.test2();
     }
 
     /** play time limit in milliseconds */
     long time;
 
+    static final double volume = Double.parseDouble(System.getProperty("vavi.test.volume",  "0.2"));
+
     @BeforeEach
-    void setup() {
+    void setup() throws Exception {
+        if (localPropertiesExists()) {
+            PropsEntity.Util.bind(this);
+        }
+
         time = System.getProperty("vavi.test", "").equals("ide") ? 600 * 1000 : 3 * 1000;
 Debug.println("time: " + time);
     }
@@ -125,14 +133,11 @@ Debug.println("done");
     @Test
     @DisplayName("https://github.com/umjammer/mp3spi/issues/5")
     void test3() throws Exception {
-        try {
-            Path in = Paths.get(Test3.class.getResource("/test.mid").toURI());
+        assertThrows(UnsupportedAudioFileException.class, () -> {
+            Path in = Paths.get(Test3.class.getResource("/test.caf").toURI());
             AudioInputStream ais = AudioSystem.getAudioInputStream(new BufferedInputStream(Files.newInputStream(in)));
 Debug.println(ais);
-        } catch (EOFException e) {
-            e.printStackTrace();
-            fail("spi consumes all bytes, and eof make stream unresettable");
-        }
+        }, "spi consumes all bytes, and eof make stream unresettable");
     }
 
     @Test
