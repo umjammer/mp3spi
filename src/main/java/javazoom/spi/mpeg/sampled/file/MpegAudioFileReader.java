@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Scanner;
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
@@ -52,29 +53,50 @@ import static java.lang.System.getLogger;
 /**
  * This class implements AudioFileReader for MP3 SPI.
  *
+ * system properties
+ * <ul>
+ *  <li>mp3spi.weak ... to skip controls</li>
+ * </ul>
+ *
  * @author JavaZOOM mp3spi@javazoom.net http://www.javazoom.net
  * @version 10/10/05 : size computation bug fixed in parseID3v2Frames.
- * RIFF/MP3 header support added.
- * FLAC and MAC headers throw UnsupportedAudioFileException now.
- * "mp3.id3tag.publisher" (TPUB/TPB) added.
- * "mp3.id3tag.orchestra" (TPE2/TP2) added.
- * "mp3.id3tag.length" (TLEN/TLE) added.
+ *                   RIFF/MP3 header support added.
+ *                   FLAC and MAC headers throw UnsupportedAudioFileException now.
+ *                   "mp3.id3tag.publisher" (TPUB/TPB) added.
+ *                   "mp3.id3tag.orchestra" (TPE2/TP2) added.
+ *                   "mp3.id3tag.length" (TLEN/TLE) added.
  * 08/15/05 : parseID3v2Frames improved.
  * 12/31/04 : mp3spi.weak system property added to skip controls.
  * 11/29/04 : ID3v2.2, v2.3 & v2.4 support improved.
- * "mp3.id3tag.composer" (TCOM/TCM) added
- * "mp3.id3tag.grouping" (TIT1/TT1) added
- * "mp3.id3tag.disc" (TPA/TPOS) added
- * "mp3.id3tag.encoded" (TEN/TENC) added
- * "mp3.id3tag.v2.version" added
+ *                   "mp3.id3tag.composer" (TCOM/TCM) added
+ *                   "mp3.id3tag.grouping" (TIT1/TT1) added
+ *                   "mp3.id3tag.disc" (TPA/TPOS) added
+ *                   "mp3.id3tag.encoded" (TEN/TENC) added
+ *                   "mp3.id3tag.v2.version" added
  * 11/28/04 : String encoding bug fix in chopSubstring method.
  */
 public class MpegAudioFileReader extends TAudioFileReader {
 
     private static final Logger logger = getLogger("org.tritonus.TraceAudioFileReader");
-    
-    public static final String VERSION = "MP3SPI 1.9.12";
-    //  private final int SYNC = 0xFFE00000;
+
+    static {
+        try {
+            try (InputStream is = MpegAudioFileReader.class.getResourceAsStream("/META-INF/maven/net.javazoom/mp3spi/pom.properties")) {
+                if (is != null) {
+                    Properties props = new Properties();
+                    props.load(is);
+                    VERSION = props.getProperty("version", "undefined in pom.properties");
+                } else {
+                    VERSION = System.getProperty("vavi.test.version", "undefined");
+                }
+            }
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public static final String VERSION;
+//    private final int SYNC = 0xFFE00000;
     private String weak = null;
     private final AudioFormat.Encoding[][] sm_aEncodings = {
             {MpegEncoding.MPEG2L1, MpegEncoding.MPEG2L2, MpegEncoding.MPEG2L3},
@@ -171,7 +193,7 @@ public class MpegAudioFileReader extends TAudioFileReader {
         byte[] head = new byte[22];
         int r = pis.read(head);
         assert r == head.length : "read header bytes";
-        logger.log(Level.TRACE, "InputStream : " + inputStream + " =>" + new String(head));
+logger.log(Level.TRACE, "InputStream : " + inputStream + " =>" + new String(head));
 
         // Check for WAV, AU, and AIFF, Ogg Vorbis, Flac, MAC file formats.
         // Next check for Shoutcast (supported) and OGG (unsupported) streams.
@@ -195,29 +217,29 @@ public class MpegAudioFileReader extends TAudioFileReader {
             logger.log(Level.TRACE, "FLAC stream found");
             if (weak == null) throw new UnsupportedAudioFileException("FLAC stream found");
         }
-        // Shoutcast stream ?
+            // Shoutcast stream ?
         else if (((head[0] == 'I') | (head[0] == 'i')) && ((head[1] == 'C') | (head[1] == 'c')) && ((head[2] == 'Y') | (head[2] == 'y'))) {
             pis.unread(head);
             // Load shoutcast meta data.
             loadShoutcastInfo(pis, aff_properties);
         }
-        // Ogg stream ?
+            // Ogg stream ?
         else if (((head[0] == 'O') | (head[0] == 'o')) && ((head[1] == 'G') | (head[1] == 'g')) && ((head[2] == 'G') | (head[2] == 'g'))) {
             logger.log(Level.TRACE, "Ogg stream found");
             if (weak == null) throw new UnsupportedAudioFileException("Ogg stream found");
         }
-        // No, so pushback.
+            // No, so pushback.
         else {
             pis.unread(head);
         }
-        // MPEG header info.
+    // MPEG header info.
         int nVersion;
         int nLayer;
         @SuppressWarnings("unused")
         int nSFIndex = AudioSystem.NOT_SPECIFIED;
         int nMode;
         int FrameSize;
-//      int nFrameSize = AudioSystem.NOT_SPECIFIED;
+        //        int nFrameSize = AudioSystem.NOT_SPECIFIED;
         int nFrequency;
         int nTotalFrames = AudioSystem.NOT_SPECIFIED;
         float FrameRate;
@@ -280,7 +302,7 @@ public class MpegAudioFileReader extends TAudioFileReader {
                 aff_properties.put("mp3.id3tag.v2", id3v2);
                 parseID3v2Frames(id3v2, aff_properties);
             }
-            logger.log(Level.TRACE, m_header.toString());
+logger.log(Level.TRACE, m_header.toString());
         } catch (Exception e) {
             e.printStackTrace();
             logger.log(Level.TRACE, "not a MPEG stream: " + e.getMessage());
@@ -320,7 +342,7 @@ public class MpegAudioFileReader extends TAudioFileReader {
                 logger.log(Level.TRACE, (char) id3v1[0] + ", " + (char) id3v1[1] + ", " + (char) id3v1[2]);
                 if ((id3v1[0] == 'T') && (id3v1[1] == 'A') && (id3v1[2] == 'G')) {
                     parseID3v1Frames(id3v1, aff_properties);
-                }
+        }
             } else {
                 logger.log(Level.TRACE, "larger than limit 20MB, skip id3v1");
             }
@@ -403,10 +425,10 @@ public class MpegAudioFileReader extends TAudioFileReader {
      */
     @Override
     public AudioInputStream getAudioInputStream(InputStream inputStream) throws UnsupportedAudioFileException, IOException {
-        logger.log(Level.TRACE, "MpegAudioFileReader.getAudioInputStream(InputStream inputStream)");
-        logger.log(Level.TRACE, "inputStream: " + inputStream.getClass().getName() + ", mark: " + inputStream.markSupported());
+logger.log(Level.TRACE, "MpegAudioFileReader.getAudioInputStream(InputStream inputStream)");
+logger.log(Level.TRACE, "inputStream: " + inputStream.getClass().getName() + ", mark: " + inputStream.markSupported());
         if (!inputStream.markSupported()) inputStream = new BufferedInputStream(inputStream);
-        logger.log(Level.TRACE, "available/limit: " + inputStream.available() + ", " + getMarkLimit());
+logger.log(Level.TRACE, "available/limit: " + inputStream.available() + ", " + getMarkLimit());
         setMarkLimit(Math.min(inputStream.available(), getMarkLimit()));
         return super.getAudioInputStream(inputStream);
     }
@@ -418,7 +440,7 @@ public class MpegAudioFileReader extends TAudioFileReader {
      * @param props
      */
     protected void parseID3v1Frames(byte[] frames, Map<String, Object> props) {
-        logger.log(Level.TRACE, "Parsing ID3v1");
+logger.log(Level.TRACE, "Parsing ID3v1");
         String titlev1 = CharConverter.createString(frames, 3, 30).trim();
         String titlev2 = (String) props.get("title");
         if (((titlev2 == null) || (titlev2.isEmpty())) && (titlev1 != null)) props.put("title", titlev1);
@@ -442,7 +464,7 @@ public class MpegAudioFileReader extends TAudioFileReader {
             String genrev2 = (String) props.get("mp3.id3tag.genre");
             if (((genrev2 == null) || (genrev2.isEmpty()))) props.put("mp3.id3tag.genre", id3v1genres[genrev1]);
         }
-        logger.log(Level.TRACE, "ID3v1 parsed");
+logger.log(Level.TRACE, "ID3v1 parsed");
     }
 
     /**
@@ -463,7 +485,7 @@ public class MpegAudioFileReader extends TAudioFileReader {
             if (loc != -1) str = str.substring(0, loc);
         } catch (StringIndexOutOfBoundsException e) {
             // Skip encoding issues.
-            logger.log(Level.TRACE, "Cannot chopSubString " + e.getMessage());
+logger.log(Level.TRACE, "Cannot chopSubString " + e.getMessage());
         }
         return str;
     }
@@ -582,7 +604,7 @@ logger.log(Level.DEBUG, "code: " + code);
         logger.log(Level.TRACE, "ID3v2 parsed");
     }
 
-    /**  */
+    /** */
     private int getSkipForComment(byte[] bframes, int offset, int size, int skip) {
 //logger.log(Level.DEBUG, "\n" + StringUtil.getDump(bframes, offset, size + skip));
         int n = skip;
