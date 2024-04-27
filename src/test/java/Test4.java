@@ -84,11 +84,11 @@ class Test4 {
 Debug.println(inFormat);
         AudioFormat outFormat = new AudioFormat(
                 Mp3LameFormatConversionProvider.MPEG1L3,
-                -1f,
-                -1,
+                AudioSystem.NOT_SPECIFIED,
+                AudioSystem.NOT_SPECIFIED,
                 2,
-                -1,
-                -1f,
+                AudioSystem.NOT_SPECIFIED,
+                AudioSystem.NOT_SPECIFIED,
                 false);
 Debug.println(outFormat);
         AudioInputStream aout = AudioSystem.getAudioInputStream(outFormat, ais);
@@ -118,10 +118,10 @@ Debug.println(inFormat);
         AudioFormat outFormat = new AudioFormat(
                 Mp3LameFormatConversionProvider.MPEG1L3,
                 inFormat.getSampleRate(),
-                -1,
+                AudioSystem.NOT_SPECIFIED,
                 inFormat.getChannels(),
-                -1,
-                -1f,
+                AudioSystem.NOT_SPECIFIED,
+                AudioSystem.NOT_SPECIFIED,
                 false);
 Debug.println(outFormat);
         AudioInputStream aout = AudioSystem.getAudioInputStream(outFormat, ais);
@@ -145,5 +145,3 @@ Debug.println(inFormat);
         assertEquals(Checksum.getChecksum(out2), Checksum.getChecksum(Paths.get(mp3raw)));
     }
 }
-
-/* */

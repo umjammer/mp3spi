@@ -77,5 +77,3 @@ public final class CharConverter {
         return encoding;
     }
 }
-
-/* */

@@ -204,5 +204,3 @@ Debug.println("ERROR: " + file + ", " + Files.size(file));
 Debug.println("RESULT: " + error + "/" + count);
     }
 }
-
-/* */
