@@ -33,7 +33,8 @@ Both are in pure Java.
  * ~~encoder using https://github.com/nwaldispuehl/java-lame~~
  * rename project as vavi-sound-mp3
  * out source tag parser (use like vavi-util-tag)
- * out source version
+ * ~~out source version~~
+ * jsidplay2:jump3r is the origin of java-lame (replace?)
 
 ----
 
