@@ -190,11 +190,15 @@ logger.log(Level.TRACE, "InputStream : " + inputStream + " =>" + new String(head
         // Next check for Shoutcast (supported) and OGG (unsupported) streams.
         if ((head[0] == 'R') && (head[1] == 'I') && (head[2] == 'F') && (head[3] == 'F') && (head[8] == 'W') && (head[9] == 'A') && (head[10] == 'V') && (head[11] == 'E')) {
             logger.log(Level.TRACE, "RIFF/WAV stream found");
-            int isPCM = ((head[21] << 8) & 0x0000FF00) | ((head[20]) & 0x00000FF);
-                if (isPCM == 1) throw new UnsupportedAudioFileException("WAV PCM stream found");
+            if ((head[12] == 'f') && (head[13] == 'm') && (head[14] == 't')) {
+                int typeOfFormat = ((head[21] << 8) & 0x0000FF00) | ((head[20]) & 0x00000FF);
                 if (!weak) {
+                    if (typeOfFormat != 0x55) throw new UnsupportedAudioFileException("WAV (" + typeOfFormat + ") stream found");
+                }
+                pis.skip(22); // TODO sloppy
+            } else {
+                if (!weak) throw new UnsupportedAudioFileException("unsupported WAV stream found");
             }
-
         } else if ((head[0] == '.') && (head[1] == 's') && (head[2] == 'n') && (head[3] == 'd')) {
             logger.log(Level.TRACE, "AU stream found");
             if (!weak) throw new UnsupportedAudioFileException("AU stream found");

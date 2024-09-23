@@ -5,8 +5,10 @@
  */
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,13 +27,16 @@ import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.sound.sampled.spi.AudioFileReader;
 
+import javazoom.spi.mpeg.sampled.file.MpegAudioFileReader;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIf;
 import vavi.util.Debug;
 import vavi.util.properties.annotation.Property;
 import vavi.util.properties.annotation.PropsEntity;
+import vavi.util.win32.WAVE;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -202,5 +207,44 @@ Debug.println("ERROR: " + file + ", " + Files.size(file));
             }
         });
 Debug.println("RESULT: " + error + "/" + count);
+    }
+
+    @Test
+    @EnabledIf("localPropertiesExists")
+    void testIssue16() throws Exception {
+        String file = "tmp/pcm-48k_24.wav";
+Debug.println(file);
+        InputStream is = new BufferedInputStream(Files.newInputStream(Paths.get(file)));
+        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(is);
+        play(audioInputStream);
+    }
+
+    @Test
+    @DisplayName("wave reader spi will catch at first")
+    void testIssue16_1() throws Exception {
+        String in = "src/test/resources/with-junk.wav";
+        InputStream is = new BufferedInputStream(Files.newInputStream(Paths.get(in)));
+        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(is);
+        play(audioInputStream);
+    }
+
+    @Test
+    @DisplayName("reader direct cause unhandled")
+    void testIssue16_2() throws Exception {
+        String in = "src/test/resources/with-junk.wav";
+        InputStream is = new BufferedInputStream(Files.newInputStream(Paths.get(in)));
+        Exception e = assertThrows(UnsupportedAudioFileException.class, () -> {
+            new MpegAudioFileReader().getAudioInputStream(is);
+        });
+Debug.println(e);
+    }
+
+    @Test
+    @DisplayName("mp3 in wav")
+    void testIssue16_3() throws Exception {
+        String in = "src/test/resources/mp3.wav";
+        InputStream is = new BufferedInputStream(Files.newInputStream(Paths.get(in)));
+        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(is);
+        play(audioInputStream);
     }
 }
