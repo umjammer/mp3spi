@@ -55,7 +55,7 @@ import static java.lang.System.getLogger;
  *
  * system properties
  * <ul>
- *  <li>mp3spi.weak ... to skip controls</li>
+ *  <li>mp3spi.weak ... boolean: to skip controls, default false</li>
  * </ul>
  *
  * @author JavaZOOM mp3spi@javazoom.net http://www.javazoom.net
@@ -97,7 +97,7 @@ public class MpegAudioFileReader extends TAudioFileReader {
 
     public static final String VERSION;
 //    private final int SYNC = 0xFFE00000;
-    private String weak = null;
+    private final boolean weak;
     private final AudioFormat.Encoding[][] sm_aEncodings = {
             {MpegEncoding.MPEG2L1, MpegEncoding.MPEG2L2, MpegEncoding.MPEG2L3},
             {MpegEncoding.MPEG1L1, MpegEncoding.MPEG1L2, MpegEncoding.MPEG1L3},
@@ -128,7 +128,7 @@ public class MpegAudioFileReader extends TAudioFileReader {
     public MpegAudioFileReader() {
         super(MARK_LIMIT, true);
         logger.log(Level.TRACE, "MP3SPI " + VERSION);
-        weak = System.getProperty("mp3spi.weak");
+        weak = Boolean.parseBoolean(System.getProperty("mp3spi.weak", "false"));
     }
 
     /**
@@ -190,23 +190,27 @@ logger.log(Level.TRACE, "InputStream : " + inputStream + " =>" + new String(head
         // Next check for Shoutcast (supported) and OGG (unsupported) streams.
         if ((head[0] == 'R') && (head[1] == 'I') && (head[2] == 'F') && (head[3] == 'F') && (head[8] == 'W') && (head[9] == 'A') && (head[10] == 'V') && (head[11] == 'E')) {
             logger.log(Level.TRACE, "RIFF/WAV stream found");
-            int isPCM = ((head[21] << 8) & 0x0000FF00) | ((head[20]) & 0x00000FF);
-            if (weak == null) {
-                if (isPCM == 1) throw new UnsupportedAudioFileException("WAV PCM stream found");
+            if ((head[12] == 'f') && (head[13] == 'm') && (head[14] == 't')) {
+                int typeOfFormat = ((head[21] << 8) & 0x0000FF00) | ((head[20]) & 0x00000FF);
+                if (!weak) {
+                    if (typeOfFormat != 0x55) throw new UnsupportedAudioFileException("WAV (" + typeOfFormat + ") stream found");
+                }
+                pis.skip(22); // TODO sloppy
+            } else {
+                if (!weak) throw new UnsupportedAudioFileException("unsupported WAV stream found");
             }
-
         } else if ((head[0] == '.') && (head[1] == 's') && (head[2] == 'n') && (head[3] == 'd')) {
             logger.log(Level.TRACE, "AU stream found");
-            if (weak == null) throw new UnsupportedAudioFileException("AU stream found");
+            if (!weak) throw new UnsupportedAudioFileException("AU stream found");
         } else if ((head[0] == 'F') && (head[1] == 'O') && (head[2] == 'R') && (head[3] == 'M') && (head[8] == 'A') && (head[9] == 'I') && (head[10] == 'F') && (head[11] == 'F')) {
             logger.log(Level.TRACE, "AIFF stream found");
-            if (weak == null) throw new UnsupportedAudioFileException("AIFF stream found");
+            if (!weak) throw new UnsupportedAudioFileException("AIFF stream found");
         } else if (((head[0] == 'M') | (head[0] == 'm')) && ((head[1] == 'A') | (head[1] == 'a')) && ((head[2] == 'C') | (head[2] == 'c'))) {
             logger.log(Level.TRACE, "APE stream found");
-            if (weak == null) throw new UnsupportedAudioFileException("APE stream found");
+            if (!weak) throw new UnsupportedAudioFileException("APE stream found");
         } else if (((head[0] == 'F') | (head[0] == 'f')) && ((head[1] == 'L') | (head[1] == 'l')) && ((head[2] == 'A') | (head[2] == 'a')) && ((head[3] == 'C') | (head[3] == 'c'))) {
             logger.log(Level.TRACE, "FLAC stream found");
-            if (weak == null) throw new UnsupportedAudioFileException("FLAC stream found");
+            if (!weak) throw new UnsupportedAudioFileException("FLAC stream found");
         } else if (((head[0] == 'I') | (head[0] == 'i')) && ((head[1] == 'C') | (head[1] == 'c')) && ((head[2] == 'Y') | (head[2] == 'y'))) {
             // Shoutcast stream ?
             pis.unread(head);
@@ -215,7 +219,7 @@ logger.log(Level.TRACE, "InputStream : " + inputStream + " =>" + new String(head
         } else if (((head[0] == 'O') | (head[0] == 'o')) && ((head[1] == 'G') | (head[1] == 'g')) && ((head[2] == 'G') | (head[2] == 'g'))) {
             // Ogg stream ?
             logger.log(Level.TRACE, "Ogg stream found");
-            if (weak == null) throw new UnsupportedAudioFileException("Ogg stream found");
+            if (!weak) throw new UnsupportedAudioFileException("Ogg stream found");
         } else {
             // No, so pushback.
             pis.unread(head);

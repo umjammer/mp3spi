@@ -165,5 +165,3 @@ logger.info("Out Format 2: " + outFormat2);
         });
     }
 }
-
-/* */
