@@ -49,7 +49,7 @@ import static vavix.util.DelayedWorker.later;
  * @version 0.00 2012/06/11 umjammer initial version <br>
  */
 @PropsEntity(url = "file://${user.dir}/local.properties")
-class Test3 {
+class DecoderTest {
 
     static boolean localPropertiesExists() {
         return Files.exists(Paths.get("local.properties"));
@@ -63,7 +63,7 @@ class Test3 {
         for (AudioFileFormat.Type type : AudioSystem.getAudioFileTypes()) {
             System.err.println(type);
         }
-        Test3 app = new Test3();
+        DecoderTest app = new DecoderTest();
         if (localPropertiesExists()) {
             PropsEntity.Util.bind(app);
         }
@@ -136,7 +136,7 @@ Debug.println("done");
     @DisplayName("https://github.com/umjammer/mp3spi/issues/5")
     void test3() throws Exception {
         assertThrows(UnsupportedAudioFileException.class, () -> {
-            Path in = Paths.get(Test3.class.getResource("/test.caf").toURI());
+            Path in = Paths.get(DecoderTest.class.getResource("/test.caf").toURI());
             AudioInputStream ais = AudioSystem.getAudioInputStream(new BufferedInputStream(Files.newInputStream(in)));
 Debug.println(ais);
         }, "spi consumes all bytes, and eof make stream unresettable");

@@ -37,7 +37,7 @@ import static vavi.sound.sampled.mp3.MpegAudioFileWriter.MP3;
  * @version 0.00 2012/06/11 umjammer initial version <br>
  */
 @PropsEntity(url = "file://${user.dir}/local.properties")
-class Test4 {
+class EncoderTest {
 
     static boolean localPropertiesExists() {
         return Files.exists(Paths.get("local.properties"));
@@ -68,7 +68,7 @@ class Test4 {
         for (AudioFileFormat.Type type : AudioSystem.getAudioFileTypes()) {
             System.err.println(type);
         }
-        Test4 app = new Test4();
+        EncoderTest app = new EncoderTest();
         if (localPropertiesExists()) {
             PropsEntity.Util.bind(app);
         }
