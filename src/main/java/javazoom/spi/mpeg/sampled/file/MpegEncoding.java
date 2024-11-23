@@ -41,7 +41,7 @@ public class MpegEncoding extends AudioFormat.Encoding {
     public static final AudioFormat.Encoding MPEG2DOT5L2 = new MpegEncoding("MPEG2DOT5L2");
     public static final AudioFormat.Encoding MPEG2DOT5L3 = new MpegEncoding("MPEG2DOT5L3");
 
-    public MpegEncoding(String strName) {
+    private MpegEncoding(String strName) {
         super(strName);
     }
 }
