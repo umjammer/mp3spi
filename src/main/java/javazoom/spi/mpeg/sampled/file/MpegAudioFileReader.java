@@ -481,7 +481,7 @@ logger.log(Level.TRACE, "ID3v1 parsed");
      * @return chopped string
      */
     @SuppressWarnings("unused")
-    private String chopSubstring(String s, int start, int end) {
+    private static String chopSubstring(String s, int start, int end) {
         String str = null;
         // 11/28/04 - String encoding bug fix.
         try {

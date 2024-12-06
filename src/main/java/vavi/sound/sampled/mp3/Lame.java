@@ -302,14 +302,14 @@ public class Lame {
     private int nEncodeBuffer(byte[] pcm, int length, byte[] encoded) {
 
         logger.log(Level.TRACE, "Lame#nEncodeBuffer: ");
-        logger.log(Level.TRACE, String.format("   length:%d", length));
-        logger.log(Level.TRACE, String.format("   %d bytes in PCM array", length));
-        logger.log(Level.TRACE, String.format("   %d bytes in to-be-encoded array", encoded.length));
+        logger.log(Level.TRACE, "   length:%d".formatted(length));
+        logger.log(Level.TRACE, "   %d bytes in PCM array".formatted(length));
+        logger.log(Level.TRACE, "   %d bytes in to-be-encoded array".formatted(encoded.length));
 
-//        logger.log(Level.TRACE, "   Sample1=%d Sample2=%d", pcmSamples[0], pcmSamples[1]);
+//logger.log(Level.TRACE, "   Sample1=%d Sample2=%d".formatted(pcmSamples[0], pcmSamples[1]));
 
         int result = lameApi.encodeBuffer(pcm, 0, length, encoded);
-//        logger.log(Level.TRACE, "   MP3-1=%d MP3-2=%d", (int) encodedBytes[0], (int) encodedBytes[1]);
+//logger.log(Level.TRACE, "   MP3-1=%d MP3-2=%d".formatted((int) encodedBytes[0], (int) encodedBytes[1]));
 
         return result;
     }
@@ -353,15 +353,15 @@ public class Lame {
     public int encodeFinish(byte[] encoded) {
         int result = 0;
 
-        // jsize length=(*env).GetArrayLength(env, buffer);
+        //jsize length=(*env).GetArrayLength(env, buffer);
         logger.log(Level.TRACE, "encodeFinish: ");
-//        logger.log(Level.TRACE, "   %d bytes in the array", (int) length);
+//logger.log(Level.TRACE, "   %d bytes in the array".formatted((int) length));
 
         result = lameApi.encodeFinish(encoded);
 
         close();
 
-        logger.log(Level.TRACE, String.format("   %d bytes returned", result));
+        logger.log(Level.TRACE, "   %d bytes returned".formatted(result));
 
         return result;
     }
