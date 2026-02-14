@@ -55,7 +55,8 @@ import static java.lang.System.getLogger;
  *
  * system properties
  * <ul>
- *  <li>mp3spi.weak ... boolean: to skip controls, default false</li>
+ *  <li>{@code mp3spi.weak} ... boolean: to skip controls, default {@code false}</li>
+ *  <li>{@code mp3spi.bufferSize} ... max buffer size for parsing mp3, default 20MiB</li>
  * </ul>
  *
  * @author JavaZOOM mp3spi@javazoom.net http://www.javazoom.net
@@ -106,11 +107,11 @@ public class MpegAudioFileReader extends TAudioFileReader {
      * SPI must not consume all input stream and must not cause EOF exception
      * for following other SPIs those take over to analyze audio stream.
      * but ID3v1 is located at end of mp3 data. there is a risk to consume all input data
-     * when analysing ID3v1. so we determine max size of buffer to reset
+     * when analyzing ID3v1. so we determine max size of buffer to reset
      * and if it reached to max size when analysis this spi will throw an exception
      * and give up to deal the stream as a mp3.
      */
-    public static final int INITIAL_READ_LENGTH = 1024 * 1024 * 20; // TODO limitation
+    public static final int INITIAL_READ_LENGTH = Integer.parseInt(System.getProperty("mp3spi.bufferSize", "20971520"));
     private static final int MARK_LIMIT = INITIAL_READ_LENGTH + 1;
 
     private static final String[] id3v1genres;
