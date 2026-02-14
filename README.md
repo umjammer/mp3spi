@@ -10,7 +10,7 @@
 
 MP3 Java Sound SPI.
 
-- decider is powered by [jlayer](https://github.com/umjammer/jlayer)
+- decoder is powered by [jlayer](https://github.com/umjammer/jlayer)
 - encoder is powered by [java-lame](https://github.com/nwaldispuehl/java-lame)
 
 Both are in pure Java.
@@ -21,12 +21,25 @@ Both are in pure Java.
 
 ## Usage
 
- * [decode](src/test/java/Test3.java)
- * [encode](src/test/java/Test4.java)
+ * [decode](src/test/java/DecoderTest.java)
+ * [encode](src/test/java/EncoderTest.java)
+
+### system properties
+
+ * `mp3spi.weak` ... boolean: to skip controls, default `false`
+ * `mp3spi.bufferSize` ... max buffer size for parsing mp3, default 20MiB
+
+### note
+
+* when you use `AudioSystem#getInputStream(InputStream)` not for only mp3,
+  you should use BufferedInputStream with enough buffer size referring to `mp3spi.bufferSize`
+  because given InputStream has smaller buffer, spi cannot enlarge it.
+* as for `AudioSystem#getInputStream(URL)`, `AudioSystem#getInputStream(File)`, buffer is set automatically
 
 ## References
 
  * [Java Sound Programmer Guide](https://docs.oracle.com/javase/8/docs/technotes/guides/sound/programmer_guide/contents.html)
+ * https://nowokay.hatenablog.com/entry/2025/09/17/013904 🇯🇵
 
 ## TODO
 
@@ -34,7 +47,7 @@ Both are in pure Java.
  * rename project as vavi-sound-mp3
  * out source tag parser (use like vavi-util-tag)
  * ~~out source version~~
- * jsidplay2:jump3r is the origin of java-lame (replace?)
+ * [jsidplay2:jump3r](https://github.com/umjammer/JSIDPlay2/tree/vavi/jump3r) is the origin of java-lame (replace?)
 
 ----
 

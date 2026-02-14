@@ -26,14 +26,15 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.sound.sampled.spi.AudioFileReader;
 
 import javazoom.spi.mpeg.sampled.file.MpegAudioFileReader;
+import vavi.util.Debug;
+import vavi.util.properties.annotation.Property;
+import vavi.util.properties.annotation.PropsEntity;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIf;
-import vavi.util.Debug;
-import vavi.util.properties.annotation.Property;
-import vavi.util.properties.annotation.PropsEntity;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -43,13 +44,13 @@ import static vavix.util.DelayedWorker.later;
 
 
 /**
- * line.
+ * DecoderTest.
  *
  * @author <a href="mailto:umjammer@gmail.com">Naohide Sano</a> (umjammer)
  * @version 0.00 2012/06/11 umjammer initial version <br>
  */
 @PropsEntity(url = "file://${user.dir}/local.properties")
-class Test3 {
+class DecoderTest {
 
     static boolean localPropertiesExists() {
         return Files.exists(Paths.get("local.properties"));
@@ -63,17 +64,16 @@ class Test3 {
         for (AudioFileFormat.Type type : AudioSystem.getAudioFileTypes()) {
             System.err.println(type);
         }
-        Test3 app = new Test3();
-        if (localPropertiesExists()) {
-            PropsEntity.Util.bind(app);
-        }
+        DecoderTest app = new DecoderTest();
+        app.setup();
         app.test2();
     }
 
     /** play time limit in milliseconds */
-    long time;
+    static final long time = System.getProperty("vavi.test", "").equals("ide") ? 600 * 1000 : 3 * 1000;
 
-    static final double volume = Double.parseDouble(System.getProperty("vavi.test.volume",  "0.2"));
+    @Property(name = "vavi.test.volume")
+    double volume = 0.2;
 
     @BeforeEach
     void setup() throws Exception {
@@ -81,8 +81,8 @@ class Test3 {
             PropsEntity.Util.bind(this);
         }
 
-        time = System.getProperty("vavi.test", "").equals("ide") ? 600 * 1000 : 3 * 1000;
-Debug.println("time: " + time);
+Debug.print("time: " + time);
+Debug.print("volume: " + volume);
     }
 
     @Test
@@ -136,7 +136,7 @@ Debug.println("done");
     @DisplayName("https://github.com/umjammer/mp3spi/issues/5")
     void test3() throws Exception {
         assertThrows(UnsupportedAudioFileException.class, () -> {
-            Path in = Paths.get(Test3.class.getResource("/test.caf").toURI());
+            Path in = Paths.get(DecoderTest.class.getResource("/test.caf").toURI());
             AudioInputStream ais = AudioSystem.getAudioInputStream(new BufferedInputStream(Files.newInputStream(in)));
 Debug.println(ais);
         }, "spi consumes all bytes, and eof make stream unresettable");
@@ -216,13 +216,17 @@ Debug.println(file);
         play(audioInputStream);
     }
 
+    // TODO noise
+    //  $ play -v 0.02 src/test/resources/with-junk.wav got
+    //  ... play WARN wav: Premature EOF on .wav input file
     @Test
     @DisplayName("wave reader spi will catch at first")
     void testIssue16_1() throws Exception {
         String in = "src/test/resources/with-junk.wav";
         InputStream is = new BufferedInputStream(Files.newInputStream(Paths.get(in)));
         AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(is);
-        play(audioInputStream);
+        assertEquals(AudioFormat.Encoding.PCM_SIGNED, audioInputStream.getFormat().getEncoding());
+        //play(audioInputStream);
     }
 
     @Test

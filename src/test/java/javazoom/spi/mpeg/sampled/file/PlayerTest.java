@@ -22,6 +22,8 @@ package javazoom.spi.mpeg.sampled.file;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Properties;
 import java.util.logging.Logger;
 import javax.sound.sampled.AudioFileFormat;
@@ -33,6 +35,9 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
 import javazoom.spi.PropertiesContainer;
+import vavi.util.properties.annotation.Property;
+import vavi.util.properties.annotation.PropsEntity;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -44,33 +49,43 @@ import static vavix.util.DelayedWorker.later;
 /**
  * Simple player (based on MP3 SPI) unit test.
  */
+@PropsEntity(url = "file:local.properties")
 class PlayerTest {
 
-    static final double volume = Double.parseDouble(System.getProperty("vavi.test.volume",  "0.2"));
+    static boolean localPropertiesExists() {
+        return Files.exists(Paths.get("local.properties"));
+    }
 
-    private String basefile = null;
-    private String filename = null;
+    @Property(name = "vavi.test.volume")
+    double volume = 0.2;
+
+    /** play time limit in milliseconds */
+    private static long time = System.getProperty("vavi.test", "").equals("ide") ? 3000 * 1000 : 3 * 1000;
+
+    private String baseFile = null;
+    private String fileName = null;
     private String name = null;
     private Properties props = null;
     private Logger out;
-    /** play time limit in milliseconds */
-    private long time;
 
     @BeforeEach
     void setUp() throws Exception {
+        if (localPropertiesExists()) {
+            PropsEntity.Util.bind(this);
+        }
+
         props = new Properties();
         InputStream pin = getClass().getClassLoader().getResourceAsStream("test.mp3.properties");
         props.load(pin);
-        basefile = props.getProperty("basefile");
+        baseFile = props.getProperty("basefile");
         name = props.getProperty("filename");
-        filename = basefile + name;
+        fileName = baseFile + name;
         out = Logger.getLogger(PlayerTest.class.getName());
-        time = System.getProperty("vavi.test", "").equals("ide") ? 3000 * 1000 : 3 * 1000;
     }
 
     @Test
     void testPlay0() throws Exception {
-        AudioInputStream in = AudioSystem.getAudioInputStream(new File(filename));
+        AudioInputStream in = AudioSystem.getAudioInputStream(new File(fileName));
         AudioFormat baseFormat = in.getFormat();
         AudioFormat decodedFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED,
                                                     baseFormat.getSampleRate(),
@@ -85,8 +100,8 @@ class PlayerTest {
 
     @Test
     void testPlay() throws Exception {
-        out.info("---  Start : " + filename + "  ---");
-        File file = new File(filename);
+        out.info("---  Start : " + fileName + "  ---");
+        File file = new File(fileName);
         //URL file = new URL(props.getProperty("shoutcast"));
         AudioFileFormat aff = AudioSystem.getAudioFileFormat(file);
         out.info("Audio Type : " + aff.getType());
@@ -108,7 +123,7 @@ class PlayerTest {
             assertInstanceOf(PropertiesContainer.class, din, "PropertiesContainer");
             rawplay(decodedFormat, din);
             in.close();
-            out.info("---  Stop : " + filename + "  ---");
+            out.info("---  Stop : " + fileName + "  ---");
             assertTrue(true, "testPlay : OK");
         }
     }
