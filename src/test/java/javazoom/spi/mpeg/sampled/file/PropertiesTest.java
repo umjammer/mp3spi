@@ -28,12 +28,12 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 class PropertiesTest {
 
-    private static Logger logger = Logger.getLogger(PropertiesTest.class.getName());
+    private static final Logger logger = Logger.getLogger(PropertiesTest.class.getName());
 
-    private String basefile = null;
-    private String baseurl = null;
-    private String filename = null;
-    private String fileurl = null;
+    private String baseFile = null;
+    private String baseUrl = null;
+    private String fileName = null;
+    private String fileUrl = null;
     private String name = null;
     private Properties props = null;
 
@@ -42,11 +42,11 @@ class PropertiesTest {
         props = new Properties();
         InputStream pin = getClass().getClassLoader().getResourceAsStream("test.mp3.properties");
         props.load(pin);
-        basefile = props.getProperty("basefile");
-        baseurl = props.getProperty("baseurl").replaceAll("\\$\\{PWD\\}", System.getProperty("user.dir"));
+        baseFile = props.getProperty("basefile");
+        baseUrl = props.getProperty("baseurl").replaceAll("\\$\\{PWD\\}", System.getProperty("user.dir"));
         name = props.getProperty("filename");
-        filename = basefile + name;
-        fileurl = baseurl + name;
+        fileName = baseFile + name;
+        fileUrl = baseUrl + name;
     }
 
     @Test
@@ -61,10 +61,10 @@ class PropertiesTest {
             "vbr", "bitrate"
         };
 
-        File file = new File(filename);
+        File file = new File(fileName);
         AudioFileFormat baseFileFormat = AudioSystem.getAudioFileFormat(file);
         AudioFormat baseFormat = baseFileFormat.getFormat();
-        logger.info("-> Filename : " + filename + " <-");
+        logger.info("-> Filename : " + fileName + " <-");
         logger.info(baseFileFormat.toString());
         if (baseFileFormat instanceof TAudioFileFormat) {
             Map<?, ?> properties = baseFileFormat.properties();
@@ -107,10 +107,10 @@ class PropertiesTest {
         String[] testPropsAF = {
             "vbr", "bitrate"
         };
-        URL url = new URL(fileurl);
+        URL url = new URL(fileUrl);
         AudioFileFormat baseFileFormat = AudioSystem.getAudioFileFormat(url);
         AudioFormat baseFormat = baseFileFormat.getFormat();
-        logger.info("-> URL : " + filename + " <-");
+        logger.info("-> URL: " + fileName + " <-");
         logger.info(baseFileFormat.toString());
         if (baseFileFormat instanceof TAudioFileFormat) {
             Map<String, ?> properties = baseFileFormat.properties();
@@ -123,7 +123,7 @@ class PropertiesTest {
                 assertEquals(valexpected, val, key);
             }
         } else {
-            fail("testPropertiesURL : TAudioFileFormat expected");
+            fail("testPropertiesURL: TAudioFileFormat expected");
         }
 
         if (baseFormat instanceof TAudioFormat) {
@@ -137,7 +137,7 @@ class PropertiesTest {
                 assertEquals(valexpected, val, key);
             }
         } else {
-            fail("testPropertiesURL : TAudioFormat expected");
+            fail("testPropertiesURL: TAudioFormat expected");
         }
     }
 
@@ -159,7 +159,7 @@ class PropertiesTest {
                 logger.info(key + "='" + val + "'");
             }
         } else {
-            fail("testPropertiesShoutcast : TAudioFileFormat expected");
+            fail("testPropertiesShoutcast: TAudioFileFormat expected");
         }
 
         if (baseFormat instanceof TAudioFormat) {
@@ -171,16 +171,16 @@ class PropertiesTest {
                 logger.info(key + "='" + val + "'");
             }
         } else {
-            fail("testPropertiesShoutcast : TAudioFormat expected");
+            fail("testPropertiesShoutcast: TAudioFormat expected");
         }
     }
 
     @Test
     void testDumpPropertiesURL() throws Exception {
-        URL file = new URL(fileurl);
+        URL file = new URL(fileUrl);
         AudioFileFormat baseFileFormat = AudioSystem.getAudioFileFormat(file);
         AudioFormat baseFormat = baseFileFormat.getFormat();
-        logger.info("-> Filename : " + filename + " <-");
+        logger.info("-> Filename: " + fileName + " <-");
         if (baseFileFormat instanceof TAudioFileFormat) {
             Map<String, ?> properties = baseFileFormat.properties();
             for (String key : properties.keySet()) {
@@ -188,7 +188,7 @@ class PropertiesTest {
                 logger.info(key + "='" + val + "'");
             }
         } else {
-            fail("testDumpPropertiesFile : TAudioFileFormat expected");
+            fail("testDumpPropertiesFile: TAudioFileFormat expected");
         }
 
         if (baseFormat instanceof TAudioFormat) {
@@ -198,7 +198,7 @@ class PropertiesTest {
                 logger.info(key + "='" + val + "'");
             }
         } else {
-            fail("testDumpPropertiesFile : TAudioFormat expected");
+            fail("testDumpPropertiesFile: TAudioFormat expected");
         }
     }
 }

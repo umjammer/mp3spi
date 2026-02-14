@@ -23,6 +23,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -32,6 +34,9 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
+
+import vavi.util.properties.annotation.Property;
+import vavi.util.properties.annotation.PropsEntity;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,28 +48,39 @@ import static vavi.sound.SoundUtil.volume;
 /**
  * Skip bytes before playing.
  */
+@PropsEntity(url = "file:local.properties")
 class SkipTest {
-    private static Logger logger = Logger.getLogger(SkipTest.class.getName());
 
-    static final double volume = Double.parseDouble(System.getProperty("vavi.test.volume",  "0.2"));
+    private static final Logger logger = Logger.getLogger(SkipTest.class.getName());
 
-    private String basefile = null;
-    private String baseurl = null;
+    static boolean localPropertiesExists() {
+        return Files.exists(Paths.get("local.properties"));
+    }
+
+    @Property(name = "vavi.test.volume")
+    double volume = 0.2;
+
+    private String baseFile = null;
+    private String baseUrl = null;
     private String filename = null;
-    private String fileurl = null;
+    private String fileUrl = null;
     private String name = null;
     private Properties props = null;
 
     @BeforeEach
     void setUp() throws Exception {
+        if (localPropertiesExists()) {
+            PropsEntity.Util.bind(this);
+        }
+
         props = new Properties();
         InputStream pin = getClass().getClassLoader().getResourceAsStream("test.mp3.properties");
         props.load(pin);
-        basefile = props.getProperty("basefile");
-        baseurl = props.getProperty("baseurl").replaceAll("\\$\\{PWD\\}", System.getProperty("user.dir"));
+        baseFile = props.getProperty("basefile");
+        baseUrl = props.getProperty("baseurl").replaceAll("\\$\\{PWD\\}", System.getProperty("user.dir"));
         name = props.getProperty("filename");
-        filename = basefile + name;
-        fileurl = baseurl + name;
+        filename = baseFile + name;
+        fileUrl = baseUrl + name;
     }
 
     @Test
@@ -96,8 +112,8 @@ class SkipTest {
 
     @Test
     void testSkipUrl() throws Exception {
-        logger.info("-> URL : " + fileurl + " <-");
-        URL url = new URL(fileurl);
+        logger.info("-> URL : " + fileUrl + " <-");
+        URL url = new URL(fileUrl);
         AudioInputStream in = AudioSystem.getAudioInputStream(url);
         AudioInputStream din = null;
         AudioFormat baseFormat = in.getFormat();
@@ -135,9 +151,8 @@ class SkipTest {
     }
 
     private SourceDataLine getLine(AudioFormat audioFormat) throws LineUnavailableException {
-        SourceDataLine res = null;
         DataLine.Info info = new DataLine.Info(SourceDataLine.class, audioFormat);
-        res = (SourceDataLine) AudioSystem.getLine(info);
+        SourceDataLine res = (SourceDataLine) AudioSystem.getLine(info);
         res.open(audioFormat);
         return res;
     }
@@ -145,21 +160,19 @@ class SkipTest {
     private void rawplay(AudioFormat targetFormat, AudioInputStream din) throws IOException, LineUnavailableException {
         byte[] data = new byte[4096];
         SourceDataLine line = getLine(targetFormat);
-        if (line != null) {
-            volume(line, volume);
-            // Start
-            line.start();
-            int nBytesRead = 0;
-            while (nBytesRead != -1) {
-                nBytesRead = din.read(data, 0, data.length);
-                if (nBytesRead != -1)
-                    line.write(data, 0, nBytesRead);
-            }
-            // Stop
-            line.drain();
-            line.stop();
-            line.close();
-            din.close();
+        volume(line, volume);
+        // Start
+        line.start();
+        int nBytesRead = 0;
+        while (nBytesRead != -1) {
+            nBytesRead = din.read(data, 0, data.length);
+            if (nBytesRead != -1)
+                line.write(data, 0, nBytesRead);
         }
+        // Stop
+        line.drain();
+        line.stop();
+        line.close();
+        din.close();
     }
 }

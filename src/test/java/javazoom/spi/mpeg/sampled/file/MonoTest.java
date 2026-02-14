@@ -6,6 +6,8 @@
 
 package javazoom.spi.mpeg.sampled.file;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.logging.Logger;
 
 import javax.sound.sampled.AudioFormat;
@@ -13,7 +15,12 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 
+import vavi.util.Debug;
+import vavi.util.properties.annotation.Property;
+import vavi.util.properties.annotation.PropsEntity;
+
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -29,18 +36,28 @@ import static vavi.sound.SoundUtil.volume;
  * @author <a href="mailto:umjammer@gmail.com">Naohide Sano</a> (umjammer)
  * @version 0.00 2021/11/23 umjammer initial version <br>
  */
+@PropsEntity(url = "file:local.properties")
 class MonoTest {
 
-    static {
-//        TDebug.TraceAudioConverter = true;
+    static final Logger logger = Logger.getLogger(SkipTest.class.getName());
+
+    static boolean localPropertiesExists() {
+        return Files.exists(Paths.get("local.properties"));
     }
 
-    static Logger logger = Logger.getLogger(SkipTest.class.getName());
-
-    static final double volume = Double.parseDouble(System.getProperty("vavi.test.volume",  "0.2"));
+    @Property(name = "vavi.test.volume")
+    double volume = 0.2;
 
     /** play frames limit */
     static int frames;
+
+    @BeforeEach
+    void before() throws Exception {
+        if (localPropertiesExists()) {
+            PropsEntity.Util.bind(this);
+        }
+Debug.print("volume: " + volume);
+    }
 
     @BeforeAll
     static void setup() {

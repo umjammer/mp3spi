@@ -48,12 +48,12 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 class MpegAudioFileReaderTest {
 
-    private static Logger logger = Logger.getLogger(MpegAudioFileReaderTest.class.getName());
+    private static final Logger logger = Logger.getLogger(MpegAudioFileReaderTest.class.getName());
 
-    private String basefile = null;
-    private String baseurl = null;
+    private String baseFile = null;
+    private String baseUrl = null;
     private String filename = null;
-    private String fileurl = null;
+    private String fileUrl = null;
     private String name = null;
     private Properties props = null;
 
@@ -62,11 +62,11 @@ class MpegAudioFileReaderTest {
         props = new Properties();
         InputStream pin = getClass().getClassLoader().getResourceAsStream("test.mp3.properties");
         props.load(pin);
-        basefile = props.getProperty("basefile");
-        baseurl = props.getProperty("baseurl").replaceAll("\\$\\{PWD\\}", System.getProperty("user.dir"));
+        baseFile = props.getProperty("basefile");
+        baseUrl = props.getProperty("baseurl").replaceAll("\\$\\{PWD\\}", System.getProperty("user.dir"));
         name = props.getProperty("filename");
-        filename = basefile + name;
-        fileurl = baseurl + name;
+        filename = baseFile + name;
+        fileUrl = baseUrl + name;
     }
 
     @DisplayName("Test for AudioFileFormat getAudioFileFormat(File)")
@@ -89,7 +89,7 @@ class MpegAudioFileReaderTest {
     void _testGetAudioFileFormatURL() {
         logger.info("*** testGetAudioFileFormatURL ***");
         try {
-            URL url = new URL(fileurl);
+            URL url = new URL(fileUrl);
             AudioFileFormat baseFileFormat = AudioSystem.getAudioFileFormat(url);
             dumpAudioFileFormat(baseFileFormat, url.toString());
             assertEquals(-1, baseFileFormat.getFrameLength(), "FrameLength");
@@ -153,7 +153,7 @@ class MpegAudioFileReaderTest {
     void _testGetAudioInputStreamURL() {
         logger.info("*** testGetAudioInputStreamURL ***");
         try {
-            URL url = new URL(fileurl);
+            URL url = new URL(fileUrl);
             AudioInputStream in = AudioSystem.getAudioInputStream(url);
             dumpAudioInputStream(in, url.toString());
             assertEquals(-1, in.getFrameLength(), "FrameLength");

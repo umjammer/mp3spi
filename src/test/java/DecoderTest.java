@@ -26,14 +26,15 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.sound.sampled.spi.AudioFileReader;
 
 import javazoom.spi.mpeg.sampled.file.MpegAudioFileReader;
+import vavi.util.Debug;
+import vavi.util.properties.annotation.Property;
+import vavi.util.properties.annotation.PropsEntity;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIf;
-import vavi.util.Debug;
-import vavi.util.properties.annotation.Property;
-import vavi.util.properties.annotation.PropsEntity;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -43,7 +44,7 @@ import static vavix.util.DelayedWorker.later;
 
 
 /**
- * line.
+ * DecoderTest.
  *
  * @author <a href="mailto:umjammer@gmail.com">Naohide Sano</a> (umjammer)
  * @version 0.00 2012/06/11 umjammer initial version <br>
@@ -64,16 +65,15 @@ class DecoderTest {
             System.err.println(type);
         }
         DecoderTest app = new DecoderTest();
-        if (localPropertiesExists()) {
-            PropsEntity.Util.bind(app);
-        }
+        app.setup();
         app.test2();
     }
 
     /** play time limit in milliseconds */
-    long time;
+    static final long time = System.getProperty("vavi.test", "").equals("ide") ? 600 * 1000 : 3 * 1000;
 
-    static final double volume = Double.parseDouble(System.getProperty("vavi.test.volume",  "0.2"));
+    @Property(name = "vavi.test.volume")
+    double volume = 0.2;
 
     @BeforeEach
     void setup() throws Exception {
@@ -81,8 +81,8 @@ class DecoderTest {
             PropsEntity.Util.bind(this);
         }
 
-        time = System.getProperty("vavi.test", "").equals("ide") ? 600 * 1000 : 3 * 1000;
-Debug.println("time: " + time);
+Debug.print("time: " + time);
+Debug.print("volume: " + volume);
     }
 
     @Test
@@ -216,13 +216,17 @@ Debug.println(file);
         play(audioInputStream);
     }
 
+    // TODO noise
+    //  $ play -v 0.02 src/test/resources/with-junk.wav got
+    //  ... play WARN wav: Premature EOF on .wav input file
     @Test
     @DisplayName("wave reader spi will catch at first")
     void testIssue16_1() throws Exception {
         String in = "src/test/resources/with-junk.wav";
         InputStream is = new BufferedInputStream(Files.newInputStream(Paths.get(in)));
         AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(is);
-        play(audioInputStream);
+        assertEquals(AudioFormat.Encoding.PCM_SIGNED, audioInputStream.getFormat().getEncoding());
+        //play(audioInputStream);
     }
 
     @Test
