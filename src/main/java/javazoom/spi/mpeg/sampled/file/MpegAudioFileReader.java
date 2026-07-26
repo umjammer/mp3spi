@@ -151,7 +151,7 @@ public class MpegAudioFileReader extends TAudioFileReader {
         // Tell shoucast server (if any) that SPI support shoutcast stream.
         conn.setRequestProperty("Icy-Metadata", "1");
         InputStream inputStream = conn.getInputStream();
-        AudioFileFormat audioFileFormat = null;
+        AudioFileFormat audioFileFormat;
         try {
             audioFileFormat = getAudioFileFormat(inputStream, lFileLengthInBytes);
         } finally {
@@ -166,9 +166,9 @@ public class MpegAudioFileReader extends TAudioFileReader {
      *
      * @param inputStream it's user's responsibility to prepare enough read buffer for mp3 tag analysis like
      *                    <pre>
-     *                    ... = getAudioFileFormat(new BufferedInputStream(your_input_stream, INITIAL_READ_LENGTH)) ...
+     *                    ... = getAudioFileFormat(new BufferedInputStream(your_input_stream, max_file_length - 8  - 1)) ...
      *                    </pre>
-     *                    and max buffer size is defined in {@link #INITIAL_READ_LENGTH}.
+     *                    and max buffer size is defined by the system property {@code mp3spi.bufferSize}.
      * @see #INITIAL_READ_LENGTH
      */
     @Override
@@ -196,7 +196,7 @@ logger.log(Level.TRACE, "InputStream : " + inputStream + " =>" + new String(head
                 if (!weak) {
                     if (typeOfFormat != 0x55) throw new UnsupportedAudioFileException("WAV (" + typeOfFormat + ") stream found");
                 }
-                pis.skip(22); // TODO sloppy
+                pis.skipNBytes(22); // TODO sloppy
             } else {
                 if (!weak) throw new UnsupportedAudioFileException("unsupported WAV stream found");
             }
