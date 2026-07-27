@@ -48,6 +48,7 @@ Both are in pure Java.
  * out source tag parser (use like vavi-util-tag)
  * ~~out source version~~
  * [jsidplay2:jump3r](https://github.com/umjammer/JSIDPlay2/tree/vavi/jump3r) is the origin of java-lame (replace?)
+ * wav file reader
 
 ----
 
