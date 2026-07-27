@@ -53,8 +53,8 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.12.1</version>
         <configuration>
-          <target>17</target>
-          <source>17</source>
+          <target>25</target>
+          <source>25</source>
           <compilerArgs>
             <arg>--add-exports</arg>
             <arg>java.desktop/com.sun.media.sound=ALL-UNNAMED</arg>
