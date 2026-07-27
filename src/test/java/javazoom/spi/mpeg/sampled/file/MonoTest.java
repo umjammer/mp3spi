@@ -74,7 +74,7 @@ logger.info("In Format: " + inFormat.toString());
                                                 inFormat.getSampleRate(),
                                                 16,
                                                 inFormat.getChannels(),
-                                                inFormat.getChannels(),
+                                                inFormat.getChannels() * 2, // 16 bit, so 2 bytes per channel
                                                 inFormat.getSampleRate(),
                                                 false);
 logger.info("Out Format: " + outFormat);

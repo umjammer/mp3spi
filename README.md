@@ -1,7 +1,7 @@
 [![Release](https://jitpack.io/v/umjammer/mp3spi.svg)](https://jitpack.io/#umjammer/mp3spi)
 [![Java CI](https://github.com/umjammer/mp3spi/actions/workflows/maven.yml/badge.svg)](https://github.com/umjammer/mp3spi/actions/workflows/maven.yml)
 [![CodeQL](https://github.com/umjammer/mp3spi/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/umjammer/mp3spi/actions/workflows/codeql-analysis.yml)
-![Java](https://img.shields.io/badge/Java-17-b07219)
+![Java](https://img.shields.io/badge/Java-25-b07219)
 [![Parent](https://img.shields.io/badge/Parent-vavi--sound--sandbox-pink)](https://github.com/umjammer/vavi-sound-sandbox)
 
 # MP3SPI
@@ -48,6 +48,7 @@ Both are in pure Java.
  * out source tag parser (use like vavi-util-tag)
  * ~~out source version~~
  * [jsidplay2:jump3r](https://github.com/umjammer/JSIDPlay2/tree/vavi/jump3r) is the origin of java-lame (replace?)
+ * wav file reader
 
 ----
 

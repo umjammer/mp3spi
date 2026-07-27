@@ -3,7 +3,7 @@
 
   <groupId>net.javazoom</groupId>
   <artifactId>mp3spi</artifactId>
-  <version>1.9.18</version>
+  <version>1.9.19</version>
 
   <properties>
     <tritonus.groupId>com.github.umjammer.tritonus</tritonus.groupId> <!-- org.tritonus / com.github.umjammer.tritonus -->
@@ -53,8 +53,8 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.12.1</version>
         <configuration>
-          <target>17</target>
-          <source>17</source>
+          <target>25</target>
+          <source>25</source>
           <compilerArgs>
             <arg>--add-exports</arg>
             <arg>java.desktop/com.sun.media.sound=ALL-UNNAMED</arg>
@@ -89,7 +89,7 @@
       <dependency>
         <groupId>org.junit</groupId>
         <artifactId>junit-bom</artifactId>
-        <version>6.0.2</version>
+        <version>6.0.3</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -100,7 +100,7 @@
     <dependency>
       <groupId>com.github.umjammer</groupId> <!-- vavi / com.github.umjammer -->
       <artifactId>vavi-sound</artifactId>
-      <version>1.0.22</version>
+      <version>1.0.27</version>
     </dependency>
 
     <dependency>
