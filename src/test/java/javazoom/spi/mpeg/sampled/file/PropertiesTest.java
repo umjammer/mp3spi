@@ -3,6 +3,7 @@ package javazoom.spi.mpeg.sampled.file;
 
 import java.io.File;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
 import java.util.Map;
 import java.util.Properties;
@@ -64,16 +65,16 @@ class PropertiesTest {
         File file = new File(fileName);
         AudioFileFormat baseFileFormat = AudioSystem.getAudioFileFormat(file);
         AudioFormat baseFormat = baseFileFormat.getFormat();
-        logger.info("-> Filename : " + fileName + " <-");
-        logger.info(baseFileFormat.toString());
+        System.err.println("-> Filename : " + fileName + " <-");
+        System.err.println(baseFileFormat.toString());
         if (baseFileFormat instanceof TAudioFileFormat) {
             Map<?, ?> properties = baseFileFormat.properties();
-            logger.info(properties.toString());
+            System.err.println(properties.toString());
             for (String key : testPropsAFF) {
                 String val = null;
                 if (properties.get(key) != null)
                     val = (properties.get(key)).toString();
-                logger.info(key + "='" + val + "'");
+                System.err.println(key + "='" + val + "'");
                 String valexpected = props.getProperty(key);
                 assertEquals(valexpected, val, key);
             }
@@ -87,7 +88,7 @@ class PropertiesTest {
                 String val = null;
                 if (properties.get(key) != null)
                     val = (properties.get(key)).toString();
-                logger.info(key + "='" + val + "'");
+                System.err.println(key + "='" + val + "'");
                 String valexpected = props.getProperty(key);
                 assertEquals(valexpected, val, key);
             }
@@ -107,18 +108,18 @@ class PropertiesTest {
         String[] testPropsAF = {
             "vbr", "bitrate"
         };
-        URL url = new URL(fileUrl);
+        URL url = URI.create(fileUrl).toURL();
         AudioFileFormat baseFileFormat = AudioSystem.getAudioFileFormat(url);
         AudioFormat baseFormat = baseFileFormat.getFormat();
-        logger.info("-> URL: " + fileName + " <-");
-        logger.info(baseFileFormat.toString());
+        System.err.println("-> URL: " + fileName + " <-");
+        System.err.println(baseFileFormat.toString());
         if (baseFileFormat instanceof TAudioFileFormat) {
             Map<String, ?> properties = baseFileFormat.properties();
             for (String key : testPropsAFF) {
                 String val = null;
                 if (properties.get(key) != null)
                     val = (properties.get(key)).toString();
-                logger.info(key + "='" + val + "'");
+                System.err.println(key + "='" + val + "'");
                 String valexpected = props.getProperty(key);
                 assertEquals(valexpected, val, key);
             }
@@ -132,7 +133,7 @@ class PropertiesTest {
                 String val = null;
                 if (properties.get(key) != null)
                     val = (properties.get(key)).toString();
-                logger.info(key + "='" + val + "'");
+                System.err.println(key + "='" + val + "'");
                 String valexpected = props.getProperty(key);
                 assertEquals(valexpected, val, key);
             }
@@ -145,18 +146,18 @@ class PropertiesTest {
     @Disabled
     void testPropertiesShoutcast() throws Exception {
         String shoutURL = props.getProperty("shoutcast");
-        URL url = new URL(shoutURL);
+        URL url = URI.create(shoutURL).toURL();
         AudioFileFormat baseFileFormat = AudioSystem.getAudioFileFormat(url);
         AudioFormat baseFormat = baseFileFormat.getFormat();
-        logger.info("-> URL : " + url + " <-");
-        logger.info(baseFileFormat.toString());
+        System.err.println("-> URL : " + url + " <-");
+        System.err.println(baseFileFormat.toString());
         if (baseFileFormat instanceof TAudioFileFormat) {
             Map<String, ?> properties = baseFileFormat.properties();
             for (String key : properties.keySet()) {
                 String val = null;
                 if (properties.get(key) != null)
                     val = (properties.get(key)).toString();
-                logger.info(key + "='" + val + "'");
+                System.err.println(key + "='" + val + "'");
             }
         } else {
             fail("testPropertiesShoutcast: TAudioFileFormat expected");
@@ -168,7 +169,7 @@ class PropertiesTest {
                 String val = null;
                 if (properties.get(key) != null)
                     val = (properties.get(key)).toString();
-                logger.info(key + "='" + val + "'");
+                System.err.println(key + "='" + val + "'");
             }
         } else {
             fail("testPropertiesShoutcast: TAudioFormat expected");
@@ -180,12 +181,12 @@ class PropertiesTest {
         URL file = new URL(fileUrl);
         AudioFileFormat baseFileFormat = AudioSystem.getAudioFileFormat(file);
         AudioFormat baseFormat = baseFileFormat.getFormat();
-        logger.info("-> Filename: " + fileName + " <-");
+        System.err.println("-> Filename: " + fileName + " <-");
         if (baseFileFormat instanceof TAudioFileFormat) {
             Map<String, ?> properties = baseFileFormat.properties();
             for (String key : properties.keySet()) {
                 String val = (properties.get(key)).toString();
-                logger.info(key + "='" + val + "'");
+                System.err.println(key + "='" + val + "'");
             }
         } else {
             fail("testDumpPropertiesFile: TAudioFileFormat expected");
@@ -195,7 +196,7 @@ class PropertiesTest {
             Map<String, ?> properties = baseFormat.properties();
             for (String key : properties.keySet()) {
                 String val = (properties.get(key)).toString();
-                logger.info(key + "='" + val + "'");
+                System.err.println(key + "='" + val + "'");
             }
         } else {
             fail("testDumpPropertiesFile: TAudioFormat expected");

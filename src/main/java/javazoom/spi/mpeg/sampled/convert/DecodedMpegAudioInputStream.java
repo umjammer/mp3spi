@@ -38,7 +38,7 @@ import javazoom.jl.decoder.Decoder;
 import javazoom.jl.decoder.DecoderException;
 import javazoom.jl.decoder.Equalizer;
 import javazoom.jl.decoder.Header;
-import javazoom.jl.decoder.Obuffer;
+import javazoom.jl.decoder.OBuffer;
 import javazoom.spi.PropertiesContainer;
 import javazoom.spi.mpeg.sampled.file.IcyListener;
 import javazoom.spi.mpeg.sampled.file.tag.TagParseEvent;
@@ -190,7 +190,7 @@ public class DecodedMpegAudioInputStream extends TAsynchronousFilteredAudioInput
                 m_equalizer.setBand(b, m_equalizer_values[b]);
             }
             m_decoder.setEqualizer(m_equalizer);
-            Obuffer decoderOutput = m_decoder.decodeFrame(header, m_bitstream);
+            OBuffer decoderOutput = m_decoder.decodeFrame(header, m_bitstream);
             m_bitstream.closeFrame();
             getCircularBuffer().write(m_oBuffer.getBuffer(), 0, m_oBuffer.getCurrentBufferSize());
             m_oBuffer.reset();
@@ -253,7 +253,7 @@ public class DecodedMpegAudioInputStream extends TAsynchronousFilteredAudioInput
         m_encodedStream.close();
     }
 
-    private class DMAISObuffer extends Obuffer {
+    private class DMAISObuffer extends OBuffer {
 
         private int m_nChannels;
 
@@ -265,7 +265,7 @@ public class DecodedMpegAudioInputStream extends TAsynchronousFilteredAudioInput
 
         public DMAISObuffer(int nChannels) {
             m_nChannels = nChannels;
-            m_abBuffer = new byte[OBUFFERSIZE * nChannels];
+            m_abBuffer = new byte[O_BUFFER_SIZE * nChannels];
             m_anBufferPointers = new int[nChannels];
             reset();
             m_bIsBigEndian = DecodedMpegAudioInputStream.this.isBigEndian();

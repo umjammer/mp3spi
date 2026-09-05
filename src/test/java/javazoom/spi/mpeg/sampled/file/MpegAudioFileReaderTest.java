@@ -168,18 +168,18 @@ class MpegAudioFileReaderTest {
                                      String info) throws UnsupportedAudioFileException {
         AudioFormat baseFormat = baseFileFormat.getFormat();
         // AudioFileFormat
-        logger.info("  -----  " + info + "  -----");
-        logger.info("    ByteLength=" + baseFileFormat.getByteLength());
-        logger.info("    FrameLength=" + baseFileFormat.getFrameLength());
-        logger.info("    Type=" + baseFileFormat.getType());
+        System.err.println("  -----  " + info + "  -----");
+        System.err.println("    ByteLength=" + baseFileFormat.getByteLength());
+        System.err.println("    FrameLength=" + baseFileFormat.getFrameLength());
+        System.err.println("    Type=" + baseFileFormat.getType());
         // AudioFormat
-        logger.info("    SourceFormat=" + baseFormat.toString());
-        logger.info("    Channels=" + baseFormat.getChannels());
-        logger.info("    FrameRate=" + baseFormat.getFrameRate());
-        logger.info("    FrameSize=" + baseFormat.getFrameSize());
-        logger.info("    SampleRate=" + baseFormat.getSampleRate());
-        logger.info("    SampleSizeInBits=" + baseFormat.getSampleSizeInBits());
-        logger.info("    Encoding=" + baseFormat.getEncoding());
+        System.err.println("    SourceFormat=" + baseFormat.toString());
+        System.err.println("    Channels=" + baseFormat.getChannels());
+        System.err.println("    FrameRate=" + baseFormat.getFrameRate());
+        System.err.println("    FrameSize=" + baseFormat.getFrameSize());
+        System.err.println("    SampleRate=" + baseFormat.getSampleRate());
+        System.err.println("    SampleSizeInBits=" + baseFormat.getSampleSizeInBits());
+        System.err.println("    Encoding=" + baseFormat.getEncoding());
         assertEquals(props.getProperty("Type"), baseFileFormat.getType().toString(), "Type");
         assertEquals(props.getProperty("SourceFormat"), baseFormat.toString(), "SourceFormat");
         assertEquals(Integer.parseInt(props.getProperty("Channels")), baseFormat.getChannels(), "Channels");
@@ -194,17 +194,17 @@ class MpegAudioFileReaderTest {
 
     private void dumpAudioInputStream(AudioInputStream in, String info) throws IOException {
         AudioFormat baseFormat = in.getFormat();
-        logger.info("  -----  " + info + "  -----");
-        logger.info("    Available=" + in.available());
-        logger.info("    FrameLength=" + in.getFrameLength());
+        System.err.println("  -----  " + info + "  -----");
+        System.err.println("    Available=" + in.available());
+        System.err.println("    FrameLength=" + in.getFrameLength());
         // AudioFormat
-        logger.info("    SourceFormat=" + baseFormat.toString());
-        logger.info("    Channels=" + baseFormat.getChannels());
-        logger.info("    FrameRate=" + baseFormat.getFrameRate());
-        logger.info("    FrameSize=" + baseFormat.getFrameSize());
-        logger.info("    SampleRate=" + baseFormat.getSampleRate());
-        logger.info("    SampleSizeInBits=" + baseFormat.getSampleSizeInBits());
-        logger.info("    Encoding=" + baseFormat.getEncoding());
+        System.err.println("    SourceFormat=" + baseFormat.toString());
+        System.err.println("    Channels=" + baseFormat.getChannels());
+        System.err.println("    FrameRate=" + baseFormat.getFrameRate());
+        System.err.println("    FrameSize=" + baseFormat.getFrameSize());
+        System.err.println("    SampleRate=" + baseFormat.getSampleRate());
+        System.err.println("    SampleSizeInBits=" + baseFormat.getSampleSizeInBits());
+        System.err.println("    Encoding=" + baseFormat.getEncoding());
         assertEquals(props.getProperty("SourceFormat"), baseFormat.toString(), "SourceFormat");
         assertEquals(Integer.parseInt(props.getProperty("Channels")), baseFormat.getChannels(), "Channels");
         assertEquals(Float.parseFloat(props.getProperty("FrameRate")), baseFormat.getFrameRate(), "FrameRate");
