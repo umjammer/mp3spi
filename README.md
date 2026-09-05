@@ -6,7 +6,7 @@
 
 # MP3SPI
 
-<img alt="mp3 logo" src="https://github.com/umjammer/mp3spi/assets/493908/b718b78d-15c6-4356-a5ca-fca63ad7ffcb" width=160 /><sub><a href="https://www.iis.fraunhofer.de/de/ff/amm/unterhaltungselektronik/mp3.html">🅮 fraunhofer</a></sub>
+<img alt="logo" src="src/test/resources/duke_mp3.png" width=160 />
 
 MP3 Java Sound SPI.
 
@@ -29,12 +29,23 @@ Both are in pure Java.
  * `mp3spi.weak` ... boolean: to skip controls, default `false`
  * `mp3spi.bufferSize` ... max buffer size for parsing mp3, default 20MiB
 
-### note
+### jvm args
 
-* when you use `AudioSystem#getInputStream(InputStream)` not for only mp3,
-  you should use BufferedInputStream with enough buffer size referring to `mp3spi.bufferSize`
-  because given InputStream has smaller buffer, spi cannot enlarge it.
-* as for `AudioSystem#getInputStream(URL)`, `AudioSystem#getInputStream(File)`, buffer is set automatically
+```
+--add-opens java.desktop/com.sun.media.sound=ALL-UNNAMED
+--add-opens java.base/java.io=ALL-UNNAMED
+--add-opens java.base/sun.nio.ch=ALL-UNNAMED
+```
+
+### ⚠️ note
+
+* when you use `AudioSystem.getAudioInputStream(InputStream)` for formats other than aac,
+  you should wrap the input in a `BufferedInputStream` with a sufficiently large buffer.
+  (see `mp3spi.bufferSize`)
+  this is because the provided `InputStream` often has a small internal buffer,
+  and the spi cannot increase it on its own.
+* for `AudioSystem.getAudioInputStream(URL)` and `AudioSystem.getAudioInputStream(File)`,
+  the buffering is handled automatically.
 
 ## References
 
@@ -124,3 +135,7 @@ contribution. MP3SPI is licensed under LGPL (see [LICENSE](LICENSE.txt)).
 ### How to specify mp3 tag's encoding
 
   Set the system property `javazoom.spi.mpeg.encoding`. e.g `javazoom.spi.mpeg.encoding=MS932`
+
+---
+
+<sub>image designed by @umjammer, drawn by nano banana</sub>
