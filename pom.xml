@@ -68,6 +68,8 @@
         <configuration>
           <argLine>
             --add-opens java.desktop/com.sun.media.sound=ALL-UNNAMED
+            --add-opens java.base/java.io=ALL-UNNAMED
+            --add-opens java.base/sun.nio.ch=ALL-UNNAMED
             -Djava.util.logging.config.file=${project.build.testOutputDirectory}/logging.properties
             -Dvavi.test.volume=@{vavi.test.volume}
           </argLine>
@@ -89,7 +91,7 @@
       <dependency>
         <groupId>org.junit</groupId>
         <artifactId>junit-bom</artifactId>
-        <version>6.0.3</version>
+        <version>6.1.1</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -100,7 +102,7 @@
     <dependency>
       <groupId>com.github.umjammer</groupId> <!-- vavi / com.github.umjammer -->
       <artifactId>vavi-sound</artifactId>
-      <version>1.0.27</version>
+      <version>1.0.30</version>
     </dependency>
 
     <dependency>
@@ -116,7 +118,7 @@
     <dependency>
       <groupId>com.github.umjammer</groupId> <!-- net.javazoom:jlayer / com.github.umjammer -->
       <artifactId>jlayer</artifactId>
-      <version>1.0.3</version>
+      <version>1.0.4</version>
     </dependency>
 
     <dependency>
