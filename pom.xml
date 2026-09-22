@@ -3,7 +3,7 @@
 
   <groupId>net.javazoom</groupId>
   <artifactId>mp3spi</artifactId>
-  <version>1.9.20</version>
+  <version>1.9.21</version>
 
   <properties>
     <tritonus.groupId>com.github.umjammer.tritonus</tritonus.groupId> <!-- org.tritonus / com.github.umjammer.tritonus -->
@@ -102,7 +102,7 @@
     <dependency>
       <groupId>com.github.umjammer</groupId> <!-- vavi / com.github.umjammer -->
       <artifactId>vavi-sound</artifactId>
-      <version>1.0.30</version>
+      <version>1.1.6</version>
     </dependency>
 
     <dependency>
@@ -118,7 +118,7 @@
     <dependency>
       <groupId>com.github.umjammer</groupId> <!-- net.javazoom:jlayer / com.github.umjammer -->
       <artifactId>jlayer</artifactId>
-      <version>1.0.4</version>
+      <version>1.0.5b</version>
     </dependency>
 
     <dependency>
