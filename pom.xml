@@ -91,7 +91,7 @@
       <dependency>
         <groupId>org.junit</groupId>
         <artifactId>junit-bom</artifactId>
-        <version>6.1.1</version>
+        <version>6.1.3</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -102,7 +102,7 @@
     <dependency>
       <groupId>com.github.umjammer</groupId> <!-- vavi / com.github.umjammer -->
       <artifactId>vavi-sound</artifactId>
-      <version>1.1.6</version>
+      <version>1.1.7</version>
     </dependency>
 
     <dependency>
@@ -118,7 +118,7 @@
     <dependency>
       <groupId>com.github.umjammer</groupId> <!-- net.javazoom:jlayer / com.github.umjammer -->
       <artifactId>jlayer</artifactId>
-      <version>1.0.5b</version>
+      <version>1.0.6</version>
     </dependency>
 
     <dependency>
@@ -130,7 +130,7 @@
     <dependency>
       <groupId>com.github.nwaldispuehl</groupId>
       <artifactId>java-lame</artifactId>
-      <version>v3.98.4</version>
+      <version>3.98.4</version>
     </dependency>
 
     <dependency>
